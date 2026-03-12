@@ -1,4 +1,4 @@
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const express = require('express');
 const qrcode = require('qrcode-terminal');
 const pino = require('pino');
@@ -7,20 +7,23 @@ const pino = require('pino');
 const app = express();
 const port = process.env.PORT || 3000;
 app.get('/', (req, res) => res.send('Bot do WhatsApp está Vivo! 🚀'));
-app.listen(port, () => console.log(`Monitorando porta ${port}`));
+app.listen(port, () => console.log(`Servidor na porta ${port}`));
 
 async function connectToWhatsApp() {
-    console.log('Iniciando conexão com o WhatsApp...');
-    
+    console.log('Buscando versão mais recente do WhatsApp...');
+    const { version, isLatest } = await fetchLatestBaileysVersion();
+    console.log(`Usando versão v${version.join('.')}, isLatest: ${isLatest}`);
+
     const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
 
     const sock = makeWASocket({
+        version,
         auth: state,
-        logger: pino({ level: 'error' }),
-        printQRInTerminal: false, // Vamos gerenciar o QR manualmente
-        browser: Browsers.macOS('Desktop'), // Identifica o bot como um computador real
-        auth: state,
-        syncFullHistory: false
+        logger: pino({ level: 'silent' }),
+        printQRInTerminal: false,
+        browser: Browsers.appropriate('Desktop'), // Seleciona automaticamente a melhor identificação
+        syncFullHistory: false,
+        markOnlineOnConnect: true,
     });
 
     sock.ev.on('creds.update', saveCreds);
@@ -31,18 +34,18 @@ async function connectToWhatsApp() {
         if (qr) {
             console.log('\n--- ESCANEIE O QR CODE ---');
             qrcode.generate(qr, { small: true });
-            console.log('--- AGUARDANDO ---');
+            console.log('--- AGUARDANDO ESCANEAMENTO ---');
         }
 
         if (connection === 'close') {
-            const reason = lastDisconnect?.error?.output?.statusCode;
-            console.log('Conexão fechada. Motivo:', reason);
+            const statusCode = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
+            console.log('Conexão fechada. Motivo:', statusCode);
 
-            if (reason !== DisconnectReason.loggedOut) {
-                console.log('Tentando reconectar em 5 segundos...');
-                setTimeout(connectToWhatsApp, 5000);
+            if (statusCode !== DisconnectReason.loggedOut) {
+                console.log('Tentando reconectar em 10 segundos...');
+                setTimeout(connectToWhatsApp, 10000);
             } else {
-                console.log('Você foi desconectado. Por favor, apague a pasta auth_info_baileys e escaneie o QR de novo.');
+                console.log('Sessão encerrada. Escaneie o QR de novo.');
             }
         } else if (connection === 'open') {
             console.log('--- BOT CONECTADO COM SUCESSO! ✅ ---');
@@ -66,4 +69,4 @@ async function connectToWhatsApp() {
     });
 }
 
-connectToWhatsApp();
+connectToWhatsApp().catch(err => console.log("Erro crítico:", err));
