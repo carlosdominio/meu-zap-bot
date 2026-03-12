@@ -7,7 +7,7 @@ const pino = require('pino');
 const app = express();
 const port = process.env.PORT || 3000;
 let lastQr = null;
-let statusConexao = "DESCONECTADO ❌"; // Variável para controlar o status
+let statusConexao = "DESCONECTADO ❌";
 
 app.get('/qr', (req, res) => {
     if (lastQr) {
@@ -42,7 +42,8 @@ async function connectToWhatsApp() {
             statusConexao = "AGUARDANDO QR 📲";
             console.log('\n#########################################');
             console.log('#   STATUS: AGUARDANDO ESCANEAMENTO 📲   #');
-            console.log('#   Acesse: /qr para ver a imagem       #');
+            console.log('#   ACESSE O LINK ABAIXO PARA ESCANEAR:  #');
+            console.log(`#   https://meu-zap-bot.onrender.com/qr   #`);
             console.log('#########################################\n');
             qrcodeTerminal.generate(qr, { small: true });
         }
@@ -58,17 +59,13 @@ async function connectToWhatsApp() {
             console.log('#########################################\n');
 
             if (statusCode !== DisconnectReason.loggedOut) {
-                console.log('Tentando reconectar em 5 segundos...');
                 setTimeout(connectToWhatsApp, 5000);
-            } else {
-                console.log('SESSÃO ENCERRADA DEFINITIVAMENTE. ESCANEIE DE NOVO.');
             }
         } else if (connection === 'open') {
             lastQr = null;
             statusConexao = "CONECTADO ✅";
             console.log('\n#########################################');
             console.log('#   STATUS: BOT CONECTADO COM SUCESSO! ✅ #');
-            console.log('#   PRONTO PARA RECEBER MENSAGENS       #');
             console.log('#########################################\n');
         }
     });
