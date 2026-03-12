@@ -1,24 +1,24 @@
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const express = require('express');
 const qrcodeTerminal = require('qrcode-terminal');
-const QRCode = require('qrcode'); // Nova biblioteca para gerar imagem
+const QRCode = require('qrcode');
 const pino = require('pino');
 
 const app = express();
 const port = process.env.PORT || 3000;
-let lastQr = null; // Guarda o último QR gerado
+let lastQr = null;
+let statusConexao = "DESCONECTADO ❌"; // Variável para controlar o status
 
-// Rota para ver o QR Code como imagem no navegador
 app.get('/qr', (req, res) => {
     if (lastQr) {
         res.setHeader('Content-Type', 'image/png');
         QRCode.toBuffer(lastQr).then(buffer => res.send(buffer));
     } else {
-        res.send('QR Code ainda não gerado ou bot já conectado. Verifique os logs.');
+        res.send(`Status: ${statusConexao}. Se estiver conectado, não há QR Code.`);
     }
 });
 
-app.get('/', (req, res) => res.send('Bot Online! Acesse /qr para escanear o código.'));
+app.get('/', (req, res) => res.send(`O Bot está: ${statusConexao} 🚀`));
 app.listen(port, () => console.log(`Servidor na porta ${port}`));
 
 async function connectToWhatsApp() {
@@ -38,23 +38,38 @@ async function connectToWhatsApp() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            lastQr = qr; // Salva o QR para a rota /qr
-            console.log('\n--- NOVO QR CODE GERADO ---');
-            console.log('Acesse o link abaixo para escanear:');
-            console.log(`https://meu-zap-bot.onrender.com/qr`);
-            console.log('---------------------------\n');
+            lastQr = qr;
+            statusConexao = "AGUARDANDO QR 📲";
+            console.log('\n#########################################');
+            console.log('#   STATUS: AGUARDANDO ESCANEAMENTO 📲   #');
+            console.log('#   Acesse: /qr para ver a imagem       #');
+            console.log('#########################################\n');
             qrcodeTerminal.generate(qr, { small: true });
         }
 
         if (connection === 'close') {
             lastQr = null;
+            statusConexao = "DESCONECTADO ❌";
             const statusCode = lastDisconnect?.error?.output?.statusCode;
+            
+            console.log('\n#########################################');
+            console.log(`#   STATUS: CONEXÃO FECHADA ❌          #`);
+            console.log(`#   MOTIVO: ${statusCode}                 #`);
+            console.log('#########################################\n');
+
             if (statusCode !== DisconnectReason.loggedOut) {
+                console.log('Tentando reconectar em 5 segundos...');
                 setTimeout(connectToWhatsApp, 5000);
+            } else {
+                console.log('SESSÃO ENCERRADA DEFINITIVAMENTE. ESCANEIE DE NOVO.');
             }
         } else if (connection === 'open') {
             lastQr = null;
-            console.log('--- BOT CONECTADO COM SUCESSO! ✅ ---');
+            statusConexao = "CONECTADO ✅";
+            console.log('\n#########################################');
+            console.log('#   STATUS: BOT CONECTADO COM SUCESSO! ✅ #');
+            console.log('#   PRONTO PARA RECEBER MENSAGENS       #');
+            console.log('#########################################\n');
         }
     });
 
@@ -65,9 +80,9 @@ async function connectToWhatsApp() {
             const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "").toLowerCase();
 
             if (text === 'oi' || text === 'olá' || text === 'menu') {
-                await sock.sendMessage(from, { text: 'Olá! 👋 Bot Online!\n\n1 - Horário\n2 - Localização' });
+                await sock.sendMessage(from, { text: 'Olá! 👋 Seu bot no Render está online!\n\n1 - Horário\n2 - Localização' });
             } else if (text === '1') {
-                await sock.sendMessage(from, { text: '🕒 Horário: 08h-18h.' });
+                await sock.sendMessage(from, { text: '🕒 Horário: 08h às 18h.' });
             } else if (text === '2') {
                 await sock.sendMessage(from, { text: '📍 Endereço: Rua Exemplo, 123.' });
             }
