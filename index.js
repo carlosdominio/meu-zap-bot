@@ -1,29 +1,35 @@
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const express = require('express');
-const qrcode = require('qrcode-terminal');
+const qrcodeTerminal = require('qrcode-terminal');
+const QRCode = require('qrcode'); // Nova biblioteca para gerar imagem
 const pino = require('pino');
 
-// Servidor para o Render
 const app = express();
 const port = process.env.PORT || 3000;
-app.get('/', (req, res) => res.send('Bot do WhatsApp está Vivo! 🚀'));
+let lastQr = null; // Guarda o último QR gerado
+
+// Rota para ver o QR Code como imagem no navegador
+app.get('/qr', (req, res) => {
+    if (lastQr) {
+        res.setHeader('Content-Type', 'image/png');
+        QRCode.toBuffer(lastQr).then(buffer => res.send(buffer));
+    } else {
+        res.send('QR Code ainda não gerado ou bot já conectado. Verifique os logs.');
+    }
+});
+
+app.get('/', (req, res) => res.send('Bot Online! Acesse /qr para escanear o código.'));
 app.listen(port, () => console.log(`Servidor na porta ${port}`));
 
 async function connectToWhatsApp() {
-    console.log('Buscando versão mais recente do WhatsApp...');
-    const { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(`Usando versão v${version.join('.')}, isLatest: ${isLatest}`);
-
+    const { version } = await fetchLatestBaileysVersion();
     const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
 
     const sock = makeWASocket({
         version,
         auth: state,
         logger: pino({ level: 'silent' }),
-        printQRInTerminal: false,
-        browser: Browsers.appropriate('Desktop'), // Seleciona automaticamente a melhor identificação
-        syncFullHistory: false,
-        markOnlineOnConnect: true,
+        browser: Browsers.appropriate('Desktop'),
     });
 
     sock.ev.on('creds.update', saveCreds);
@@ -32,22 +38,22 @@ async function connectToWhatsApp() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            console.log('\n--- ESCANEIE O QR CODE ---');
-            qrcode.generate(qr, { small: true });
-            console.log('--- AGUARDANDO ESCANEAMENTO ---');
+            lastQr = qr; // Salva o QR para a rota /qr
+            console.log('\n--- NOVO QR CODE GERADO ---');
+            console.log('Acesse o link abaixo para escanear:');
+            console.log(`https://meu-zap-bot.onrender.com/qr`);
+            console.log('---------------------------\n');
+            qrcodeTerminal.generate(qr, { small: true });
         }
 
         if (connection === 'close') {
-            const statusCode = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
-            console.log('Conexão fechada. Motivo:', statusCode);
-
+            lastQr = null;
+            const statusCode = lastDisconnect?.error?.output?.statusCode;
             if (statusCode !== DisconnectReason.loggedOut) {
-                console.log('Tentando reconectar em 10 segundos...');
-                setTimeout(connectToWhatsApp, 10000);
-            } else {
-                console.log('Sessão encerrada. Escaneie o QR de novo.');
+                setTimeout(connectToWhatsApp, 5000);
             }
         } else if (connection === 'open') {
+            lastQr = null;
             console.log('--- BOT CONECTADO COM SUCESSO! ✅ ---');
         }
     });
@@ -59,14 +65,14 @@ async function connectToWhatsApp() {
             const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "").toLowerCase();
 
             if (text === 'oi' || text === 'olá' || text === 'menu') {
-                await sock.sendMessage(from, { text: 'Olá! 👋 Bot Online no Render!\n\n1 - Horário\n2 - Localização' });
+                await sock.sendMessage(from, { text: 'Olá! 👋 Bot Online!\n\n1 - Horário\n2 - Localização' });
             } else if (text === '1') {
                 await sock.sendMessage(from, { text: '🕒 Horário: 08h-18h.' });
             } else if (text === '2') {
-                await sock.sendMessage(from, { text: '📍 Rua Exemplo, 123.' });
+                await sock.sendMessage(from, { text: '📍 Endereço: Rua Exemplo, 123.' });
             }
         }
     });
 }
 
-connectToWhatsApp().catch(err => console.log("Erro crítico:", err));
+connectToWhatsApp();
