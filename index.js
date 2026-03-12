@@ -1,47 +1,54 @@
-const wppconnect = require('@wppconnect-team/wppconnect');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const express = require('express');
-const path = require('path');
+const qrcode = require('qrcode-terminal');
+const pino = require('pino');
 
+// Servidor para o Render
 const app = express();
-const port = process.env.PORT || 3000;
-app.get('/', (req, res) => res.send('Bot do WhatsApp está Online! 🚀'));
-app.listen(port, () => console.log(`Servidor rodando na porta ${port}`));
+app.get('/', (req, res) => res.send('Bot Online! 🚀'));
+app.listen(process.env.PORT || 3000);
 
-wppconnect
-  .create({
-    session: 'sessionName',
-    puppeteerOptions: {
-      userDataDir: path.join(__dirname, 'tokens', 'sessionName'),
-      executablePath: process.env.CHROME_PATH || null, // Tenta usar o caminho do servidor se disponível
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process', // Economiza memória no plano gratuito do Render
-        '--disable-gpu'
-      ],
-    },
-    catchQR: (base64Qr, asciiQR) => {
-      console.log('Escaneie o QR Code abaixo:');
-      console.log(asciiQR);
-    },
-  })
-  .then((client) => {
-    console.log('Bot conectado com sucesso!');
-    client.onMessage(async (message) => {
-      if (message.isGroupMsg === false) {
-        const text = message.body.toLowerCase();
-        if (text === 'oi' || text === 'olá' || text === 'menu') {
-          await client.sendText(message.from, 'Olá! 👋 Bot Online no Render! Digite 1 para Horário ou 2 para Localização.');
-        } else if (text === '1') {
-          await client.sendText(message.from, '🕒 Segunda a Sexta: 08h-18h.');
-        } else if (text === '2') {
-          await client.sendText(message.from, '📍 Rua Exemplo, 123.');
-        }
-      }
+async function connectToWhatsApp() {
+    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+
+    const sock = makeWASocket({
+        auth: state,
+        printQRInTerminal: true, // Mostra o QR Code nos logs do Render
+        logger: pino({ level: 'silent' }) // Deixa os logs limpos
     });
-  })
-  .catch((err) => console.log('Erro ao iniciar bot:', err));
+
+    sock.ev.on('creds.update', saveCreds);
+
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect, qr } = update;
+        if (qr) {
+            console.log('--- ESCANEIE ESTE QR CODE ---');
+            qrcode.generate(qr, { small: true });
+        }
+        if (connection === 'close') {
+            const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
+            if (shouldReconnect) connectToWhatsApp();
+        } else if (connection === 'open') {
+            console.log('BOT CONECTADO COM SUCESSO! ✅');
+        }
+    });
+
+    sock.ev.on('messages.upsert', async (m) => {
+        const msg = m.messages[0];
+        if (!msg.key.fromMe && m.type === 'notify') {
+            const from = msg.key.remoteJid;
+            const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "").toLowerCase();
+
+            // MENU DE OPÇÕES
+            if (text === 'oi' || text === 'olá' || text === 'menu') {
+                await sock.sendMessage(from, { text: 'Olá! 👋 Sou seu Bot no Render.\n\n1 - Horário\n2 - Localização' });
+            } else if (text === '1') {
+                await sock.sendMessage(from, { text: '🕒 Atendimento: 08h-18h.' });
+            } else if (text === '2') {
+                await sock.sendMessage(from, { text: '📍 Endereço: Rua Exemplo, 123.' });
+            }
+        }
+    });
+}
+
+connectToWhatsApp();
