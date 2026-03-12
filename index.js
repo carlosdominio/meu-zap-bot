@@ -1,7 +1,7 @@
 const wppconnect = require('@wppconnect-team/wppconnect');
 const express = require('express');
+const path = require('path');
 
-// Cria um mini servidor para o Render não desligar o bot
 const app = express();
 const port = process.env.PORT || 3000;
 app.get('/', (req, res) => res.send('Bot do WhatsApp está Online! 🚀'));
@@ -11,7 +11,18 @@ wppconnect
   .create({
     session: 'sessionName',
     puppeteerOptions: {
-      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Necessário para rodar em servidores Linux (Nuvem)
+      userDataDir: path.join(__dirname, 'tokens', 'sessionName'),
+      executablePath: process.env.CHROME_PATH || null, // Tenta usar o caminho do servidor se disponível
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process', // Economiza memória no plano gratuito do Render
+        '--disable-gpu'
+      ],
     },
     catchQR: (base64Qr, asciiQR) => {
       console.log('Escaneie o QR Code abaixo:');
@@ -20,32 +31,17 @@ wppconnect
   })
   .then((client) => {
     console.log('Bot conectado com sucesso!');
-    
     client.onMessage(async (message) => {
       if (message.isGroupMsg === false) {
         const text = message.body.toLowerCase();
-
-        // LÓGICA DO MENU DE OPÇÕES
         if (text === 'oi' || text === 'olá' || text === 'menu') {
-          await client.sendText(message.from, 
-            'Olá! 👋 Eu sou o seu Assistente Virtual.\n\n' +
-            'Como posso te ajudar hoje? Digite o número da opção:\n\n' +
-            '1️⃣ - Horário de Atendimento\n' +
-            '2️⃣ - Localização da Loja\n' +
-            '3️⃣ - Falar com um Humano\n' +
-            '0️⃣ - Voltar ao Menu'
-          );
-        } 
-        else if (text === '1') {
-          await client.sendText(message.from, '🕒 Nosso horário é de Segunda a Sexta, das 08h às 18h.');
-        }
-        else if (text === '2') {
-          await client.sendText(message.from, '📍 Estamos localizados na Rua Exemplo, 123 - Centro.');
-        }
-        else if (text === '3') {
-          await client.sendText(message.from, '👨‍💻 Entendido! Vou encaminhar sua conversa para um atendente. Aguarde um momento...');
+          await client.sendText(message.from, 'Olá! 👋 Bot Online no Render! Digite 1 para Horário ou 2 para Localização.');
+        } else if (text === '1') {
+          await client.sendText(message.from, '🕒 Segunda a Sexta: 08h-18h.');
+        } else if (text === '2') {
+          await client.sendText(message.from, '📍 Rua Exemplo, 123.');
         }
       }
     });
   })
-  .catch((error) => console.log(error));
+  .catch((err) => console.log('Erro ao iniciar bot:', err));
