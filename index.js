@@ -29,6 +29,11 @@ io.on('connection', (socket) => {
     if (lastQr) socket.emit('qr', lastQr);
     socket.emit('history', db.get('chats').value());
 
+    // Resposta de Ping para medir latência
+    socket.on('ping', (callback) => {
+        if (typeof callback === 'function') callback();
+    });
+
     // Enviar Mensagem
     socket.on('send_msg', async (data) => {
         if (!sock || statusConexao !== "CONECTADO ✅") return;

@@ -50,7 +50,10 @@
 </div>
 
 <div id="sidebar">
-    <div id="sidebar-header">Suas Conversas</div>
+    <div id="sidebar-header">
+        Suas Conversas
+        <span id="ping-indicator" style="font-size: 10px; color: #27ae60; float: right; font-weight: normal;">Conectando...</span>
+    </div>
     <div id="chat-list"></div>
 </div>
 
@@ -71,6 +74,19 @@
     let chatData = {};
     let mediaRecorder;
     let audioChunks = [];
+
+    // CÁLCULO DE LATÊNCIA (PING)
+    setInterval(() => {
+        const start = Date.now();
+        socket.emit("ping", () => {
+            const duration = Date.now() - start;
+            const el = document.getElementById('ping-indicator');
+            if (el) {
+                el.innerText = `Sinal: ${duration}ms`;
+                el.style.color = duration < 300 ? '#27ae60' : (duration < 600 ? '#f39c12' : '#e74c3c');
+            }
+        });
+    }, 5000);
 
     socket.on('status', (data) => {
         document.getElementById('status-text').innerText = data.status;
