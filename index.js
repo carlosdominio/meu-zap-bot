@@ -6,12 +6,17 @@ const pino = require('pino');
 const path = require('path');
 const fs = require('fs');
 
-// Banco de dados local
+// Banco de dados local (ASSÍNCRONO para melhor performance)
 const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync('db.json');
-const db = low(adapter);
-db.defaults({ chats: {} }).write();
+const FileAsync = require('lowdb/adapters/FileAsync');
+const adapter = new FileAsync('db.json');
+let db;
+
+async function initDB() {
+    db = await low(adapter);
+    await db.defaults({ chats: {} }).write();
+    console.log('Banco de dados carregado 📦');
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -24,7 +29,7 @@ let sock;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
     socket.emit('status', { status: statusConexao });
     if (lastQr) socket.emit('qr', lastQr);
     socket.emit('history', db.get('chats').value());
@@ -42,7 +47,7 @@ io.on('connection', (socket) => {
             if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
             const sent = await sock.sendMessage(jid, { text: data.text });
             const msgObj = { id: sent.key.id, text: data.text, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Você" };
-            saveMessage(jid, msgObj, "Você");
+            await saveMessage(jid, msgObj, "Você");
             io.emit('new_msg', msgObj);
         } catch (e) { console.log('Erro envio:', e); }
     });
@@ -55,7 +60,7 @@ io.on('connection', (socket) => {
             if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
             const sent = await sock.sendMessage(jid, { audio: data.audio, mimetype: 'audio/mp4', ptt: true });
             const msgObj = { id: sent.key.id, text: "🎤 Áudio enviado", fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Você" };
-            saveMessage(jid, msgObj, "Você");
+            await saveMessage(jid, msgObj, "Você");
             io.emit('new_msg', msgObj);
         } catch (e) { console.log('Erro áudio:', e); }
     });
@@ -71,37 +76,39 @@ io.on('connection', (socket) => {
             }
             const chatPath = `chats.${jid}.messages`;
             const messages = db.get(chatPath).value() || [];
-            db.set(chatPath, messages.filter(m => m.id !== id)).write();
+            await db.set(chatPath, messages.filter(m => m.id !== id)).write();
             io.emit('msg_deleted', { jid, id });
             console.log(`[APAGAR] Mensagem ${id} removida do banco.`);
         } catch (e) { console.log('Erro ao apagar msg:', e); }
     });
 
     // Apagar Conversa Inteira
-    socket.on('delete_chat', (jid) => {
+    socket.on('delete_chat', async (jid) => {
         console.log(`[APAGAR CHAT] Deletando tudo de ${jid}`);
         try {
-            db.unset(`chats.${jid}`).write();
+            await db.unset(`chats.${jid}`).write();
             io.emit('chat_deleted', jid);
         } catch (e) { console.log('Erro ao apagar chat:', e); }
     });
 
     // Alternar Modo de Atendimento (Manual/Automático)
-    socket.on('toggle_atendimento', (data) => {
+    socket.on('toggle_atendimento', async (data) => {
         const { jid, atendimentoManual } = data;
-        db.set(`chats.${jid}.atendimentoManual`, atendimentoManual).write();
+        await db.set(`chats.${jid}.atendimentoManual`, atendimentoManual).write();
         io.emit('status_atendimento', { jid, atendimentoManual });
         console.log(`[ATENDIMENTO] ${jid} agora está em modo ${atendimentoManual ? 'MANUAL' : 'AUTOMÁTICO'}`);
     });
 });
 
-function saveMessage(jid, msg, name) {
+async function saveMessage(jid, msg, name) {
     const chatPath = `chats.${jid}`;
     if (!db.has(chatPath).value()) {
-        db.set(chatPath, { name: name, messages: [], atendimentoManual: false }).write();
+        await db.set(chatPath, { name: name, messages: [], atendimentoManual: false }).write();
     }
-    db.get(`${chatPath}.messages`).push(msg).write();
-    if (name !== "Você" && name !== "Robô 🤖") db.set(`${chatPath}.name`, name).write();
+    await db.get(`${chatPath}.messages`).push(msg).write();
+    if (name !== "Você" && name !== "Robô 🤖") {
+        await db.set(`${chatPath}.name`, name).write();
+    }
 }
 
 async function connectToWhatsApp() {
@@ -144,12 +151,12 @@ async function connectToWhatsApp() {
 
             // Salva e avisa o painel
             const msgObj = { id: msg.key.id, text, fromMe: isMe, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName };
-            saveMessage(jid, msgObj, pushName);
+            await saveMessage(jid, msgObj, pushName);
             io.emit('new_msg', msgObj);
 
             // Se eu responder pelo celular, ativa o modo manual automaticamente para este chat
             if (isMe) {
-                db.set(`chats.${jid}.atendimentoManual`, true).write();
+                await db.set(`chats.${jid}.atendimentoManual`, true).write();
                 io.emit('status_atendimento', { jid, atendimentoManual: true });
                 return;
             }
@@ -176,7 +183,7 @@ async function connectToWhatsApp() {
                 } else if (lowerText === '5') {
                     reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
                     // Ativa o modo manual ao solicitar atendente
-                    db.set(`chats.${jid}.atendimentoManual`, true).write();
+                    await db.set(`chats.${jid}.atendimentoManual`, true).write();
                     io.emit('status_atendimento', { jid, atendimentoManual: true });
                 }
             }
@@ -184,10 +191,17 @@ async function connectToWhatsApp() {
             if (reply) {
                 const sentReply = await sock.sendMessage(jid, { text: reply });
                 const replyObj = { id: sentReply.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
-                saveMessage(jid, replyObj, pushName);
+                await saveMessage(jid, replyObj, pushName);
                 io.emit('new_msg', replyObj);
             }
         });
     } catch (err) { setTimeout(connectToWhatsApp, 5000); }
 }
-server.listen(port, () => { console.log(`🚀 PAINEL: http://localhost:${port}`); connectToWhatsApp(); });
+
+initDB().then(() => {
+    server.listen(port, () => { 
+        console.log(`🚀 PAINEL: http://localhost:${port}`); 
+        connectToWhatsApp(); 
+    });
+});
+
