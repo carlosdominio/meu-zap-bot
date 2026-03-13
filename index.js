@@ -115,17 +115,26 @@ async function connectToWhatsApp() {
 
         sock.ev.on('messages.upsert', async (m) => {
             const msg = m.messages[0];
-            if (!msg.key.fromMe && m.type === 'notify') {
-                const jid = msg.key.remoteJid;
-                let pushName = msg.pushName || jid.split('@')[0];
-                const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "");
-                
-                // Salva e avisa o painel
-                const msgObj = { id: msg.key.id, text, fromMe: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName };
-                saveMessage(jid, msgObj, pushName);
-                io.emit('new_msg', msgObj);
+            
+            // FILTRO DE SEGURANÇA:
+            // 1. Ignora se a mensagem foi enviada pelo próprio robô (evita loop)
+            // 2. Ignora se for uma mensagem de sistema/status (vazia ou sem texto)
+            if (msg.key.fromMe) return;
+            if (m.type !== 'notify') return;
 
-                // --- LÓGICA DO ROBÔ (CHATBOT) ---
+            const jid = msg.key.remoteJid;
+            const pushName = msg.pushName || jid.split('@')[0];
+            const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "").trim();
+
+            // Ignora se a mensagem estiver vazia (ex: só figurinha, imagem sem legenda ou status de conexão)
+            if (!text) return;
+
+            // Salva e avisa o painel
+            const msgObj = { id: msg.key.id, text, fromMe: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName };
+            saveMessage(jid, msgObj, pushName);
+            io.emit('new_msg', msgObj);
+
+            // --- LÓGICA DO ROBÔ (CHATBOT) ---
                 let reply = "";
                 const lowerText = text.toLowerCase().trim();
                 
