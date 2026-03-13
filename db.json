@@ -125,6 +125,32 @@
           "pushName": "120363172867223601"
         }
       ]
+    },
+    "120363169274631787@newsletter": {
+      "name": "120363169274631787",
+      "messages": [
+        {
+          "id": "ACCF5F2481A176CAAA4AA48A4836388B",
+          "text": "*CÁSSIO FORA DA TEMPORADA! 🤕🚨*\n\nCássio sofre grave lesão joelho, terá que passar por cirurgia e não deve mais jogar no Cruzeiro em 2026\n\n⬇️⬇️⬇️\nhttps://www.espn.com.br/futebol/cruzeiro/artigo/_/id/16430685/cassio-sofre-grave-lesao-joelho-tera-passar-cirurgia-nao-deve-mais-jogar-cruzeiro-2026?ex_cid=whatsapp_br",
+          "fromMe": false,
+          "time": "11:42",
+          "sender": "120363169274631787@newsletter",
+          "pushName": "120363169274631787"
+        }
+      ]
+    },
+    "120363173003902460@newsletter": {
+      "name": "120363173003902460",
+      "messages": [
+        {
+          "id": "3EB0865DA440355FA6E835",
+          "text": "",
+          "fromMe": false,
+          "time": "11:46",
+          "sender": "120363173003902460@newsletter",
+          "pushName": "120363173003902460"
+        }
+      ]
     }
   }
 }
