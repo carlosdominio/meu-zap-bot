@@ -115,10 +115,6 @@ async function connectToWhatsApp() {
 
         sock.ev.on('messages.upsert', async (m) => {
             const msg = m.messages[0];
-            
-            // FILTRO DE SEGURANÇA:
-            // 1. Ignora se a mensagem foi enviada pelo próprio robô (evita loop)
-            // 2. Ignora se for uma mensagem de sistema/status (vazia ou sem texto)
             if (msg.key.fromMe) return;
             if (m.type !== 'notify') return;
 
@@ -126,7 +122,6 @@ async function connectToWhatsApp() {
             const pushName = msg.pushName || jid.split('@')[0];
             const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "").trim();
 
-            // Ignora se a mensagem estiver vazia (ex: só figurinha, imagem sem legenda ou status de conexão)
             if (!text) return;
 
             // Salva e avisa o painel
@@ -135,33 +130,30 @@ async function connectToWhatsApp() {
             io.emit('new_msg', msgObj);
 
             // --- LÓGICA DO ROBÔ (CHATBOT) ---
-                let reply = "";
-                const lowerText = text.toLowerCase().trim();
-                
-                // Se não for um número de opção (1-5), mostra o menu principal
-                if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
-                    reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1️⃣ - Ver Cardápio Digital 📖\n2️⃣ - Fazer um Pedido 🛒\n3️⃣ - Promoções do Dia 🔥\n4️⃣ - Endereço e Horário 📍\n5️⃣ - Falar com o Atendente 👨‍💻\n\n_Digite apenas o número da opção desejada._`;
-                } else {
-                    // Trata cada opção do menu
-                    if (lowerText === '1') {
-                        reply = "📖 *CARDÁPIO DIGITAL*\n\nVocê pode ver todos os nossos itens e preços clicando no link abaixo:\nhttps://garconnexpress.vercel.app/\n\n_(Escolha o que deseja e nos mande o pedido por aqui!)_";
-                    } else if (lowerText === '2') {
-                        reply = "🛒 *COMO FAZER UM PEDIDO*\n\nÉ muito simples:\n1. Veja o cardápio (opção 1)\n2. Escreva aqui o que deseja (ex: 2 Cervejas, 1 Porção de Batata)\n3. Confirme seu endereço\n\n*Um atendente irá confirmar seu pedido em instantes!*";
-                    } else if (lowerText === '3') {
-                        reply = "🔥 *PROMOÇÕES DO DIA*\n\n🍺 Balde com 5 Eisenbahn: R$ 45,00\n🍹 Caipirinha em Dobro até às 20h!\n🍟 Batata com Queijo e Bacon: R$ 29,90";
-                    } else if (lowerText === '4') {
-                        reply = "📍 *ONDE ESTAMOS E HORÁRIO*\n\n🏠 Endereço: Rua Exemplo, nº 123, Centro.\n🕒 Horário: Terça a Domingo, das 17h às 00h.";
-                    } else if (lowerText === '5') {
-                        reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
-                    }
+            let reply = "";
+            const lowerText = text.toLowerCase().trim();
+            
+            if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
+                reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1️⃣ - Ver Cardápio Digital 📖\n2️⃣ - Fazer um Pedido 🛒\n3️⃣ - Promoções do Dia 🔥\n4️⃣ - Endereço e Horário 📍\n5️⃣ - Falar com o Atendente 👨‍💻\n\n_Digite apenas o número da opção desejada._`;
+            } else {
+                if (lowerText === '1') {
+                    reply = "📖 *CARDÁPIO DIGITAL*\n\nVocê pode ver todos os nossos itens e preços clicando no link abaixo:\nhttps://garconnexpress.vercel.app/\n\n_(Escolha o que deseja e nos mande o pedido por aqui!)_";
+                } else if (lowerText === '2') {
+                    reply = "🛒 *COMO FAZER UM PEDIDO*\n\nÉ muito simples:\n1. Veja o cardápio (opção 1)\n2. Escreva aqui o que deseja (ex: 2 Cervejas, 1 Porção de Batata)\n3. Confirme seu endereço\n\n*Um atendente irá confirmar seu pedido em instantes!*";
+                } else if (lowerText === '3') {
+                    reply = "🔥 *PROMOÇÕES DO DIA*\n\n🍺 Balde com 5 Eisenbahn: R$ 45,00\n🍹 Caipirinha em Dobro até às 20h!\n🍟 Batata com Queijo e Bacon: R$ 29,90";
+                } else if (lowerText === '4') {
+                    reply = "📍 *ONDE ESTAMOS E HORÁRIO*\n\n🏠 Endereço: Rua Exemplo, nº 123, Centro.\n🕒 Horário: Terça a Domingo, das 17h às 00h.";
+                } else if (lowerText === '5') {
+                    reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
                 }
+            }
 
-                if (reply) {
-                    const sentReply = await sock.sendMessage(jid, { text: reply });
-                    const replyObj = { id: sentReply.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
-                    saveMessage(jid, replyObj, pushName);
-                    io.emit('new_msg', replyObj);
-                }
+            if (reply) {
+                const sentReply = await sock.sendMessage(jid, { text: reply });
+                const replyObj = { id: sentReply.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
+                saveMessage(jid, replyObj, pushName);
+                io.emit('new_msg', replyObj);
             }
         });
     } catch (err) { setTimeout(connectToWhatsApp, 5000); }
