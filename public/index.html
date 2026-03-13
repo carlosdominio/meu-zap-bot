@@ -58,7 +58,13 @@
 </div>
 
 <div id="main-chat">
-    <div id="chat-header"><strong id="current-chat-name">Selecione uma conversa</strong></div>
+    <div id="chat-header" style="justify-content: space-between; width: 100%;">
+        <strong id="current-chat-name">Selecione uma conversa</strong>
+        <div id="atendimento-status" style="display: none; align-items: center; gap: 10px;">
+            <span id="atendimento-label" style="font-size: 13px; font-weight: bold;"></span>
+            <button id="btn-toggle-atendimento" onclick="toggleAtendimento()" style="padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; color: white;"></button>
+        </div>
+    </div>
     <div id="messages"></div>
     <footer id="chat-footer" style="display: none;">
         <input type="text" id="msg-input" placeholder="Digite uma mensagem...">
@@ -104,10 +110,17 @@
         updateChatList();
     });
 
+    socket.on('status_atendimento', (data) => {
+        if (chatData[data.jid]) {
+            chatData[data.jid].atendimentoManual = data.atendimentoManual;
+            if (currentJid === data.jid) updateAtendimentoUI();
+        }
+    });
+
     socket.on('new_msg', (msg) => {
         const jid = msg.sender;
         const target = msg.fromMe ? currentJid || jid : jid;
-        if (!chatData[target]) chatData[target] = { name: msg.pushName || target, messages: [] };
+        if (!chatData[target]) chatData[target] = { name: msg.pushName || target, messages: [], atendimentoManual: false };
         if (!chatData[target].messages) chatData[target].messages = [];
         chatData[target].messages.push(msg);
         if (target === currentJid) renderMessage(msg);
@@ -133,6 +146,7 @@
             currentJid = null;
             document.getElementById('messages').innerHTML = '';
             document.getElementById('chat-footer').style.display = 'none';
+            document.getElementById('atendimento-status').style.display = 'none';
             document.getElementById('current-chat-name').innerText = 'Selecione uma conversa';
         }
         updateChatList();
@@ -150,8 +164,8 @@
             item.className = `chat-item ${jid === currentJid ? 'active' : ''}`;
             item.innerHTML = `
                 <div class="chat-info" onclick="openChat('${jid}')">
-                    <strong>${chat.name || jid}</strong><br>
-                    <small style="color: #666;">${lastMsg.text}</small>
+                    <strong>${chat.name || jid}</strong> ${chat.atendimentoManual ? '👨‍💻' : '🤖'}<br>
+                    <small style="color: #666;">${lastMsg.text.substring(0, 30)}${lastMsg.text.length > 30 ? '...' : ''}</small>
                 </div>
                 <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')" title="Apagar conversa toda">🗑️</button>
             `;
@@ -163,10 +177,37 @@
         currentJid = jid;
         document.getElementById('chat-footer').style.display = 'flex';
         document.getElementById('current-chat-name').innerText = chatData[jid].name || jid;
+        document.getElementById('atendimento-status').style.display = 'flex';
+        
+        updateAtendimentoUI();
+        
         const messagesDiv = document.getElementById('messages');
         messagesDiv.innerHTML = '';
         (chatData[jid].messages || []).forEach(renderMessage);
         updateChatList();
+    }
+
+    function updateAtendimentoUI() {
+        const isManual = chatData[currentJid]?.atendimentoManual;
+        const label = document.getElementById('atendimento-label');
+        const btn = document.getElementById('btn-toggle-atendimento');
+        
+        if (isManual) {
+            label.innerText = 'Atendimento: MANUAL 👨‍💻';
+            label.style.color = '#e67e22';
+            btn.innerText = 'Ativar Robô 🤖';
+            btn.style.background = '#27ae60';
+        } else {
+            label.innerText = 'Atendimento: ROBÔ 🤖';
+            label.style.color = '#27ae60';
+            btn.innerText = 'Assumir Humano 👨‍💻';
+            btn.style.background = '#e67e22';
+        }
+    }
+
+    function toggleAtendimento() {
+        const newStatus = !chatData[currentJid].atendimentoManual;
+        socket.emit('toggle_atendimento', { jid: currentJid, atendimentoManual: newStatus });
     }
 
     function renderMessage(msg) {

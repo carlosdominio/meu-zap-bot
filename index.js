@@ -85,12 +85,20 @@ io.on('connection', (socket) => {
             io.emit('chat_deleted', jid);
         } catch (e) { console.log('Erro ao apagar chat:', e); }
     });
+
+    // Alternar Modo de Atendimento (Manual/Automático)
+    socket.on('toggle_atendimento', (data) => {
+        const { jid, atendimentoManual } = data;
+        db.set(`chats.${jid}.atendimentoManual`, atendimentoManual).write();
+        io.emit('status_atendimento', { jid, atendimentoManual });
+        console.log(`[ATENDIMENTO] ${jid} agora está em modo ${atendimentoManual ? 'MANUAL' : 'AUTOMÁTICO'}`);
+    });
 });
 
 function saveMessage(jid, msg, name) {
     const chatPath = `chats.${jid}`;
     if (!db.has(chatPath).value()) {
-        db.set(chatPath, { name: name, messages: [] }).write();
+        db.set(chatPath, { name: name, messages: [], atendimentoManual: false }).write();
     }
     db.get(`${chatPath}.messages`).push(msg).write();
     if (name !== "Você" && name !== "Robô 🤖") db.set(`${chatPath}.name`, name).write();
@@ -120,19 +128,35 @@ async function connectToWhatsApp() {
 
         sock.ev.on('messages.upsert', async (m) => {
             const msg = m.messages[0];
-            if (msg.key.fromMe) return;
             if (m.type !== 'notify') return;
 
             const jid = msg.key.remoteJid;
-            const pushName = msg.pushName || jid.split('@')[0];
-            const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "").trim();
+            const isMe = msg.key.fromMe;
+            const pushName = isMe ? "Você" : (msg.pushName || jid.split('@')[0]);
+
+            // Captura de texto melhorada (inclui legendas de imagens/vídeos)
+            const text = (msg.message?.conversation || 
+                          msg.message?.extendedTextMessage?.text || 
+                          msg.message?.imageMessage?.caption || 
+                          msg.message?.videoMessage?.caption || "").trim();
 
             if (!text) return;
 
             // Salva e avisa o painel
-            const msgObj = { id: msg.key.id, text, fromMe: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName };
+            const msgObj = { id: msg.key.id, text, fromMe: isMe, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName };
             saveMessage(jid, msgObj, pushName);
             io.emit('new_msg', msgObj);
+
+            // Se eu responder pelo celular, ativa o modo manual automaticamente para este chat
+            if (isMe) {
+                db.set(`chats.${jid}.atendimentoManual`, true).write();
+                io.emit('status_atendimento', { jid, atendimentoManual: true });
+                return;
+            }
+
+            // Verifica se o chat está em modo de atendimento manual
+            const isManual = db.get(`chats.${jid}.atendimentoManual`).value();
+            if (isManual) return;
 
             // --- LÓGICA DO ROBÔ (CHATBOT) ---
             let reply = "";
@@ -151,6 +175,9 @@ async function connectToWhatsApp() {
                     reply = "📍 *ONDE ESTAMOS E HORÁRIO*\n\n🏠 Endereço: Rua Exemplo, nº 123, Centro.\n🕒 Horário: Terça a Domingo, das 17h às 00h.";
                 } else if (lowerText === '5') {
                     reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
+                    // Ativa o modo manual ao solicitar atendente
+                    db.set(`chats.${jid}.atendimentoManual`, true).write();
+                    io.emit('status_atendimento', { jid, atendimentoManual: true });
                 }
             }
 
