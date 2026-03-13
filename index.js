@@ -1,90 +1,151 @@
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const express = require('express');
-const qrcodeTerminal = require('qrcode-terminal');
+const http = require('http');
+const { Server } = require('socket.io');
 const QRCode = require('qrcode');
 const pino = require('pino');
+const path = require('path');
+const fs = require('fs');
+
+// Banco de dados local
+const low = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
+const adapter = new FileSync('db.json');
+const db = low(adapter);
+db.defaults({ chats: {} }).write();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 });
 const port = process.env.PORT || 3000;
+
 let lastQr = null;
 let statusConexao = "DESCONECTADO ❌";
+let sock;
 
-app.get('/qr', (req, res) => {
-    if (lastQr) {
-        res.setHeader('Content-Type', 'image/png');
-        QRCode.toBuffer(lastQr).then(buffer => res.send(buffer));
-    } else {
-        res.send(`Status: ${statusConexao}. Se estiver conectado, não há QR Code.`);
-    }
+app.use(express.static(path.join(__dirname, 'public')));
+
+io.on('connection', (socket) => {
+    socket.emit('status', { status: statusConexao });
+    if (lastQr) socket.emit('qr', lastQr);
+    socket.emit('history', db.get('chats').value());
+
+    // Enviar Mensagem
+    socket.on('send_msg', async (data) => {
+        if (!sock || statusConexao !== "CONECTADO ✅") return;
+        try {
+            let jid = data.number;
+            if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+            const sent = await sock.sendMessage(jid, { text: data.text });
+            const msgObj = { id: sent.key.id, text: data.text, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Você" };
+            saveMessage(jid, msgObj, "Você");
+            io.emit('new_msg', msgObj);
+        } catch (e) { console.log('Erro envio:', e); }
+    });
+
+    // Enviar Áudio
+    socket.on('send_audio', async (data) => {
+        if (!sock || statusConexao !== "CONECTADO ✅") return;
+        try {
+            let jid = data.number;
+            if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+            const sent = await sock.sendMessage(jid, { audio: data.audio, mimetype: 'audio/mp4', ptt: true });
+            const msgObj = { id: sent.key.id, text: "🎤 Áudio enviado", fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Você" };
+            saveMessage(jid, msgObj, "Você");
+            io.emit('new_msg', msgObj);
+        } catch (e) { console.log('Erro áudio:', e); }
+    });
+
+    // Apagar Mensagem Individual
+    socket.on('delete_msg', async (data) => {
+        console.log(`[APAGAR] Solicitado apagar msg ${data.id} de ${data.jid}`);
+        if (!sock || statusConexao !== "CONECTADO ✅") return;
+        try {
+            const { jid, id, fromMe } = data;
+            if (fromMe) {
+                await sock.sendMessage(jid, { delete: { remoteJid: jid, fromMe: true, id: id } });
+            }
+            const chatPath = `chats.${jid}.messages`;
+            const messages = db.get(chatPath).value() || [];
+            db.set(chatPath, messages.filter(m => m.id !== id)).write();
+            io.emit('msg_deleted', { jid, id });
+            console.log(`[APAGAR] Mensagem ${id} removida do banco.`);
+        } catch (e) { console.log('Erro ao apagar msg:', e); }
+    });
+
+    // Apagar Conversa Inteira
+    socket.on('delete_chat', (jid) => {
+        console.log(`[APAGAR CHAT] Deletando tudo de ${jid}`);
+        try {
+            db.unset(`chats.${jid}`).write();
+            io.emit('chat_deleted', jid);
+        } catch (e) { console.log('Erro ao apagar chat:', e); }
+    });
 });
 
-app.get('/', (req, res) => res.send(`O Bot está: ${statusConexao} 🚀`));
-app.listen(port, () => console.log(`Servidor na porta ${port}`));
-
-async function connectToWhatsApp() {
-    const { version } = await fetchLatestBaileysVersion();
-    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
-
-    const sock = makeWASocket({
-        version,
-        auth: state,
-        logger: pino({ level: 'silent' }),
-        browser: Browsers.appropriate('Desktop'),
-    });
-
-    sock.ev.on('creds.update', saveCreds);
-
-    sock.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect, qr } = update;
-
-        if (qr) {
-            lastQr = qr;
-            statusConexao = "AGUARDANDO QR 📲";
-            console.log('\n#########################################');
-            console.log('#   STATUS: AGUARDANDO ESCANEAMENTO 📲   #');
-            console.log('#   ACESSE O LINK ABAIXO PARA ESCANEAR:  #');
-            console.log(`#   https://meu-zap-bot.onrender.com/qr   #`);
-            console.log('#########################################\n');
-            qrcodeTerminal.generate(qr, { small: true });
-        }
-
-        if (connection === 'close') {
-            lastQr = null;
-            statusConexao = "DESCONECTADO ❌";
-            const statusCode = lastDisconnect?.error?.output?.statusCode;
-            
-            console.log('\n#########################################');
-            console.log(`#   STATUS: CONEXÃO FECHADA ❌          #`);
-            console.log(`#   MOTIVO: ${statusCode}                 #`);
-            console.log('#########################################\n');
-
-            if (statusCode !== DisconnectReason.loggedOut) {
-                setTimeout(connectToWhatsApp, 5000);
-            }
-        } else if (connection === 'open') {
-            lastQr = null;
-            statusConexao = "CONECTADO ✅";
-            console.log('\n#########################################');
-            console.log('#   STATUS: BOT CONECTADO COM SUCESSO! ✅ #');
-            console.log('#########################################\n');
-        }
-    });
-
-    sock.ev.on('messages.upsert', async (m) => {
-        const msg = m.messages[0];
-        if (!msg.key.fromMe && m.type === 'notify') {
-            const from = msg.key.remoteJid;
-            const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "").toLowerCase();
-
-            if (text === 'oi' || text === 'olá' || text === 'menu') {
-                await sock.sendMessage(from, { text: 'Olá! 👋 Seu bot no Render está online!\n\n1 - Horário\n2 - Localização' });
-            } else if (text === '1') {
-                await sock.sendMessage(from, { text: '🕒 Horário: 08h às 18h.' });
-            } else if (text === '2') {
-                await sock.sendMessage(from, { text: '📍 Endereço: Rua Exemplo, 123.' });
-            }
-        }
-    });
+function saveMessage(jid, msg, name) {
+    const chatPath = `chats.${jid}`;
+    if (!db.has(chatPath).value()) {
+        db.set(chatPath, { name: name, messages: [] }).write();
+    }
+    db.get(`${chatPath}.messages`).push(msg).write();
+    if (name !== "Você" && name !== "Robô 🤖") db.set(`${chatPath}.name`, name).write();
 }
 
-connectToWhatsApp();
+async function connectToWhatsApp() {
+    const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
+    try {
+        const { version } = await fetchLatestBaileysVersion();
+        const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+        sock = makeWASocket({ version, auth: state, logger: pino({ level: 'error' }), browser: Browsers.appropriate('Painel Zap'), printQRInTerminal: false });
+        sock.ev.on('creds.update', saveCreds);
+        
+        sock.ev.on('connection.update', async (update) => {
+            const { connection, lastDisconnect, qr } = update;
+            if (qr) { lastQr = await QRCode.toDataURL(qr); statusConexao = "AGUARDANDO QR 📲"; io.emit('status', { status: statusConexao }); io.emit('qr', lastQr); }
+            if (connection === 'open') { statusConexao = "CONECTADO ✅"; lastQr = null; io.emit('status', { status: statusConexao }); console.log('BOT PRONTO!'); }
+            if (connection === 'close') {
+                const statusCode = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
+                statusConexao = "DESCONECTADO ❌"; io.emit('status', { status: statusConexao });
+                if (statusCode === DisconnectReason.loggedOut) {
+                    if (fs.existsSync('auth_info_baileys')) fs.rmSync('auth_info_baileys', { recursive: true, force: true });
+                    setTimeout(connectToWhatsApp, 3000);
+                } else { setTimeout(connectToWhatsApp, 5000); }
+            }
+        });
+
+        sock.ev.on('messages.upsert', async (m) => {
+            const msg = m.messages[0];
+            if (!msg.key.fromMe && m.type === 'notify') {
+                const jid = msg.key.remoteJid;
+                let pushName = msg.pushName || jid.split('@')[0];
+                const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "");
+                
+                // Salva e avisa o painel
+                const msgObj = { id: msg.key.id, text, fromMe: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName };
+                saveMessage(jid, msgObj, pushName);
+                io.emit('new_msg', msgObj);
+
+                // --- LÓGICA DO ROBÔ (CHATBOT) ---
+                let reply = "";
+                const lowerText = text.toLowerCase().trim();
+                if (lowerText === 'oi' || lowerText === 'olá' || lowerText === 'menu') {
+                    reply = `Olá ${pushName}! 👋\n\n1 - Horário\n2 - Localização\n3 - Falar com Humano`;
+                } else if (lowerText === '1') {
+                    reply = "🕒 Nosso horário de funcionamento é:\nSegunda a Sexta: 08h às 18h\nSábado: 08h às 12h";
+                } else if (lowerText === '2') {
+                    reply = "📍 Estamos localizados na Rua Exemplo, nº 123, Centro.";
+                } else if (lowerText === '3') {
+                    reply = "👨‍💻 Aguarde um momento. Um atendente humano irá visualizar sua mensagem em breve e entrará em contato.";
+                }
+
+                if (reply) {
+                    const sentReply = await sock.sendMessage(jid, { text: reply });
+                    const replyObj = { id: sentReply.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
+                    saveMessage(jid, replyObj, pushName);
+                    io.emit('new_msg', replyObj);
+                }
+            }
+        });
+    } catch (err) { setTimeout(connectToWhatsApp, 5000); }
+}
+server.listen(port, () => { console.log(`🚀 PAINEL: http://localhost:${port}`); connectToWhatsApp(); });

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Zap 🤖</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #d1d7db; height: 100vh; display: flex; overflow: hidden; }
+        
+        /* Sidebar */
+        #sidebar { width: 350px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        #sidebar-header { background: #f0f2f5; padding: 15px; font-weight: bold; border-bottom: 1px solid #ddd; }
+        #chat-list { flex: 1; overflow-y: auto; }
+        
+        .chat-item { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
+        .chat-item.active { background: #ebebeb; }
+        .chat-info { flex: 1; overflow: hidden; }
+        
+        /* Lixeira da Conversa (Sempre Visível) */
+        .btn-del-chat { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; padding: 5px; margin-left: 10px; opacity: 0.7; transition: opacity 0.2s; }
+        .btn-del-chat:hover { opacity: 1; color: #ff0000; }
+
+        /* Área de Chat */
+        #main-chat { flex: 1; display: flex; flex-direction: column; background: #efeae2; position: relative; }
+        #chat-header { background: #f0f2f5; padding: 10px 20px; border-bottom: 1px solid #ddd; height: 60px; display: flex; align-items: center; }
+        #messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        
+        .msg { max-width: 70%; padding: 10px 15px; border-radius: 8px; position: relative; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .msg-recebida { align-self: flex-start; background: white; border-top-left-radius: 0; }
+        .msg-enviada { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 0; }
+        
+        /* Lixeira da Mensagem (Sempre Visível) */
+        .btn-delete { align-self: flex-end; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 14px; margin-top: 5px; opacity: 0.6; }
+        .btn-delete:hover { opacity: 1; }
+
+        footer { background: #f0f2f5; padding: 10px 20px; display: flex; gap: 10px; align-items: center; border-top: 1px solid #ddd; }
+        input { flex: 1; padding: 12px; border: none; border-radius: 8px; outline: none; font-size: 15px; }
+        .btn-action { background: #00a884; color: white; border: none; padding: 10px; border-radius: 50%; cursor: pointer; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        
+        #qr-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div id="qr-overlay" style="display: flex;">
+    <h2 id="status-text">Conectando ao WhatsApp...</h2>
+    <img id="qr-img" src="" alt="QR Code" style="width: 250px; margin: 20px; display: none;">
+    <p>Aguarde o carregamento do código.</p>
+</div>
+
+<div id="sidebar">
+    <div id="sidebar-header">Suas Conversas</div>
+    <div id="chat-list"></div>
+</div>
+
+<div id="main-chat">
+    <div id="chat-header"><strong id="current-chat-name">Selecione uma conversa</strong></div>
+    <div id="messages"></div>
+    <footer id="chat-footer" style="display: none;">
+        <input type="text" id="msg-input" placeholder="Digite uma mensagem...">
+        <button class="btn-action" onclick="enviar()">➤</button>
+        <button id="mic-btn" class="btn-action" onclick="toggleRecording()">🎤</button>
+    </footer>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    let currentJid = null;
+    let chatData = {};
+    let mediaRecorder;
+    let audioChunks = [];
+
+    socket.on('status', (data) => {
+        document.getElementById('status-text').innerText = data.status;
+        document.getElementById('qr-overlay').style.display = data.status.includes('CONECTADO') ? 'none' : 'flex';
+    });
+
+    socket.on('qr', (url) => { 
+        const img = document.getElementById('qr-img');
+        img.src = url; 
+        img.style.display = 'block';
+    });
+
+    socket.on('history', (history) => {
+        chatData = history || {};
+        updateChatList();
+    });
+
+    socket.on('new_msg', (msg) => {
+        const jid = msg.sender;
+        const target = msg.fromMe ? currentJid || jid : jid;
+        if (!chatData[target]) chatData[target] = { name: msg.pushName || target, messages: [] };
+        if (!chatData[target].messages) chatData[target].messages = [];
+        chatData[target].messages.push(msg);
+        if (target === currentJid) renderMessage(msg);
+        updateChatList();
+    });
+
+    socket.on('msg_deleted', (data) => {
+        console.log('Mensagem apagada:', data.id);
+        if (chatData[data.jid]) {
+            chatData[data.jid].messages = chatData[data.jid].messages.filter(m => m.id !== data.id);
+            if (currentJid === data.jid) {
+                const msgDiv = document.getElementById(`msg-${data.id}`);
+                if (msgDiv) msgDiv.remove();
+            }
+            updateChatList();
+        }
+    });
+
+    socket.on('chat_deleted', (jid) => {
+        console.log('Conversa apagada:', jid);
+        delete chatData[jid];
+        if (currentJid === jid) {
+            currentJid = null;
+            document.getElementById('messages').innerHTML = '';
+            document.getElementById('chat-footer').style.display = 'none';
+            document.getElementById('current-chat-name').innerText = 'Selecione uma conversa';
+        }
+        updateChatList();
+    });
+
+    function updateChatList() {
+        const listDiv = document.getElementById('chat-list');
+        listDiv.innerHTML = '';
+        Object.keys(chatData).forEach(jid => {
+            const chat = chatData[jid];
+            const msgs = chat.messages || [];
+            const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : { text: 'Sem mensagens' };
+            
+            const item = document.createElement('div');
+            item.className = `chat-item ${jid === currentJid ? 'active' : ''}`;
+            item.innerHTML = `
+                <div class="chat-info" onclick="openChat('${jid}')">
+                    <strong>${chat.name || jid}</strong><br>
+                    <small style="color: #666;">${lastMsg.text}</small>
+                </div>
+                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')" title="Apagar conversa toda">🗑️</button>
+            `;
+            listDiv.appendChild(item);
+        });
+    }
+
+    function openChat(jid) {
+        currentJid = jid;
+        document.getElementById('chat-footer').style.display = 'flex';
+        document.getElementById('current-chat-name').innerText = chatData[jid].name || jid;
+        const messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML = '';
+        (chatData[jid].messages || []).forEach(renderMessage);
+        updateChatList();
+    }
+
+    function renderMessage(msg) {
+        const messagesDiv = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.id = `msg-${msg.id}`;
+        div.className = `msg ${msg.fromMe ? 'msg-enviada' : 'msg-recebida'}`;
+        div.innerHTML = `
+            <span>${msg.text}</span>
+            <button class="btn-delete" onclick="apagarMsg('${msg.id}', ${msg.fromMe})" title="Apagar esta mensagem">🗑️</button>
+            <small style="font-size: 10px; color: #999; text-align: right; margin-top: 4px;">${msg.time}</small>
+        `;
+        messagesDiv.appendChild(div);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function apagarMsg(id, fromMe) {
+        if (confirm('Apagar esta mensagem?')) {
+            socket.emit('delete_msg', { jid: currentJid, id, fromMe });
+        }
+    }
+
+    function apagarConversa(event, jid) {
+        event.stopPropagation();
+        if (confirm('Deseja apagar TODO o histórico desta conversa?')) {
+            socket.emit('delete_chat', jid);
+        }
+    }
+
+    function enviar() {
+        const input = document.getElementById('msg-input');
+        if (!input.value.trim()) return;
+        socket.emit('send_msg', { number: currentJid, text: input.value });
+        input.value = '';
+    }
+
+    async function toggleRecording() {
+        if (!mediaRecorder || mediaRecorder.state === "inactive") {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
+                    socket.emit('send_audio', { number: currentJid, audio: audioBlob });
+                };
+                mediaRecorder.start();
+                document.getElementById('mic-btn').style.background = 'red';
+            } catch (e) { alert("Microfone não permitido!"); }
+        } else {
+            mediaRecorder.stop();
+            document.getElementById('mic-btn').style.background = '#00a884';
+        }
+    }
+</script>
+</body>
+</html>

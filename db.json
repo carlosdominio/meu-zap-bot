@@ -1,0 +1,130 @@
+{
+  "chats": {
+    "147498538688743@lid": {
+      "name": "Jose Marcos",
+      "messages": [
+        {
+          "id": "AC459D6E7A4E8C1D4757D066DCEBFB93",
+          "text": "Oi",
+          "fromMe": false,
+          "time": "11:20",
+          "sender": "147498538688743@lid",
+          "pushName": "Jose Marcos"
+        },
+        {
+          "id": "3EB0C270AACCC7AA48F7B2",
+          "text": "Olá Jose Marcos! 👋\n\n1 - Horário\n2 - Localização\n3 - Falar com Humano",
+          "fromMe": true,
+          "time": "11:20",
+          "sender": "147498538688743@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC49045642BC9EA3E1C707509E6A93F5",
+          "text": "3",
+          "fromMe": false,
+          "time": "11:20",
+          "sender": "147498538688743@lid",
+          "pushName": "Jose Marcos"
+        },
+        {
+          "id": "ACE51B58863142190E29079BB3C1462A",
+          "text": "1",
+          "fromMe": false,
+          "time": "11:21",
+          "sender": "147498538688743@lid",
+          "pushName": "Jose Marcos"
+        },
+        {
+          "id": "3EB0AC91525E159E95EB54",
+          "text": "🕒 Horário: 08h às 18h.",
+          "fromMe": true,
+          "time": "11:21",
+          "sender": "147498538688743@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "ACD136C1F5CB7A19F7934FAE5A8D25AD",
+          "text": "2",
+          "fromMe": false,
+          "time": "11:21",
+          "sender": "147498538688743@lid",
+          "pushName": "Jose Marcos"
+        },
+        {
+          "id": "3EB03AD76C0FEB6CE88E0B",
+          "text": "📍 Local: Rua Exemplo, 123.",
+          "fromMe": true,
+          "time": "11:21",
+          "sender": "147498538688743@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC8A31F4F08881BE45EA7BDAE1750809",
+          "text": "3",
+          "fromMe": false,
+          "time": "11:21",
+          "sender": "147498538688743@lid",
+          "pushName": "Jose Marcos"
+        },
+        {
+          "id": "AC3C770445A3BCF39DD301F66B675761",
+          "text": "Oi",
+          "fromMe": false,
+          "time": "11:23",
+          "sender": "147498538688743@lid",
+          "pushName": "Jose Marcos"
+        },
+        {
+          "id": "3EB04C301951D0F3C6B145",
+          "text": "Olá Jose Marcos! 👋\n\n1 - Horário\n2 - Localização\n3 - Falar com Humano",
+          "fromMe": true,
+          "time": "11:23",
+          "sender": "147498538688743@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC49E38871CF52B08EF649B7C7918019",
+          "text": "3",
+          "fromMe": false,
+          "time": "11:23",
+          "sender": "147498538688743@lid",
+          "pushName": "Jose Marcos"
+        },
+        {
+          "id": "3EB0ABDFC96FC41147833F",
+          "text": "👨‍💻 Aguarde um momento. Um atendente humano irá visualizar sua mensagem em breve e entrará em contato.",
+          "fromMe": true,
+          "time": "11:23",
+          "sender": "147498538688743@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB036BEE06F74AFCFD99E",
+          "text": "bom dia ! em que posso ajudar ? ",
+          "fromMe": true,
+          "time": "11:24",
+          "sender": "147498538688743@lid",
+          "pushName": "Você"
+        }
+      ]
+    },
+    "status@broadcast": {
+      "name": "Luiz Carlos",
+      "messages": []
+    },
+    "120363172867223601@newsletter": {
+      "name": "120363172867223601",
+      "messages": [
+        {
+          "id": "3EB032986B23A982A0D7CC",
+          "text": "Nova espécie de “monstro marinho” gigante é identificada por paleontólogos\n\n*Leia mais:* https://cnnbr.app/short/c861528708/\n\n*Pense bem, pense CNN*",
+          "fromMe": false,
+          "time": "11:36",
+          "sender": "120363172867223601@newsletter",
+          "pushName": "120363172867223601"
+        }
+      ]
+    }
+  }
+}
