@@ -170,16 +170,43 @@ async function connectToWhatsApp() {
             const lowerText = text.toLowerCase().trim();
             
             if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
-                reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1️⃣ - Ver Cardápio Digital 📖\n2️⃣ - Fazer um Pedido 🛒\n3️⃣ - Promoções do Dia 🔥\n4️⃣ - Endereço e Horário 📍\n5️⃣ - Falar com o Atendente 👨‍💻\n\n_Digite apenas o número da opção desejada._`;
+                reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.
+
+Como posso te ajudar hoje?
+
+1️⃣ - Ver Cardápio Digital 📖
+2️⃣ - Fazer um Pedido 🛒
+3️⃣ - Promoções do Dia 🔥
+4️⃣ - Endereço e Horário 📍
+5️⃣ - Falar com o Atendente 👨‍💻
+
+_Digite apenas o número da opção desejada._`;
             } else {
                 if (lowerText === '1') {
-                    reply = "📖 *CARDÁPIO DIGITAL*\n\nVocê pode ver todos os nossos itens e preços clicando no link abaixo:\nhttps://garconnexpress.vercel.app/\n\n_(Escolha o que deseja e nos mande o pedido por aqui!)_";
+                    reply = "📖 *CARDÁPIO DIGITAL*\n\nVocê pode ver todos os nossos itens e preços clicando no link abaixo:\nhttps://garconnexpress.vercel.app/cardapio/\n\n_(Escolha o que deseja e nos mande o pedido por aqui!)_";
                 } else if (lowerText === '2') {
                     reply = "🛒 *COMO FAZER UM PEDIDO*\n\nÉ muito simples:\n1. Veja o cardápio (opção 1)\n2. Escreva aqui o que deseja (ex: 2 Cervejas, 1 Porção de Batata)\n3. Confirme seu endereço\n\n*Um atendente irá confirmar seu pedido em instantes!*";
                 } else if (lowerText === '3') {
-                    reply = "🔥 *PROMOÇÕES DO DIA*\n\n🍺 Balde com 5 Eisenbahn: R$ 45,00\n🍹 Caipirinha em Dobro até às 20h!\n🍟 Batata com Queijo e Bacon: R$ 29,90";
+                    try {
+                        const response = await fetch('https://garconnexpress.vercel.app/api/menu');
+                        const menu = await response.json();
+                        const promos = menu.filter(item => item.em_promocao && (item.visivel === true || item.visivel === 1));
+                        let promoMsg = "🔥 *PROMOÇÕES DO DIA*\n\n";
+                        if (promos.length > 0) {
+                            promos.forEach(p => {
+                                const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
+                                promoMsg += `✅ *${p.nome}*\n💰 ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\n\n`;
+                            });
+                            promoMsg += "_Aproveite que é por tempo limitado!_";
+                        } else {
+                            promoMsg += "No momento não temos promoções ativas, mas fique de olho no nosso cardápio! 😉";
+                        }
+                        reply = promoMsg;
+                    } catch (e) {
+                        reply = "🔥 *PROMOÇÕES DO DIA*\n\nNo momento não conseguimos carregar as promoções. Por favor, tente novamente em instantes ou veja no nosso cardápio digital!";
+                    }
                 } else if (lowerText === '4') {
-                    reply = "📍 *ONDE ESTAMOS E HORÁRIO*\n\n🏠 Endereço: Rua Exemplo, nº 123, Centro.\n🕒 Horário: Terça a Domingo, das 17h às 00h.";
+                    reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 Endereço: rua democrito gracindo 132 ponta grossa\n⏰ Horário: Diariamente das 18h às 02:00";
                 } else if (lowerText === '5') {
                     reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
                     // Ativa o modo manual ao solicitar atendente
