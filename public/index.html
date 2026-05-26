@@ -88,6 +88,8 @@
         if (!msg.fromMe && msg.pushName && msg.pushName !== "Voce" && msg.pushName !== "Robo") {
             chatData[jid].name = msg.pushName;
         }
+
+        // DEDUPLICAÇÃO: Só adiciona se o ID ainda não existir no histórico
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
             chatData[jid].messages.push(msg);
             if (jid === currentJid) renderMessage(msg);
@@ -151,14 +153,27 @@
         const messagesDiv = document.getElementById('messages');
         messagesDiv.innerHTML = '';
         if (chatData[jid].messages) {
-            chatData[jid].messages.forEach(renderMessage);
+            // Garante que não haja duplicatas visuais na abertura por algum erro no db.json
+            const uniqueMsgs = [];
+            const ids = new Set();
+            chatData[jid].messages.forEach(m => {
+                if (!ids.has(m.id)) {
+                    ids.add(m.id);
+                    uniqueMsgs.push(m);
+                }
+            });
+            uniqueMsgs.forEach(renderMessage);
         }
         updateChatList();
         scrollToBottom();
     }
 
     function renderMessage(msg) {
+        // BLOQUEIO DOM: Se o elemento já existe na tela, não cria outro
+        if (document.getElementById(`msg-${msg.id}`)) return;
+
         const div = document.createElement('div');
+        div.id = `msg-${msg.id}`;
         div.className = 'msg ' + (msg.fromMe ? 'msg-enviada' : 'msg-recebida');
         
         let content = `<p>${msg.text}</p>`;
