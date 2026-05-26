@@ -55,8 +55,24 @@ io.on('connection', (socket) => {
 
     socket.on('delete_chat', async (jid) => {
         if (db) {
-            await db.get('chats').unset(jid).write();
-            io.emit('chat_deleted', jid);
+            const chats = db.get('chats').value() || {};
+            if (chats[jid]) {
+                delete chats[jid];
+                await db.set('chats', chats).write();
+                io.emit('chat_deleted', jid);
+            }
+        }
+    });
+
+    socket.on('toggle_atendimento', async (data) => {
+        const { jid, status } = data;
+        if (db) {
+            const chats = db.get('chats').value() || {};
+            if (chats[jid]) {
+                chats[jid].atendimentoManual = status;
+                await db.set('chats', chats).write();
+                io.emit('status_atendimento', { jid, atendimentoManual: status });
+            }
         }
     });
 
@@ -64,24 +80,26 @@ io.on('connection', (socket) => {
 });
 
 async function saveMessage(jid, msg, name) {
-    if (jid.includes('@newsletter') || jid.includes('@broadcast')) return;
+    if (!jid || jid.includes('@newsletter') || jid.includes('@broadcast')) return;
     
-    // Usamos array no path para evitar que os pontos do JID (ex: @s.whatsapp.net) 
-    // sejam interpretados pelo lowdb/lodash como separadores de objetos
-    const chatPath = ['chats', jid];
-    
-    if (!db.get('chats').has(jid).value()) {
-        await db.get('chats').set(jid, { name: jid.split('@')[0], messages: [] }).write();
+    const chats = db.get('chats').value() || {};
+    if (!chats[jid]) {
+        chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: false };
     }
     
-    const msgs = db.get(['chats', jid, 'messages']).value() || [];
-    if (msgs.some(m => m.id === msg.id)) return;
+    // Evita duplicados
+    if (chats[jid].messages.some(m => m.id === msg.id)) return;
 
-    await db.get(['chats', jid, 'messages']).push(msg).write();
+    chats[jid].messages.push(msg);
+    
+    // Limita o histórico (últimas 100 mensagens) para manter o db.json leve
+    if (chats[jid].messages.length > 100) chats[jid].messages.shift();
     
     if (name && name !== "Voce" && name !== "Robo") {
-        await db.get(['chats', jid]).set('name', name).write();
+        chats[jid].name = name;
     }
+    
+    await db.set('chats', chats).write();
 }
 
 async function connectToWhatsApp() {
@@ -124,6 +142,13 @@ async function connectToWhatsApp() {
 
             // Não responde se a mensagem for enviada pelo próprio robô (evita loop)
             if (fromMe) return;
+
+            // Verifica se o atendimento humano está ativo para este chat
+            const atendimentoManual = db.get(['chats', jid, 'atendimentoManual']).value() || false;
+            if (atendimentoManual) {
+                console.log(`[WhatsApp] Atendimento Humano ativo para ${jid}. Robô em silêncio.`);
+                return;
+            }
 
             // MENU DO ROBÔ (Sempre ativo)
             let reply = "";

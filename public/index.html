@@ -24,6 +24,14 @@
         input { flex: 1; padding: 12px; border: none; border-radius: 8px; outline: none; }
         .btn-action { background: #00a884; color: white; border: none; padding: 10px; border-radius: 50%; cursor: pointer; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         #qr-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* Switch CSS */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #00a884; }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body>
@@ -36,7 +44,17 @@
     <div id="chat-list"></div>
 </div>
 <div id="main-chat">
-    <div id="chat-header"><span id="current-chat-name">Selecione uma conversa</span></div>
+    <div id="chat-header">
+        <span id="current-chat-name" style="flex: 1;">Selecione uma conversa</span>
+        <div id="human-control-toggle" style="display: none; align-items: center; gap: 8px;">
+            <span id="status-label" style="font-size: 12px; color: #666;">Robô Ativo</span>
+            <label class="switch">
+                <input type="checkbox" id="human-toggle-input" onchange="toggleHumanControl(this.checked)">
+                <span class="slider round"></span>
+            </label>
+            <button class="btn-del-chat" style="margin-left: 10px; color: #ff4d4d; font-size: 20px;" onclick="apagarConversaAtual()">🗑️</button>
+        </div>
+    </div>
     <div id="messages"></div>
     <footer id="chat-footer" style="display: none;">
         <input type="text" id="msg-input" placeholder="Digite uma mensagem...">
@@ -75,9 +93,21 @@
             currentJid = null; 
             document.getElementById('messages').innerHTML = ''; 
             document.getElementById('chat-footer').style.display = 'none'; 
+            document.getElementById('human-control-toggle').style.display = 'none';
             document.getElementById('current-chat-name').innerText = 'Selecione uma conversa';
         } 
         updateChatList(); 
+    });
+
+    socket.on('status_atendimento', (data) => {
+        if (chatData[data.jid]) {
+            chatData[data.jid].atendimentoManual = data.atendimentoManual;
+            if (data.jid === currentJid) {
+                const input = document.getElementById('human-toggle-input');
+                input.checked = data.atendimentoManual;
+                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';
+            }
+        }
     });
 
     function updateChatList() {
@@ -88,9 +118,10 @@
             const item = document.createElement('div');
             item.className = 'chat-item' + (jid === currentJid ? ' active' : '');
             item.onclick = () => openChat(jid); // Clique direto no item
+            const statusIcon = chat.atendimentoManual ? '👤' : '🤖';
             item.innerHTML = `
                 <div class="chat-info">
-                    <strong>${chat.name || jid.split('@')[0]}</strong><br>
+                    <strong>${chat.name || jid.split('@')[0]} ${statusIcon}</strong><br>
                     <small style="color: #666;">Chat Ativo</small>
                 </div>
                 <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')">X</button>
@@ -102,13 +133,24 @@
     function openChat(jid) {
         currentJid = jid;
         document.getElementById('chat-footer').style.display = 'flex';
+        document.getElementById('human-control-toggle').style.display = 'flex';
         document.getElementById('current-chat-name').innerText = chatData[jid].name || jid.split('@')[0];
+        
+        const isManual = chatData[jid].atendimentoManual || false;
+        document.getElementById('human-toggle-input').checked = isManual;
+        document.getElementById('status-label').innerText = isManual ? 'Humano Ativo' : 'Robô Ativo';
+
         const messagesDiv = document.getElementById('messages');
         messagesDiv.innerHTML = '';
         if (chatData[jid].messages) {
             chatData[jid].messages.forEach(renderMessage);
         }
         updateChatList();
+    }
+
+    function toggleHumanControl(checked) {
+        if (!currentJid) return;
+        socket.emit('toggle_atendimento', { jid: currentJid, status: checked });
     }
 
     function renderMessage(msg) {
@@ -124,6 +166,12 @@
     function apagarConversa(event, jid) {
         event.stopPropagation();
         if (confirm('Apagar conversa?')) socket.emit('delete_chat', jid);
+    }
+
+    function apagarConversaAtual() {
+        if (currentJid && confirm('Apagar esta conversa?')) {
+            socket.emit('delete_chat', currentJid);
+        }
     }
 
     function enviar() {
