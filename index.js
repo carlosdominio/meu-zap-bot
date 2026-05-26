@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
                 id: sent.key.id, 
                 text: data.text, 
                 fromMe: true, 
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+                time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
                 sender: jid, 
                 pushName: "Voce" 
             };
@@ -136,7 +136,7 @@ async function connectToWhatsApp() {
                 from: jid,
                 text: text, 
                 fromMe: fromMe, 
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+                time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
                 sender: jid, 
                 pushName: pushName
             };
@@ -201,7 +201,7 @@ async function connectToWhatsApp() {
 
             if (reply) {
                 const s = await sock.sendMessage(jid, { text: reply });
-                const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
+                const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
                 await saveMessage(jid, rObj, "Robo");
                 io.emit('new_msg', rObj);
             }
