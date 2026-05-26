@@ -107,6 +107,9 @@ io.on('connection', (socket) => {
 });
 
 async function saveMessage(jid, msg, name) {
+    // IGNORAR CANAIS, NEWSLETTERS E STATUS
+    if (jid.includes('@newsletter') || jid.includes('@broadcast') || jid === 'status@broadcast') return;
+
     const chatPath = `chats.${jid}`;
     if (!db.has(chatPath).value()) {
         // Inicializa o chat. Se o nome for genérico, usa o número como nome inicial
@@ -120,8 +123,8 @@ async function saveMessage(jid, msg, name) {
 
     await db.get(`${chatPath}.messages`).push(msg).write();
 
-    // SÓ ATUALIZA O NOME SE FOR UM NOME REAL (não "Você" ou "Robô")
-    if (name && name !== "Você" && name !== "Robô 🤖") {
+    // SÓ ATUALIZA O NOME SE FOR UM NOME REAL E NÃO FOR UM NOME DE CANAL
+    if (name && name !== "Você" && name !== "Robô 🤖" && !name.match(/^[0-9]{15,}$/)) {
         await db.set(`${chatPath}.name`, name).write();
     }
 }
@@ -151,6 +154,10 @@ async function connectToWhatsApp() {
             if (!msg.message || msg.key.fromMe) return;
 
             const jid = msg.key.remoteJid;
+            
+            // IGNORAR CANAIS, NEWSLETTERS E STATUS
+            if (jid.includes('@newsletter') || jid.includes('@broadcast') || jid === 'status@broadcast') return;
+
             const from = jid.split('@')[0].replace(/\D/g, '');
             const pushName = msg.pushName || from; 
             const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
