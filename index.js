@@ -5,8 +5,6 @@ const QRCode = require('qrcode');
 const pino = require('pino');
 const path = require('path');
 const fs = require('fs');
-
-// lowdb v1 syntax
 const low = require('lowdb');
 const FileAsync = require('lowdb/adapters/FileAsync');
 const adapter = new FileAsync('db.json');
@@ -15,16 +13,13 @@ let db;
 async function initDB() {
     db = await low(adapter);
     await db.defaults({ chats: {} }).write();
-    
-    // Clean old corrupted names
     const chats = db.get('chats').value();
     let changed = false;
     for (const jid in chats) {
-        if (!chats[jid].name || chats[jid].name === "Voce" || chats[jid].name === "Robo" || chats[jid].name.includes('Ã')) {
+        if (!chats[jid].name || chats[jid].name === "Voce" || chats[jid].name === "Robo") {
             chats[jid].name = jid.split('@')[0];
             changed = true;
         }
-        // Remove duplicates
         if (chats[jid].messages) {
             const originalLen = chats[jid].messages.length;
             chats[jid].messages = chats[jid].messages.filter((m, i, a) => i === a.findIndex((t) => t.id === m.id));
@@ -32,7 +27,7 @@ async function initDB() {
         }
     }
     if (changed) await db.write();
-    console.log('Database initialized');
+    console.log('DB Cleaned');
 }
 
 const app = express();
@@ -68,14 +63,7 @@ io.on('connection', (socket) => {
             };
             await saveMessage(jid, msgObj, "Voce");
             io.emit('new_msg', msgObj);
-        } catch (e) { console.log('Send error:', e); }
-    });
-
-    socket.on('toggle_atendimento', async (data) => {
-        if (db) {
-            await db.set(`chats.${data.jid}.atendimentoManual`, data.atendimentoManual).write();
-            io.emit('status_atendimento', data);
-        }
+        } catch (e) { console.log('Err:', e); }
     });
 
     socket.on('delete_chat', async (jid) => {
@@ -90,13 +78,12 @@ async function saveMessage(jid, msg, name) {
     if (jid.includes('@newsletter') || jid.includes('@broadcast')) return;
     const chatPath = `chats.${jid}`;
     if (!db.has(chatPath).value()) {
-        await db.set(chatPath, { name: jid.split('@')[0], messages: [], atendimentoManual: false }).write();
+        await db.set(chatPath, { name: jid.split('@')[0], messages: [] }).write();
     }
     const msgs = db.get(`${chatPath}.messages`).value();
     if (msgs.some(m => m.id === msg.id)) return;
 
     await db.get(`${chatPath}.messages`).push(msg).write();
-    
     if (name && name !== "Voce" && name !== "Robo") {
         await db.set(`${chatPath}.name`, name).write();
     }
@@ -107,39 +94,14 @@ async function connectToWhatsApp() {
         const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
         const { version } = await fetchLatestBaileysVersion();
         const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
-        
-        sock = makeWASocket({ 
-            version, 
-            auth: state, 
-            logger: pino({ level: 'error' }), 
-            browser: Browsers.appropriate('Painel Zap'),
-            printQRInTerminal: false
-        });
-        
+        sock = makeWASocket({ version, auth: state, logger: pino({ level: 'error' }), browser: Browsers.appropriate('Painel Zap'), printQRInTerminal: false });
         sock.ev.on('creds.update', saveCreds);
 
         sock.ev.on('connection.update', (update) => {
             const { connection, lastDisconnect, qr } = update;
-            if (qr) { 
-                QRCode.toDataURL(qr).then(url => { 
-                    lastQr = url; 
-                    io.emit('qr', url); 
-                }); 
-                statusConexao = "AGUARDANDO QR"; 
-                io.emit('status', { status: statusConexao }); 
-            }
-            if (connection === 'open') { 
-                statusConexao = "CONECTADO"; 
-                lastQr = null; 
-                io.emit('status', { status: statusConexao }); 
-                console.log('Bot Connected');
-            }
-            if (connection === 'close') { 
-                const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-                if (shouldReconnect) setTimeout(connectToWhatsApp, 5000);
-                statusConexao = "DESCONECTADO";
-                io.emit('status', { status: statusConexao });
-            }
+            if (qr) { QRCode.toDataURL(qr).then(url => { lastQr = url; io.emit('qr', url); }); statusConexao = "AGUARDANDO QR"; io.emit('status', {status: statusConexao}); }
+            if (connection === 'open') { statusConexao = "CONECTADO"; lastQr = null; io.emit('status', {status: statusConexao}); }
+            if (connection === 'close') { setTimeout(connectToWhatsApp, 5000); statusConexao = "DESCONECTADO"; io.emit('status', {status: statusConexao}); }
         });
 
         sock.ev.on('messages.upsert', async (m) => {
@@ -154,21 +116,14 @@ async function connectToWhatsApp() {
             await saveMessage(jid, msgObj, pushName);
             io.emit('new_msg', msgObj);
 
-            const chat = db.get(`chats.${jid}`).value();
-            if (chat?.atendimentoManual) return;
-
             let reply = "";
             const lowerText = text.toLowerCase();
             if (!['1','2','3','4','5'].includes(lowerText)) {
-                reply = `Ola ${pushName}! Bem-vindo ao GuGA Bebidas.\n\n1 - Cardapio\n2 - Fazer Pedido\n3 - Promocoes\n4 - Endereco\n5 - Atendente`;
+                reply = `Ola ${pushName}! Seja bem-vindo ao GuGA Bebidas.\n\n1 - Ver Cardapio\n2 - Fazer Pedido\n3 - Promocoes\n4 - Endereco\n5 - Atendente`;
             } else {
                  if (lowerText === '1') reply = "📖 Cardapio: https://garconnexpress.vercel.app/cardapio/";
                  else if (lowerText === '4') reply = "📍 Endereco: rua democrito gracindo 132 ponta grossa";
-                 else if (lowerText === '5') {
-                     reply = "👨‍💻 Aguarde um momento...";
-                     await db.set(`chats.${jid}.atendimentoManual`, true).write();
-                     io.emit('status_atendimento', { jid, atendimentoManual: true });
-                 }
+                 else if (lowerText === '5') reply = "👨‍💻 Um momento, ja chamei um atendente!";
             }
 
             if (reply) {
@@ -178,15 +133,9 @@ async function connectToWhatsApp() {
                 io.emit('new_msg', rObj);
             }
         });
-    } catch (e) {
-        console.error('Connection error:', e);
-        setTimeout(connectToWhatsApp, 10000);
-    }
+    } catch (e) { setTimeout(connectToWhatsApp, 10000); }
 }
 
 initDB().then(() => {
-    server.listen(port, () => {
-        console.log(`Server running on port ${port}`);
-        connectToWhatsApp();
-    });
+    server.listen(port, () => connectToWhatsApp());
 });
