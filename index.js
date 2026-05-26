@@ -6,7 +6,7 @@ const pino = require('pino');
 const path = require('path');
 const fs = require('fs');
 
-// Banco de dados local (ASSÍNCRONO)
+// lowdb v1 syntax
 const low = require('lowdb');
 const FileAsync = require('lowdb/adapters/FileAsync');
 const adapter = new FileAsync('db.json');
@@ -16,21 +16,23 @@ async function initDB() {
     db = await low(adapter);
     await db.defaults({ chats: {} }).write();
     
-    // LIMPEZA AO INICIAR: Remove "Você" ou "Robô" dos nomes das conversas
+    // Clean old corrupted names
     const chats = db.get('chats').value();
     let changed = false;
     for (const jid in chats) {
-        if (chats[jid].name === "Você" || chats[jid].name === "Robô 🤖" || !chats[jid].name) {
+        if (!chats[jid].name || chats[jid].name === "Voce" || chats[jid].name === "Robo" || chats[jid].name.includes('Ã')) {
             chats[jid].name = jid.split('@')[0];
             changed = true;
         }
-        // Remove duplicatas
-        const originalLen = chats[jid].messages.length;
-        chats[jid].messages = chats[jid].messages.filter((m, i, a) => i === a.findIndex((t) => t.id === m.id));
-        if (chats[jid].messages.length !== originalLen) changed = true;
+        // Remove duplicates
+        if (chats[jid].messages) {
+            const originalLen = chats[jid].messages.length;
+            chats[jid].messages = chats[jid].messages.filter((m, i, a) => i === a.findIndex((t) => t.id === m.id));
+            if (chats[jid].messages.length !== originalLen) changed = true;
+        }
     }
     if (changed) await db.write();
-    console.log('Banco de dados higienizado ✅');
+    console.log('Database initialized');
 }
 
 const app = express();
@@ -42,7 +44,7 @@ app.use(express.static('public'));
 app.get('/status', (req, res) => res.json({ status: statusConexao, qr: lastQr }));
 
 let lastQr = null;
-let statusConexao = "DESCONECTADO ❌";
+let statusConexao = "DESCONECTADO";
 let sock = null;
 
 io.on('connection', (socket) => {
@@ -51,7 +53,7 @@ io.on('connection', (socket) => {
     if (db) socket.emit('history', db.get('chats').value());
 
     socket.on('send_msg', async (data) => {
-        if (!sock || statusConexao !== "CONECTADO ✅") return;
+        if (!sock || statusConexao !== "CONECTADO") return;
         try {
             let jid = data.number;
             if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
@@ -62,21 +64,25 @@ io.on('connection', (socket) => {
                 fromMe: true, 
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
                 sender: jid, 
-                pushName: "Você" 
+                pushName: "Voce" 
             };
-            await saveMessage(jid, msgObj, "Você");
+            await saveMessage(jid, msgObj, "Voce");
             io.emit('new_msg', msgObj);
-        } catch (e) { console.log('Erro envio:', e); }
+        } catch (e) { console.log('Send error:', e); }
     });
 
     socket.on('toggle_atendimento', async (data) => {
-        await db.set(`chats.${data.jid}.atendimentoManual`, data.atendimentoManual).write();
-        io.emit('status_atendimento', data);
+        if (db) {
+            await db.set(`chats.${data.jid}.atendimentoManual`, data.atendimentoManual).write();
+            io.emit('status_atendimento', data);
+        }
     });
 
     socket.on('delete_chat', async (jid) => {
-        await db.unset(`chats.${jid}`).write();
-        io.emit('chat_deleted', jid);
+        if (db) {
+            await db.unset(`chats.${jid}`).write();
+            io.emit('chat_deleted', jid);
+        }
     });
 });
 
@@ -91,64 +97,96 @@ async function saveMessage(jid, msg, name) {
 
     await db.get(`${chatPath}.messages`).push(msg).write();
     
-    // Atualiza nome apenas se NÃO for genérico
-    if (name && name !== "Você" && name !== "Robô 🤖") {
+    if (name && name !== "Voce" && name !== "Robo") {
         await db.set(`${chatPath}.name`, name).write();
     }
 }
 
 async function connectToWhatsApp() {
-    const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
-    const { version } = await fetchLatestBaileysVersion();
-    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
-    sock = makeWASocket({ version, auth: state, logger: pino({ level: 'error' }), browser: Browsers.appropriate('Painel Zap') });
-    sock.ev.on('creds.update', saveCreds);
+    try {
+        const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
+        const { version } = await fetchLatestBaileysVersion();
+        const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+        
+        sock = makeWASocket({ 
+            version, 
+            auth: state, 
+            logger: pino({ level: 'error' }), 
+            browser: Browsers.appropriate('Painel Zap'),
+            printQRInTerminal: false
+        });
+        
+        sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect, qr } = update;
-        if (qr) { QRCode.toDataURL(qr).then(url => { lastQr = url; io.emit('qr', url); }); statusConexao = "AGUARDANDO QR 📲"; io.emit('status', {status: statusConexao}); }
-        if (connection === 'open') { statusConexao = "CONECTADO ✅"; lastQr = null; io.emit('status', {status: statusConexao}); }
-        if (connection === 'close') { setTimeout(connectToWhatsApp, 5000); }
-    });
+        sock.ev.on('connection.update', (update) => {
+            const { connection, lastDisconnect, qr } = update;
+            if (qr) { 
+                QRCode.toDataURL(qr).then(url => { 
+                    lastQr = url; 
+                    io.emit('qr', url); 
+                }); 
+                statusConexao = "AGUARDANDO QR"; 
+                io.emit('status', { status: statusConexao }); 
+            }
+            if (connection === 'open') { 
+                statusConexao = "CONECTADO"; 
+                lastQr = null; 
+                io.emit('status', { status: statusConexao }); 
+                console.log('Bot Connected');
+            }
+            if (connection === 'close') { 
+                const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+                if (shouldReconnect) setTimeout(connectToWhatsApp, 5000);
+                statusConexao = "DESCONECTADO";
+                io.emit('status', { status: statusConexao });
+            }
+        });
 
-    sock.ev.on('messages.upsert', async (m) => {
-        const msg = m.messages[0];
-        if (!msg.message || msg.key.fromMe) return;
-        const jid = msg.key.remoteJid;
-        const pushName = msg.pushName || jid.split('@')[0];
-        const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
-        if (!text) return;
+        sock.ev.on('messages.upsert', async (m) => {
+            const msg = m.messages[0];
+            if (!msg.message || msg.key.fromMe) return;
+            const jid = msg.key.remoteJid;
+            const pushName = msg.pushName || jid.split('@')[0];
+            const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
+            if (!text) return;
 
-        const msgObj = { id: msg.key.id, from: jid, text, fromMe: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName };
-        await saveMessage(jid, msgObj, pushName);
-        io.emit('new_msg', msgObj);
+            const msgObj = { id: msg.key.id, from: jid, text, fromMe: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName };
+            await saveMessage(jid, msgObj, pushName);
+            io.emit('new_msg', msgObj);
 
-        const chat = db.get(`chats.${jid}`).value();
-        if (chat?.atendimentoManual) return;
+            const chat = db.get(`chats.${jid}`).value();
+            if (chat?.atendimentoManual) return;
 
-        // Resposta do Robô
-        let reply = "";
-        if (!['1','2','3','4','5'].includes(text.toLowerCase())) {
-            reply = `Olá ${pushName}! 👋 Bem-vindo.\n\n1️⃣ - Cardápio\n2️⃣ - Pedido\n3️⃣ - Promoções\n4️⃣ - Endereço\n5️⃣ - Atendente`;
-        } else {
-             if (text === '1') reply = "📖 Cardápio: https://garconnexpress.vercel.app/cardapio/";
-             else if (text === '4') reply = "🏠 Rua Democrito Gracindo 132";
-             else if (text === '5') {
-                 reply = "👨‍💻 Aguarde um momento...";
-                 await db.set(`chats.${jid}.atendimentoManual`, true).write();
-                 io.emit('status_atendimento', { jid, atendimentoManual: true });
-             }
-        }
+            let reply = "";
+            const lowerText = text.toLowerCase();
+            if (!['1','2','3','4','5'].includes(lowerText)) {
+                reply = `Ola ${pushName}! Bem-vindo ao GuGA Bebidas.\n\n1 - Cardapio\n2 - Fazer Pedido\n3 - Promocoes\n4 - Endereco\n5 - Atendente`;
+            } else {
+                 if (lowerText === '1') reply = "📖 Cardapio: https://garconnexpress.vercel.app/cardapio/";
+                 else if (lowerText === '4') reply = "📍 Endereco: rua democrito gracindo 132 ponta grossa";
+                 else if (lowerText === '5') {
+                     reply = "👨‍💻 Aguarde um momento...";
+                     await db.set(`chats.${jid}.atendimentoManual`, true).write();
+                     io.emit('status_atendimento', { jid, atendimentoManual: true });
+                 }
+            }
 
-        if (reply) {
-            const s = await sock.sendMessage(jid, { text: reply });
-            const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
-            await saveMessage(jid, rObj, "Robô 🤖");
-            io.emit('new_msg', rObj);
-        }
-    });
+            if (reply) {
+                const s = await sock.sendMessage(jid, { text: reply });
+                const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robo" };
+                await saveMessage(jid, rObj, "Robo");
+                io.emit('new_msg', rObj);
+            }
+        });
+    } catch (e) {
+        console.error('Connection error:', e);
+        setTimeout(connectToWhatsApp, 10000);
+    }
 }
 
 initDB().then(() => {
-    server.listen(port, () => connectToWhatsApp());
+    server.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+        connectToWhatsApp();
+    });
 });

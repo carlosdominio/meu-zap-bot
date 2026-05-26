@@ -1,53 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<!-- v1.0.6 - FORCE REFRESH -->
+<!-- v1.0.7 - EMERGENCY FIX -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Zap 🤖</title>
+    <title>Painel Zap</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         body { background: #d1d7db; height: 100vh; display: flex; overflow: hidden; }
-        #sidebar { width: 350px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; } 
-        #sidebar-header { background: #f0f2f5; padding: 15px; font-weight: bold; border-bottom: 1px solid #ddd; }
+        #sidebar { width: 300px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; } 
+        #sidebar-header { background: #f0f2f5; padding: 15px; font-weight: bold; }
         #chat-list { flex: 1; overflow-y: auto; }
-        .chat-item { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
-        .chat-item.active { background: #ebebeb; }
-        .chat-info { flex: 1; overflow: hidden; }
-        .btn-del-chat { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; padding: 5px; opacity: 0.7; }
-        #main-chat { flex: 1; display: flex; flex-direction: column; background: #efeae2; position: relative; }
-        #chat-header { background: #f0f2f5; padding: 10px 20px; border-bottom: 1px solid #ddd; height: 60px; display: flex; align-items: center; }
-        #messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 70%; padding: 10px 15px; border-radius: 8px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .chat-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .chat-item.active { background: #e9edef; }
+        #main-chat { flex: 1; display: flex; flex-direction: column; background: #efeae2; }
+        #chat-header { background: #f0f2f5; padding: 15px; border-bottom: 1px solid #ddd; font-weight: bold; }
+        #messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 70%; padding: 8px 12px; border-radius: 8px; font-size: 14px; }
         .msg-recebida { align-self: flex-start; background: white; }
         .msg-enviada { align-self: flex-end; background: #d9fdd3; }
-        footer { background: #f0f2f5; padding: 10px 20px; display: flex; gap: 10px; border-top: 1px solid #ddd; }
-        input { flex: 1; padding: 12px; border: none; border-radius: 8px; outline: none; }
-        .btn-action { background: #00a884; color: white; border: none; padding: 10px; border-radius: 50%; cursor: pointer; width: 45px; height: 45px; }
-        #qr-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        footer { background: #f0f2f5; padding: 10px; display: flex; gap: 10px; }
+        input { flex: 1; padding: 10px; border: none; border-radius: 5px; }
+        button { background: #00a884; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        #qr-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background:white; z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center; }
     </style>
 </head>
 <body>
-<div id="qr-overlay" style="display: flex;">
-    <h2 id="status-text">Conectando...</h2>
-    <img id="qr-img" src="" alt="QR Code" style="width: 250px; margin: 20px; display: none;">
+<div id="qr-overlay">
+    <h2 id="status-text">Iniciando...</h2>
+    <img id="qr-img" style="width:250px; display:none; margin-top:20px;">
 </div>
 <div id="sidebar">
-    <div id="sidebar-header">Suas Conversas</div>
+    <div id="sidebar-header">Conversas</div>
     <div id="chat-list"></div>
 </div>
 <div id="main-chat">
-    <div id="chat-header" style="justify-content: space-between; width: 100%;">
-        <strong id="current-chat-name">Selecione uma conversa</strong>
-        <div id="atendimento-status" style="display: none; align-items: center; gap: 10px;">
-            <span id="atendimento-label" style="font-size: 13px; font-weight: bold;"></span>
-            <button id="btn-toggle-atendimento" onclick="toggleAtendimento()" style="padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; color: white;"></button>
-        </div>
-    </div>
+    <div id="chat-header">Selecione um cliente</div>
     <div id="messages"></div>
-    <footer id="chat-footer" style="display: none;">
-        <input type="text" id="msg-input" placeholder="Digite uma mensagem...">
-        <button class="btn-action" onclick="enviar()">➤</button>
+    <footer id="chat-footer" style="display:none;">
+        <input type="text" id="msg-input" placeholder="Mensagem...">
+        <button onclick="enviar()">Enviar</button>
     </footer>
 </div>
 <script src="/socket.io/socket.io.js"></script>
@@ -58,18 +50,20 @@
 
     socket.on('status', (data) => {
         document.getElementById('status-text').innerText = data.status;
-        document.getElementById('qr-overlay').style.display = data.status.includes('CONECTADO') ? 'none' : 'flex';
+        document.getElementById('qr-overlay').style.display = data.status === 'CONECTADO' ? 'none' : 'flex';
     });
-    socket.on('qr', (url) => { const img = document.getElementById('qr-img'); img.src = url; img.style.display = 'block'; });
-
-    socket.on('history', (history) => { chatData = history || {}; updateChatList(); });
-
+    socket.on('qr', (url) => {
+        const img = document.getElementById('qr-img');
+        img.src = url;
+        img.style.display = 'block';
+    });
+    socket.on('history', (history) => {
+        chatData = history || {};
+        updateChatList();
+    });
     socket.on('new_msg', (msg) => {
         const jid = msg.sender;
-        if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: false };
-        if (!msg.fromMe && msg.pushName && msg.pushName !== "Você" && msg.pushName !== "Robô 🤖") {
-            chatData[jid].name = msg.pushName;
-        }
+        if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [] };
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
             chatData[jid].messages.push(msg);
             if (jid === currentJid) renderMessage(msg);
@@ -77,62 +71,37 @@
         updateChatList();
     });
 
-    socket.on('chat_deleted', (jid) => { delete chatData[jid]; if(currentJid === jid) { currentJid = null; document.getElementById('messages').innerHTML = ''; document.getElementById('chat-footer').style.display = 'none'; } updateChatList(); });
-
     function updateChatList() {
-        const listDiv = document.getElementById('chat-list');
-        listDiv.innerHTML = '';
+        const list = document.getElementById('chat-list');
+        list.innerHTML = '';
         Object.keys(chatData).forEach(jid => {
-            const chat = chatData[jid];
-            const msgs = chat.messages || [];
-            const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : { text: '...' };
-            const item = document.createElement('div');
-            item.className = `chat-item ${jid === currentJid ? 'active' : ''}`;
-            item.innerHTML = `
-                <div class="chat-info" onclick="openChat('${jid}')">
-                    <strong>${chat.name || jid.split('@')[0]}</strong> ${chat.atendimentoManual ? '👨‍💻' : '🤖'}<br>
-                    <small style="color: #666;">${lastMsg.text.substring(0, 30)}</small>
-                </div>
-                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')">🗑️</button>
-            `;
-            listDiv.appendChild(item);
+            const div = document.createElement('div');
+            div.className = 'chat-item' + (jid === currentJid ? ' active' : '');
+            div.innerHTML = '<strong>' + (chatData[jid].name || jid.split('@')[0]) + '</strong>';
+            div.onclick = () => openChat(jid);
+            list.appendChild(div);
         });
     }
 
     function openChat(jid) {
         currentJid = jid;
         document.getElementById('chat-footer').style.display = 'flex';
-        document.getElementById('current-chat-name').innerText = chatData[jid].name || jid.split('@')[0];
-        document.getElementById('atendimento-status').style.display = 'flex';
-        updateAtendimentoUI();
-        const messagesDiv = document.getElementById('messages');
-        messagesDiv.innerHTML = '';
+        document.getElementById('chat-header').innerText = chatData[jid].name || jid;
+        const msgsDiv = document.getElementById('messages');
+        msgsDiv.innerHTML = '';
         (chatData[jid].messages || []).forEach(renderMessage);
         updateChatList();
     }
 
     function renderMessage(msg) {
-        const messagesDiv = document.getElementById('messages');
-        if (document.getElementById(`msg-${msg.id}`)) return;
         const div = document.createElement('div');
-        div.id = `msg-${msg.id}`;
-        div.className = `msg ${msg.fromMe ? 'msg-enviada' : 'msg-recebida'}`;
-        div.innerHTML = `<span>${msg.text}</span><br><small style="font-size: 10px; color: #999;">${msg.time}</small>`;
-        messagesDiv.appendChild(div);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        div.className = 'msg ' + (msg.fromMe ? 'msg-enviada' : 'msg-recebida');
+        div.innerHTML = '<span>' + msg.text + '</span>';
+        const container = document.getElementById('messages');
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
     }
 
-    function apagarConversa(event, jid) { event.stopPropagation(); if (confirm('Apagar?')) socket.emit('delete_chat', jid); }
-    function toggleAtendimento() { const s = !chatData[currentJid].atendimentoManual; socket.emit('toggle_atendimento', { jid: currentJid, atendimentoManual: s }); }
-    function updateAtendimentoUI() {
-        const isM = chatData[currentJid]?.atendimentoManual;
-        const label = document.getElementById('atendimento-label');
-        const btn = document.getElementById('btn-toggle-atendimento');
-        label.innerText = isM ? 'MANUAL 👨‍💻' : 'ROBÔ 🤖';
-        label.style.color = isM ? '#e67e22' : '#27ae60';
-        btn.innerText = isM ? 'Ativar Robô' : 'Assumir';
-        btn.style.background = isM ? '#27ae60' : '#e67e22';
-    }
     function enviar() {
         const input = document.getElementById('msg-input');
         if (!input.value.trim()) return;
