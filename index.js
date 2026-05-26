@@ -15,7 +15,27 @@ let db;
 async function initDB() {
     db = await low(adapter);
     await db.defaults({ chats: {} }).write();
-    console.log('Banco de dados carregado 📦');
+    
+    // --- LIMPEZA DE BANCO CORROMPIDO (Correção Automática de Nomes e Duplicados) ---
+    const chats = db.get('chats').value();
+    let changed = false;
+    for (const jid in chats) {
+        // 1. Corrige nomes genéricos
+        if (chats[jid].name === "Você" || chats[jid].name === "Robô 🤖" || !chats[jid].name) {
+            const msgs = chats[jid].messages || [];
+            const lastClientMsg = [...msgs].reverse().find(m => !m.fromMe && m.pushName && m.pushName !== "Você" && m.pushName !== "Robô 🤖");
+            chats[jid].name = lastClientMsg ? lastClientMsg.pushName : jid.split('@')[0];
+            changed = true;
+        }
+        // 2. Remove duplicatas de mensagens pelo ID
+        const originalCount = chats[jid].messages.length;
+        chats[jid].messages = chats[jid].messages.filter((msg, index, self) =>
+            index === self.findIndex((m) => m.id === msg.id)
+        );
+        if (chats[jid].messages.length !== originalCount) changed = true;
+    }
+    if (changed) await db.write();
+    console.log('Banco de dados carregado e limpo 📦');
 }
 
 const app = express();
@@ -112,19 +132,18 @@ async function saveMessage(jid, msg, name) {
 
     const chatPath = `chats.${jid}`;
     if (!db.has(chatPath).value()) {
-        // Inicializa o chat. Se o nome for genérico, usa o número como nome inicial
         let initialName = (name === "Robô 🤖" || name === "Você" || !name) ? jid.split('@')[0] : name;
         await db.set(chatPath, { name: initialName, messages: [], atendimentoManual: false }).write();
     }
 
-    // EVITAR DUPLICATAS: Verifica se a mensagem já existe
+    // EVITAR DUPLICATAS
     const messages = db.get(`${chatPath}.messages`).value() || [];
     if (messages.some(m => m.id === msg.id)) return;
 
     await db.get(`${chatPath}.messages`).push(msg).write();
 
-    // SÓ ATUALIZA O NOME SE FOR UM NOME REAL E NÃO FOR UM NOME DE CANAL
-    if (name && name !== "Você" && name !== "Robô 🤖" && !name.match(/^[0-9]{15,}$/)) {
+    // SÓ ATUALIZA O NOME SE FOR UM NOME REAL (não sobrescreve com Você/Robô)
+    if (name && name !== "Você" && name !== "Robô 🤖") {
         await db.set(`${chatPath}.name`, name).write();
     }
 }
@@ -154,16 +173,12 @@ async function connectToWhatsApp() {
             if (!msg.message || msg.key.fromMe) return;
 
             const jid = msg.key.remoteJid;
-            
-            // IGNORAR CANAIS, NEWSLETTERS E STATUS
             if (jid.includes('@newsletter') || jid.includes('@broadcast') || jid === 'status@broadcast') return;
 
             const from = jid.split('@')[0].replace(/\D/g, '');
             const pushName = msg.pushName || from; 
             const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
             if (!text) return;
-
-            console.log(`📩 Mensagem de ${pushName} (${from}): ${text}`);
 
             const msgObj = { 
                 id: msg.key.id, 
@@ -179,47 +194,21 @@ async function connectToWhatsApp() {
             await saveMessage(jid, msgObj, pushName);
             io.emit('new_msg', msgObj);
 
-            // VERIFICA SE ESTÁ EM ATENDIMENTO MANUAL
             const chat = db.get(`chats.${jid}`).value();
-            if (chat && chat.atendimentoManual) {
-                console.log(`⏳ Atendimento manual ativo para ${pushName}. Robô em silêncio.`);
-                return;
-            }
+            if (chat && chat.atendimentoManual) return;
 
-            // LÓGICA DO MENU
+            // MENU
             let reply = "";
             const lowerText = text.toLowerCase();
-
             if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
                 reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1️⃣ - Ver Cardápio Digital 📖\n2️⃣ - Fazer um Pedido 🛒\n3️⃣ - Promoções do Dia 🔥\n4️⃣ - Endereço e Horário 📍\n5️⃣ - Falar com o Atendente 👨‍💻\n\n_Digite apenas o número da opção desejada._`;
             } else {
-                if (lowerText === '1') {
-                    reply = "📖 *CARDÁDIO DIGITAL*\n\nVocê pode ver todos os nossos itens e preços clicando no link abaixo:\nhttps://garconnexpress.vercel.app/cardapio/\n\n_(Escolha o que deseja e nos mande o pedido por aqui!)_";
-                } else if (lowerText === '2') {
-                    reply = "🛒 *COMO FAZER UM PEDIDO*\n\nÉ muito simples:\n1. Veja o cardápio (opção 1)\n2. Escreva aqui o que deseja (ex: 2 Cervejas, 1 Porção de Batata)\n3. Confirme seu endereço\n\n*Um atendente irá confirmar seu pedido em instantes!*";
-                } else if (lowerText === '3') {
-                    try {
-                        const response = await fetch('https://garconnexpress.vercel.app/api/menu');
-                        const menu = await response.json();
-                        const promos = menu.filter(item => item.em_promocao && (item.visivel === true || item.visivel === 1));
-                        let promoMsg = "🔥 *PROMOÇÕES DO DIA*\n\n";
-                        if (promos.length > 0) {
-                            promos.forEach(p => {
-                                const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
-                                promoMsg += `✅ *${p.nome}*\n💰 ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\n\n`;
-                            });
-                            promoMsg += "_Aproveite que é por tempo limitado!_";
-                        } else {
-                            promoMsg += "No momento não temos promoções ativas, mas fique de olho no nosso cardápio! 😉";
-                        }
-                        reply = promoMsg;
-                    } catch (e) {
-                        reply = "🔥 *PROMOÇÕES DO DIA*\n\nNo momento não conseguimos carregar as promoções. Por favor, tente novamente em instantes ou veja no nosso cardápio digital!";
-                    }
-                } else if (lowerText === '4') {
-                    reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 Endereço: rua democrito gracindo 132 ponta grossa\n⏰ Horário: Diariamente das 18h às 02:00";
-                } else if (lowerText === '5') {
-                    reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
+                if (lowerText === '1') reply = "📖 *CARDÁDIO DIGITAL*\n\nhttps://garconnexpress.vercel.app/cardapio/";
+                else if (lowerText === '2') reply = "🛒 *COMO FAZER UM PEDIDO*\n\nVeja o cardápio e nos mande o que deseja!";
+                else if (lowerText === '3') reply = "🔥 *PROMOÇÕES DO DIA*\n\nVeja no cardápio digital!";
+                else if (lowerText === '4') reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 rua democrito gracindo 132 ponta grossa\n⏰ Diariamente das 18h às 02:00";
+                else if (lowerText === '5') {
+                    reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento...";
                     await db.set(`chats.${jid}.atendimentoManual`, true).write();
                     io.emit('status_atendimento', { jid, atendimentoManual: true });
                 }
@@ -228,7 +217,7 @@ async function connectToWhatsApp() {
             if (reply) {
                 const sentReply = await sock.sendMessage(jid, { text: reply });
                 const replyObj = { id: sentReply.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
-                await saveMessage(jid, replyObj, pushName);
+                await saveMessage(jid, replyObj, "Robô 🤖");
                 io.emit('new_msg', replyObj);
             }
         });
