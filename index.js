@@ -67,27 +67,40 @@ io.on('connection', (socket) => {
             let jid = data.number;
             if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
             
-            // O áudio vem como base64
             const buffer = Buffer.from(data.audio.split(',')[1], 'base64');
-            const tempFile = path.join(__dirname, `temp_${Date.now()}.webm`);
-            const opusFile = path.join(__dirname, `temp_${Date.now()}.opus`);
+            const tempWebm = path.join(__dirname, `temp_${Date.now()}.webm`);
+            const tempOgg = path.join(__dirname, `temp_${Date.now()}.ogg`);
             
-            fs.writeFileSync(tempFile, buffer);
+            fs.writeFileSync(tempWebm, buffer);
             
-            // Converter para ogg/opus (formato do WhatsApp) usando ffmpeg se disponível, 
-            // ou envia o buffer direto se o baileys aceitar webm.
-            // Para maior compatibilidade com players de Zap, o ideal é ogg opus.
-            
-            await sock.sendMessage(jid, { 
-                audio: buffer, 
-                mimetype: 'audio/mp4', // Baileys lida bem com mp4/webm as vezes
-                ptt: true 
-            });
+            try {
+                const ffmpeg = require('fluent-ffmpeg');
+                const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+                ffmpeg.setFfmpegPath(ffmpegPath);
+
+                ffmpeg(tempWebm)
+                    .toFormat('ogg')
+                    .audioCodec('libopus')
+                    .on('error', async (err) => {
+                        console.log('Erro na conversão ffmpeg, enviando original:', err);
+                        await sock.sendMessage(jid, { audio: buffer, mimetype: 'audio/mp4', ptt: true });
+                    })
+                    .on('end', async () => {
+                        const oggBuffer = fs.readFileSync(tempOgg);
+                        await sock.sendMessage(jid, { audio: oggBuffer, mimetype: 'audio/ogg; codecs=opus', ptt: true });
+                        if (fs.existsSync(tempWebm)) fs.unlinkSync(tempWebm);
+                        if (fs.existsSync(tempOgg)) fs.unlinkSync(tempOgg);
+                    })
+                    .save(tempOgg);
+            } catch (ffmpegErr) {
+                console.log('FFMPEG não configurado ou erro ao carregar:', ffmpegErr);
+                await sock.sendMessage(jid, { audio: buffer, mimetype: 'audio/mp4', ptt: true });
+            }
 
             const msgObj = { 
                 id: 'aud_' + Date.now(), 
                 text: "🎤 Áudio enviado", 
-                audioUrl: data.audio, // No painel mostramos o base64 original
+                audioUrl: data.audio, 
                 fromMe: true, 
                 time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
                 sender: jid, 
@@ -95,8 +108,6 @@ io.on('connection', (socket) => {
             };
             await saveMessage(jid, msgObj, "Voce");
             io.emit('new_msg', msgObj);
-            
-            if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
         } catch (e) { console.log('Erro ao enviar áudio:', e); }
     });
 
