@@ -87,6 +87,14 @@ async function saveMessage(jid, msg, name) {
         chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: false };
     }
     
+    // Se a mensagem for do próprio número (fromMe) ou para o próprio número,
+    // garantimos que o nome do chat seja "Pedidos Zap"
+    if (jid.includes(sock?.user?.id?.split(':')[0] || 'none')) {
+        chats[jid].name = "Pedidos Zap 📦";
+    } else if (name && name !== "Voce" && name !== "Robo") {
+        chats[jid].name = name;
+    }
+    
     // Evita duplicados
     if (chats[jid].messages.some(m => m.id === msg.id)) return;
 
@@ -94,10 +102,6 @@ async function saveMessage(jid, msg, name) {
     
     // Limita o histórico (últimas 100 mensagens) para manter o db.json leve
     if (chats[jid].messages.length > 100) chats[jid].messages.shift();
-    
-    if (name && name !== "Voce" && name !== "Robo") {
-        chats[jid].name = name;
-    }
     
     await db.set('chats', chats).write();
 }
