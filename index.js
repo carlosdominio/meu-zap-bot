@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const QRCode = require('qrcode');
+const QRCode = require('qrcode');       
 const pino = require('pino');
 const path = require('path');
 const fs = require('fs');
@@ -25,31 +25,39 @@ const port = process.env.PORT || 3000;
 
 let lastQr = null;
 let statusConexao = "DESCONECTADO ❌";
-let sock;
+let sock = null;
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
+app.get('/status', (req, res) => res.json({ status: statusConexao, qr: lastQr }));
 
-io.on('connection', async (socket) => {
+io.on('connection', (socket) => {
     socket.emit('status', { status: statusConexao });
     if (lastQr) socket.emit('qr', lastQr);
-    socket.emit('history', db.get('chats').value());
 
-    // Resposta de Ping para medir latência
-    socket.on('ping', (callback) => {
-        if (typeof callback === 'function') callback();
-    });
+    // Enviar histórico ao conectar
+    if (db) {
+        socket.emit('history', db.get('chats').value());
+    }
 
-    // Enviar Mensagem
+    // Enviar Mensagem de Texto
     socket.on('send_msg', async (data) => {
         if (!sock || statusConexao !== "CONECTADO ✅") return;
         try {
             let jid = data.number;
             if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+            
             const sent = await sock.sendMessage(jid, { text: data.text });
-            const msgObj = { id: sent.key.id, text: data.text, fromMe: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Você" };
+            const msgObj = { 
+                id: sent.key.id, 
+                text: data.text, 
+                fromMe: true, 
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+                sender: jid, 
+                pushName: "Você" 
+            };
             await saveMessage(jid, msgObj, "Você");
             io.emit('new_msg', msgObj);
-        } catch (e) { console.log('Erro envio:', e); }
+        } catch (e) { console.log('Erro ao enviar:', e); }
     });
 
     // Enviar Áudio
@@ -67,7 +75,6 @@ io.on('connection', async (socket) => {
 
     // Apagar Mensagem Individual
     socket.on('delete_msg', async (data) => {
-        console.log(`[APAGAR] Solicitado apagar msg ${data.id} de ${data.jid}`);
         if (!sock || statusConexao !== "CONECTADO ✅") return;
         try {
             const { jid, id, fromMe } = data;
@@ -78,13 +85,11 @@ io.on('connection', async (socket) => {
             const messages = db.get(chatPath).value() || [];
             await db.set(chatPath, messages.filter(m => m.id !== id)).write();
             io.emit('msg_deleted', { jid, id });
-            console.log(`[APAGAR] Mensagem ${id} removida do banco.`);
         } catch (e) { console.log('Erro ao apagar msg:', e); }
     });
 
     // Apagar Conversa Inteira
     socket.on('delete_chat', async (jid) => {
-        console.log(`[APAGAR CHAT] Deletando tudo de ${jid}`);
         try {
             await db.unset(`chats.${jid}`).write();
             io.emit('chat_deleted', jid);
@@ -96,17 +101,27 @@ io.on('connection', async (socket) => {
         const { jid, atendimentoManual } = data;
         await db.set(`chats.${jid}.atendimentoManual`, atendimentoManual).write();
         io.emit('status_atendimento', { jid, atendimentoManual });
-        console.log(`[ATENDIMENTO] ${jid} agora está em modo ${atendimentoManual ? 'MANUAL' : 'AUTOMÁTICO'}`);
     });
+
+    socket.on('ping', (cb) => { if (typeof cb === 'function') cb(); });
 });
 
 async function saveMessage(jid, msg, name) {
     const chatPath = `chats.${jid}`;
     if (!db.has(chatPath).value()) {
-        await db.set(chatPath, { name: name, messages: [], atendimentoManual: false }).write();
+        // Inicializa o chat. Se o nome for genérico, usa o número como nome inicial
+        let initialName = (name === "Robô 🤖" || name === "Você" || !name) ? jid.split('@')[0] : name;
+        await db.set(chatPath, { name: initialName, messages: [], atendimentoManual: false }).write();
     }
+
+    // EVITAR DUPLICATAS: Verifica se a mensagem já existe
+    const messages = db.get(`${chatPath}.messages`).value() || [];
+    if (messages.some(m => m.id === msg.id)) return;
+
     await db.get(`${chatPath}.messages`).push(msg).write();
-    if (name !== "Você" && name !== "Robô 🤖") {
+
+    // SÓ ATUALIZA O NOME SE FOR UM NOME REAL (não "Você" ou "Robô")
+    if (name && name !== "Você" && name !== "Robô 🤖") {
         await db.set(`${chatPath}.name`, name).write();
     }
 }
@@ -118,18 +133,16 @@ async function connectToWhatsApp() {
         const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
         sock = makeWASocket({ version, auth: state, logger: pino({ level: 'error' }), browser: Browsers.appropriate('Painel Zap'), printQRInTerminal: false });
         sock.ev.on('creds.update', saveCreds);
-        
+
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
             if (qr) { lastQr = await QRCode.toDataURL(qr); statusConexao = "AGUARDANDO QR 📲"; io.emit('status', { status: statusConexao }); io.emit('qr', lastQr); }
             if (connection === 'open') { statusConexao = "CONECTADO ✅"; lastQr = null; io.emit('status', { status: statusConexao }); console.log('BOT PRONTO!'); }
             if (connection === 'close') {
                 const statusCode = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
-                statusConexao = "DESCONECTADO ❌"; io.emit('status', { status: statusConexao });
-                if (statusCode === DisconnectReason.loggedOut) {
-                    if (fs.existsSync('auth_info_baileys')) fs.rmSync('auth_info_baileys', { recursive: true, force: true });
-                    setTimeout(connectToWhatsApp, 3000);
-                } else { setTimeout(connectToWhatsApp, 5000); }
+                statusConexao = "DESCONECTADO ❌";
+                io.emit('status', { status: statusConexao });
+                if (statusCode !== DisconnectReason.loggedOut) setTimeout(connectToWhatsApp, 5000);
             }
         });
 
@@ -139,7 +152,7 @@ async function connectToWhatsApp() {
 
             const jid = msg.key.remoteJid;
             const from = jid.split('@')[0].replace(/\D/g, '');
-            const pushName = msg.pushName || "Cliente";
+            const pushName = msg.pushName || from; 
             const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
             if (!text) return;
 
@@ -159,22 +172,19 @@ async function connectToWhatsApp() {
             await saveMessage(jid, msgObj, pushName);
             io.emit('new_msg', msgObj);
 
-            // INTELIGÊNCIA DO MENU (DENTRO DO BOT PARA RESPOSTA INSTANTÂNEA)
+            // VERIFICA SE ESTÁ EM ATENDIMENTO MANUAL
+            const chat = db.get(`chats.${jid}`).value();
+            if (chat && chat.atendimentoManual) {
+                console.log(`⏳ Atendimento manual ativo para ${pushName}. Robô em silêncio.`);
+                return;
+            }
+
+            // LÓGICA DO MENU
             let reply = "";
             const lowerText = text.toLowerCase();
 
             if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
-                reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.
-
-Como posso te ajudar hoje?
-
-1️⃣ - Ver Cardápio Digital 📖
-2️⃣ - Fazer um Pedido 🛒
-3️⃣ - Promoções do Dia 🔥
-4️⃣ - Endereço e Horário 📍
-5️⃣ - Falar com o Atendente 👨‍💻
-
-_Digite apenas o número da opção desejada._`;
+                reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1️⃣ - Ver Cardápio Digital 📖\n2️⃣ - Fazer um Pedido 🛒\n3️⃣ - Promoções do Dia 🔥\n4️⃣ - Endereço e Horário 📍\n5️⃣ - Falar com o Atendente 👨‍💻\n\n_Digite apenas o número da opção desejada._`;
             } else {
                 if (lowerText === '1') {
                     reply = "📖 *CARDÁDIO DIGITAL*\n\nVocê pode ver todos os nossos itens e preços clicando no link abaixo:\nhttps://garconnexpress.vercel.app/cardapio/\n\n_(Escolha o que deseja e nos mande o pedido por aqui!)_";
@@ -215,13 +225,12 @@ _Digite apenas o número da opção desejada._`;
                 io.emit('new_msg', replyObj);
             }
         });
-        } catch (err) { setTimeout(connectToWhatsApp, 5000); }
+    } catch (err) { setTimeout(connectToWhatsApp, 5000); }
 }
 
 initDB().then(() => {
-    server.listen(port, () => { 
-        console.log(`🚀 PAINEL: http://localhost:${port}`); 
-        connectToWhatsApp(); 
+    server.listen(port, () => {
+        console.log(`🚀 PAINEL: http://localhost:${port}`);
+        connectToWhatsApp();
     });
 });
-
