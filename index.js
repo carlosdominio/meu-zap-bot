@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
 
     socket.on('delete_chat', async (jid) => {
         if (db) {
-            await db.unset(`chats.${jid}`).write();
+            await db.get('chats').unset(jid).write();
             io.emit('chat_deleted', jid);
         }
     });
@@ -65,18 +65,22 @@ io.on('connection', (socket) => {
 
 async function saveMessage(jid, msg, name) {
     if (jid.includes('@newsletter') || jid.includes('@broadcast')) return;
-    const chatPath = `chats.${jid}`;
-    if (!db.has(chatPath).value()) {
-        await db.set(chatPath, { name: jid.split('@')[0], messages: [] }).write();
+    
+    // Usamos array no path para evitar que os pontos do JID (ex: @s.whatsapp.net) 
+    // sejam interpretados pelo lowdb/lodash como separadores de objetos
+    const chatPath = ['chats', jid];
+    
+    if (!db.get('chats').has(jid).value()) {
+        await db.get('chats').set(jid, { name: jid.split('@')[0], messages: [] }).write();
     }
     
-    const msgs = db.get(`${chatPath}.messages`).value() || [];
+    const msgs = db.get(['chats', jid, 'messages']).value() || [];
     if (msgs.some(m => m.id === msg.id)) return;
 
-    await db.get(`${chatPath}.messages`).push(msg).write();
+    await db.get(['chats', jid, 'messages']).push(msg).write();
     
     if (name && name !== "Voce" && name !== "Robo") {
-        await db.set(`${chatPath}.name`, name).write();
+        await db.get(['chats', jid]).set('name', name).write();
     }
 }
 
@@ -97,10 +101,11 @@ async function connectToWhatsApp() {
 
         sock.ev.on('messages.upsert', async (m) => {
             const msg = m.messages[0];
-            if (!msg.message || msg.key.fromMe) return;
+            if (!msg.message) return; // Permitir fromMe para salvar mensagens do próprio robô
 
             const jid = msg.key.remoteJid;
-            const pushName = msg.pushName || jid.split('@')[0];
+            const fromMe = msg.key.fromMe;
+            const pushName = fromMe ? "Voce" : (msg.pushName || jid.split('@')[0]);
             const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
             if (!text) return;
 
@@ -108,7 +113,7 @@ async function connectToWhatsApp() {
                 id: msg.key.id, 
                 from: jid,
                 text: text, 
-                fromMe: false, 
+                fromMe: fromMe, 
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
                 sender: jid, 
                 pushName: pushName
@@ -116,6 +121,9 @@ async function connectToWhatsApp() {
 
             await saveMessage(jid, msgObj, pushName);
             io.emit('new_msg', msgObj);
+
+            // Não responde se a mensagem for enviada pelo próprio robô (evita loop)
+            if (fromMe) return;
 
             // MENU DO ROBÔ (Sempre ativo)
             let reply = "";
