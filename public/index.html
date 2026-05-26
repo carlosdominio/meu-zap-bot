@@ -20,9 +20,14 @@
         .msg { max-width: 70%; padding: 10px 15px; border-radius: 8px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .msg-recebida { align-self: flex-start; background: white; }
         .msg-enviada { align-self: flex-end; background: #d9fdd3; }
-        footer { background: #f0f2f5; padding: 10px 20px; display: flex; gap: 10px; border-top: 1px solid #ddd; }
+        .audio-msg { min-width: 200px; }
+        footer { background: #f0f2f5; padding: 10px 20px; display: flex; gap: 10px; border-top: 1px solid #ddd; align-items: center; }
         input { flex: 1; padding: 12px; border: none; border-radius: 8px; outline: none; }
         .btn-action { background: #00a884; color: white; border: none; padding: 10px; border-radius: 50%; cursor: pointer; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        #btn-record { background: #7f8c8d; }
+        #btn-record.recording { background: #e74c3c; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         #qr-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
         /* Switch CSS */
@@ -57,7 +62,8 @@
     </div>
     <div id="messages"></div>
     <footer id="chat-footer" style="display: none;">
-        <input type="text" id="msg-input" placeholder="Digite uma mensagem...">
+        <button id="btn-record" class="btn-action" onclick="toggleRecording()">🎤</button>
+        <input type="text" id="msg-input" placeholder="Digite uma mensagem..." onkeyup="handleKeyUp(event)">
         <button class="btn-action" onclick="enviar()">></button>
     </footer>
 </div>
@@ -66,6 +72,8 @@
     const socket = io();
     let currentJid = null;
     let chatData = {};
+    let mediaRecorder;
+    let audioChunks = [];
 
     socket.on('status', (data) => {
         document.getElementById('status-text').innerText = data.status;
@@ -117,7 +125,7 @@
             const chat = chatData[jid];
             const item = document.createElement('div');
             item.className = 'chat-item' + (jid === currentJid ? ' active' : '');
-            item.onclick = () => openChat(jid); // Clique direto no item
+            item.onclick = () => openChat(jid);
             const statusIcon = chat.atendimentoManual ? '👤' : '🤖';
             item.innerHTML = `
                 <div class="chat-info">
@@ -146,6 +154,33 @@
             chatData[jid].messages.forEach(renderMessage);
         }
         updateChatList();
+        scrollToBottom();
+    }
+
+    function renderMessage(msg) {
+        const div = document.createElement('div');
+        div.className = 'msg ' + (msg.fromMe ? 'msg-enviada' : 'msg-recebida');
+        
+        let content = `<p>${msg.text}</p>`;
+        if (msg.audioUrl) {
+            content = `<audio controls class="audio-msg"><source src="${msg.audioUrl}" type="audio/ogg"></audio>`;
+        }
+        
+        div.innerHTML = `
+            ${content}
+            <small style="display:block; text-align:right; font-size:10px; margin-top:5px; opacity:0.6;">${msg.time}</small>
+        `;
+        document.getElementById('messages').appendChild(div);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        const msgDiv = document.getElementById('messages');
+        msgDiv.scrollTop = msgDiv.scrollHeight;
+    }
+
+    function handleKeyUp(e) {
+        if (e.key === 'Enter') enviar();
     }
 
     function toggleHumanControl(checked) {
@@ -153,19 +188,11 @@
         socket.emit('toggle_atendimento', { jid: currentJid, status: checked });
     }
 
-    function renderMessage(msg) {
-        const messagesDiv = document.getElementById('messages');
-        const div = document.createElement('div');
-        div.id = 'msg-' + msg.id;
-        div.className = 'msg ' + (msg.fromMe ? 'msg-enviada' : 'msg-recebida');
-        div.innerHTML = '<span>' + msg.text + '</span><br><small style="font-size: 10px; color: #999;">' + msg.time + '</small>';
-        messagesDiv.appendChild(div);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-
-    function apagarConversa(event, jid) {
-        event.stopPropagation();
-        if (confirm('Apagar conversa?')) socket.emit('delete_chat', jid);
+    function apagarConversa(e, jid) {
+        e.stopPropagation();
+        if (confirm('Apagar esta conversa?')) {
+            socket.emit('delete_chat', jid);
+        }
     }
 
     function apagarConversaAtual() {
@@ -179,6 +206,35 @@
         if (!input.value.trim() || !currentJid) return;
         socket.emit('send_msg', { number: currentJid, text: input.value });
         input.value = '';
+    }
+
+    // Lógica de Gravação de Áudio
+    async function toggleRecording() {
+        const btn = document.getElementById('btn-record');
+        if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            
+            mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const reader = new FileReader();
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = () => {
+                    const base64 = reader.result;
+                    socket.emit('send_audio', { number: currentJid, audio: base64 });
+                };
+            };
+            
+            mediaRecorder.start();
+            btn.classList.add('recording');
+            btn.innerText = '⏹️';
+        } else {
+            mediaRecorder.stop();
+            btn.classList.remove('recording');
+            btn.innerText = '🎤';
+        }
     }
 </script>
 </body>
