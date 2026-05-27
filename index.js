@@ -97,7 +97,7 @@ io.on('connection', (socket) => {
             const chats = db.get('chats').value() || {};
             if (chats[jid]) {
                 delete chats[jid];
-                // Forçamos uma nova referência de objeto para o lowdb detectar a mudança
+                // ForÃ§amos uma nova referÃªncia de objeto para o lowdb detectar a mudanÃ§a
                 await db.set('chats', { ...chats }).write();
                 io.emit('chat_deleted', jid);
                 console.log(`[Zap] Chat excluído: ${jid}`);
@@ -152,7 +152,7 @@ async function saveMessage(jid, msg, name) {
     chats[jid].lastUpdate = Date.now();
 
     // Se a mensagem não é nossa, incrementamos o contador de não lidas.
-    // EXCEÃÃO: No "Pedidos Zap" (nosso número), sempre incrementamos se chegar atividade nova.
+    // EXCEÃÂÃÂO: No "Pedidos Zap" (nosso número), sempre incrementamos se chegar atividade nova.
     const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0];
     const isSelf = myJid && jid.includes(myJid);
 
@@ -161,7 +161,7 @@ async function saveMessage(jid, msg, name) {
     }
     
     if (isSelf) {
-        chats[jid].name = "Pedidos Zap ð¦";
+        chats[jid].name = "Pedidos Zap Ã°ÂÂÂ¦";
     } else if (name && name !== "Voce" && name !== "Robo") {
         chats[jid].name = name;
     }
@@ -200,7 +200,7 @@ async function connectToWhatsApp() {
             let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
             let audioUrl = null;
 
-            // Tratamento de Ãudio Recebido
+            // Tratamento de ÃÂudio Recebido
             if (msg.message.audioMessage) {
                 try {
                     const stream = await downloadContentFromMessage(msg.message.audioMessage, 'audio');
@@ -209,7 +209,7 @@ async function connectToWhatsApp() {
                         buffer = Buffer.concat([buffer, chunk]);
                     }
                     audioUrl = `data:audio/ogg;base64,${buffer.toString('base64')}`;
-                    text = "ð¤ Ãudio recebido";
+                    text = "Ã°ÂÂÂ¤ ÃÂudio recebido";
                 } catch (err) { console.log("Erro ao baixar áudio:", err); }
             }
 
@@ -234,14 +234,14 @@ async function connectToWhatsApp() {
             const atendimentoManual = db.get(['chats', jid, 'atendimentoManual']).value() || false;
             if (atendimentoManual) return;
 
-            // MENU DO ROBÃ (Apenas para texto)
-            if (text && text !== "ð¤ Ãudio recebido") {
-                // VERIFICAÃÃO DE CAIXA (ESTABELECIMENTO ABERTO/FECHADO)
+            // MENU DO ROBÃÂ (Apenas para texto)
+            if (text && text !== "Ã°ÂÂÂ¤ ÃÂudio recebido") {
+                // VERIFICAÃÂÃÂO DE CAIXA (ESTABELECIMENTO ABERTO/FECHADO)
                 const caixaAberto = await verificarCaixaAberto();
                 if (!caixaAberto) {
-                    const closedMsg = `Olá ${pushName}! ð Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\n⏰ *Horário de Funcionamento:*\nDiariamente das 18h às 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
+                    const closedMsg = `Olá ${pushName}! Ã°ÂÂÂ Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\nâ° *Horário de Funcionamento:*\nDiariamente das 18h Ã s 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
                     const s = await sock.sendMessage(jid, { text: closedMsg });
-                    const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô ð¤" };
+                    const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "RobÃ´ Ã°ÂÂ¤Â" };
                     await saveMessage(jid, rObj, "Robo");
                     io.emit('new_msg', rObj);
                     return;
@@ -251,35 +251,35 @@ async function connectToWhatsApp() {
                 const lowerText = text.toLowerCase();
 
                 if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
-                    reply = `Olá ${pushName}! ð Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1ï¸â£ - Ver Cardápio Digital ð\n2ï¸â£ - Fazer um Pedido ð\n3ï¸â£ - Promoções do Dia ð¥\n4ï¸â£ - Endereço e Horário ð\n5ï¸â£ - Falar com o Atendente ð¨âð»\n\n_Digite apenas o número da opção desejada._`;
+                    reply = `Olá ${pushName}! Ã°ÂÂÂ Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1Ã¯Â¸ÂÃ¢ÂÂ£ - Ver Cardápio Digital Ã°ÂÂÂ\n2Ã¯Â¸ÂÃ¢ÂÂ£ - Fazer um Pedido Ã°ÂÂÂ\n3Ã¯Â¸ÂÃ¢ÂÂ£ - PromoÃ§ões do Dia Ã°ÂÂÂ¥\n4Ã¯Â¸ÂÃ¢ÂÂ£ - EndereÃ§o e Horário Ã°ÂÂÂ\n5Ã¯Â¸ÂÃ¢ÂÂ£ - Falar com o Atendente Ã°ÂÂÂ¨Ã¢ÂÂÃ°ÂÂÂ»\n\n_Digite apenas o número da opção desejada._`;
                 } else {
                     if (lowerText === '1') {
-                        reply = `ð *CARDÃPIO DIGITAL*\n\nPara visualizar nossos produtos, você pode acessar nosso link:\nhttps://garconnexpress.vercel.app/cardapio/\n\nð¡ *Dica:* Se você estiver em uma de nossas mesas, utilize o *QR Code* fixado nela para fazer o seu pedido diretamente!`;
+                        reply = `Ã°ÂÂÂ *CARDÃÂPIO DIGITAL*\n\nPara visualizar nossos produtos, vocÃª pode acessar nosso link:\nhttps://garconnexpress.vercel.app/cardapio/\n\nÃ°ÂÂÂ¡ *Dica:* Se vocÃª estiver em uma de nossas mesas, utilize o *QR Code* fixado nela para fazer o seu pedido diretamente!`;
                     } else if (lowerText === '2') {
-                        reply = `ð *FAZER UM PEDIDO*\n\nPara sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e você poderá realizar seu pedido de forma rápida! ð\n\nð¬ *Dúvidas?* Em caso de dúvida, basta chamar o garçom mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
+                        reply = `Ã°ÂÂÂ *FAZER UM PEDIDO*\n\nPara sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e vocÃª poderá realizar seu pedido de forma rápida! Ã°ÂÂÂ\n\nÃ°ÂÂÂ¬ *Dúvidas?* Em caso de dúvida, basta chamar o garÃ§om mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
                     } else if (lowerText === '3') {
                         try {
                             const response = await fetch('https://garconnexpress.vercel.app/api/menu');
                             const menu = await response.json();
                             const promos = menu.filter(item => item.em_promocao && (item.visivel === true || item.visivel === 1));
-                            let promoMsg = "ð¥ *PROMOÃÃES DO DIA*\n\n";
+                            let promoMsg = "Ã°ÂÂÂ¥ *PROMOÃÂÃÂES DO DIA*\n\n";
                             if (promos.length > 0) {
                                 promos.forEach(p => {
                                     const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
-                                    promoMsg += `â *${p.nome}*\nð° ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\n\n`;
+                                    promoMsg += `Ã¢ÂÂ *${p.nome}*\nÃ°ÂÂÂ° ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\n\n`;
                                 });
                                 promoMsg += "_Aproveite que é por tempo limitado!_";
                             } else {
-                                promoMsg += "No momento não temos promoções ativas, mas fique de olho no nosso cardápio! ð";
+                                promoMsg += "No momento não temos promoÃ§ões ativas, mas fique de olho no nosso cardápio! Ã°ÂÂÂ";
                             }
                             reply = promoMsg;
                         } catch (e) {
-                            reply = "ð¥ *PROMOÃÃES DO DIA*\n\nNo momento não conseguimos carregar as promoções. Por favor, tente novamente em instantes ou veja no nosso cardápio digital!";
+                            reply = "Ã°ÂÂÂ¥ *PROMOÃÂÃÂES DO DIA*\n\nNo momento não conseguimos carregar as promoÃ§ões. Por favor, tente novamente em instantes ou veja no nosso cardápio digital!";
                         }
                     } else if (lowerText === '4') {
-                        reply = "ð *ENDEREÃO E HORÃRIO*\n\nð  Endereço: rua democrito gracindo 132 ponta grossa\n⏰ Horário: Diariamente das 18h às 02:00";
+                        reply = "Ã°ÂÂÂ *ENDEREÃÂO E HORÃÂRIO*\n\nÃ°ÂÂÂ  EndereÃ§o: rua democrito gracindo 132 ponta grossa\nâ° Horário: Diariamente das 18h Ã s 02:00";
                     } else if (lowerText === '5') {
-                        reply = "ð¨âð» *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
+                        reply = "Ã°ÂÂÂ¨Ã¢ÂÂÃ°ÂÂÂ» *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com vocÃª em breve!";
                         const chats = db.get('chats').value() || {};
                         if (chats[jid]) {
                             chats[jid].atendimentoManual = true;
@@ -291,7 +291,7 @@ async function connectToWhatsApp() {
 
                 if (reply) {
                     const s = await sock.sendMessage(jid, { text: reply });
-                    const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô ð¤" };
+                    const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "RobÃ´ Ã°ÂÂ¤Â" };
                     await saveMessage(jid, rObj, "Robo");
                     io.emit('new_msg', rObj);
                 }

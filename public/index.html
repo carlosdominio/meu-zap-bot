@@ -99,7 +99,7 @@
     <div id="chat-header">
         <span id="current-chat-name" style="flex: 1;">Selecione uma conversa</span>
         <div id="human-control-toggle" style="display: none; align-items: center; gap: 8px;">
-            <span id="status-label" style="font-size: 12px; color: #666;">Robô Ativo</span>
+            <span id="status-label" style="font-size: 12px; color: #666;">RobÃ´ Ativo</span>
             <label class="switch">
                 <input type="checkbox" id="human-toggle-input" onchange="toggleHumanControl(this.checked)">
                 <span class="slider round"></span>
@@ -109,7 +109,7 @@
     </div>
     <div id="messages"></div>
     <footer id="chat-footer" style="display: none;">
-        <button id="btn-record" class="btn-action" onclick="toggleRecording()">ð¤</button>
+        <button id="btn-record" class="btn-action" onclick="toggleRecording()">Ã°ÂÂÂ¤</button>
         <input type="text" id="msg-input" placeholder="Digite uma mensagem..." onkeyup="handleKeyUp(event)">
         <button class="btn-action" onclick="enviar()">></button>
     </footer>
@@ -170,7 +170,7 @@
             if (data.jid === currentJid) {
                 const input = document.getElementById('human-toggle-input');
                 input.checked = data.atendimentoManual;
-                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';
+                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'RobÃ´ Ativo';
             }
             updateChatList();
         }
@@ -204,7 +204,7 @@
             item.className = 'chat-item' + (jid === currentJid ? ' active' : '') + (isUnread ? ' unread' : '');
             
             item.onclick = () => openChat(jid);
-            const statusIcon = chat.atendimentoManual ? 'ð¤' : 'ð¤';
+            const statusIcon = chat.atendimentoManual ? 'Ã°ÂÂÂ¤' : 'Ã°ÂÂ¤Â';
             const totalMsgs = chat.messages ? chat.messages.length : 0;
 
             item.innerHTML = `
@@ -218,7 +218,7 @@
                         <small style="font-size: 10px; color: #999;">${new Date(chat.lastUpdate).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
                     </div>
                 </div>
-                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')" title="Apagar conversa">ðï¸</button>
+                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')" title="Apagar conversa">Ã°ÂÂÂÃ¯Â¸Â</button>
             `;
             listDiv.appendChild(item);
         });
@@ -237,7 +237,7 @@
         
         const isManual = chatData[jid].atendimentoManual || false;
         document.getElementById('human-toggle-input').checked = isManual;
-        document.getElementById('status-label').innerText = isManual ? 'Humano Ativo' : 'Robô Ativo';
+        document.getElementById('status-label').innerText = isManual ? 'Humano Ativo' : 'RobÃ´ Ativo';
 
         const messagesDiv = document.getElementById('messages');
         messagesDiv.innerHTML = '';
@@ -314,7 +314,7 @@
         }
     }
 
-    // Antigas funções que serão ignoradas ou substituídas
+    // Antigas funÃ§ões que serão ignoradas ou substituídas
     function _old_apagarConversa(e, jid) {
         e.stopPropagation();
         if (confirm('Apagar esta conversa?')) {
@@ -353,11 +353,11 @@
             };
             mediaRecorder.start();
             btn.classList.add('recording');
-            btn.innerText = 'â¹ï¸';
+            btn.innerText = 'Ã¢ÂÂ¹Ã¯Â¸Â';
         } else {
             mediaRecorder.stop();
             btn.classList.remove('recording');
-            btn.innerText = 'ð¤';
+            btn.innerText = 'Ã°ÂÂÂ¤';
         }
     }
 </script>
