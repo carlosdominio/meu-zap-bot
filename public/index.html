@@ -102,12 +102,10 @@
             chatData[jid].name = msg.pushName;
         }
 
-        // DEDUPLICAÇÃO
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
             chatData[jid].messages.push(msg);
             chatData[jid].lastUpdate = Date.now();
             
-            // Incrementa unread apenas se não for a conversa aberta e não for do robô
             if (jid !== currentJid && !msg.fromMe) {
                 chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1;
             }
@@ -117,11 +115,35 @@
         updateChatList();
     });
 
+    socket.on('chat_deleted', (jid) => { 
+        console.log("Recebido chat_deleted para:", jid);
+        delete chatData[jid]; 
+        if(currentJid === jid) { 
+            currentJid = null; 
+            document.getElementById('messages').innerHTML = ''; 
+            document.getElementById('chat-footer').style.display = 'none'; 
+            document.getElementById('human-control-toggle').style.display = 'none';
+            document.getElementById('current-chat-name').innerText = 'Selecione uma conversa';
+        } 
+        updateChatList(); 
+    });
+
+    socket.on('status_atendimento', (data) => {
+        if (chatData[data.jid]) {
+            chatData[data.jid].atendimentoManual = data.atendimentoManual;
+            if (data.jid === currentJid) {
+                const input = document.getElementById('human-toggle-input');
+                input.checked = data.atendimentoManual;
+                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';
+            }
+            updateChatList();
+        }
+    });
+
     function updateChatList() {
         const listDiv = document.getElementById('chat-list');
         listDiv.innerHTML = '';
 
-        // Ordenação: Mais recentes primeiro (baseado no lastUpdate)
         const sortedJids = Object.keys(chatData).sort((a, b) => {
             return (chatData[b].lastUpdate || 0) - (chatData[a].lastUpdate || 0);
         });
@@ -129,12 +151,8 @@
         sortedJids.forEach(jid => {
             const chat = chatData[jid];
             const item = document.createElement('div');
-            
-            // Classe unread se houver mensagens novas e não estiver aberta
             const isUnread = chat.unreadCount > 0;
-            item.className = 'chat-item' + 
-                             (jid === currentJid ? ' active' : '') + 
-                             (isUnread ? ' unread' : '');
+            item.className = 'chat-item' + (jid === currentJid ? ' active' : '') + (isUnread ? ' unread' : '');
             
             item.onclick = () => openChat(jid);
             const statusIcon = chat.atendimentoManual ? '👤' : '🤖';
@@ -147,7 +165,7 @@
                         ${isUnread ? `<span class="badge-msg badge-unread">${chat.unreadCount}</span>` : ''}
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <small style="color: #666;">${totalMsgs} msgs totais</small>
+                        <small style="color: #666;">${totalMsgs} msgs</small>
                         <small style="font-size: 10px; color: #999;">${new Date(chat.lastUpdate).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
                     </div>
                 </div>
@@ -159,8 +177,6 @@
 
     function openChat(jid) {
         currentJid = jid;
-        
-        // Zera contador de não lidas ao abrir e avisa o servidor
         if (chatData[jid]) {
             chatData[jid].unreadCount = 0;
             socket.emit('mark_seen', jid);
@@ -192,22 +208,15 @@
     }
 
     function renderMessage(msg) {
-        // BLOQUEIO DOM: Se o elemento já existe na tela, não cria outro
         if (document.getElementById(`msg-${msg.id}`)) return;
-
         const div = document.createElement('div');
         div.id = `msg-${msg.id}`;
         div.className = 'msg ' + (msg.fromMe ? 'msg-enviada' : 'msg-recebida');
-        
         let content = `<p>${msg.text}</p>`;
         if (msg.audioUrl) {
             content = `<audio controls class="audio-msg"><source src="${msg.audioUrl}" type="audio/ogg"></audio>`;
         }
-        
-        div.innerHTML = `
-            ${content}
-            <small style="display:block; text-align:right; font-size:10px; margin-top:5px; opacity:0.6;">${msg.time}</small>
-        `;
+        div.innerHTML = `${content}<small style="display:block; text-align:right; font-size:10px; margin-top:5px; opacity:0.6;">${msg.time}</small>`;
         document.getElementById('messages').appendChild(div);
         scrollToBottom();
     }
@@ -246,14 +255,12 @@
         input.value = '';
     }
 
-    // Lógica de Gravação de Áudio
     async function toggleRecording() {
         const btn = document.getElementById('btn-record');
         if (!mediaRecorder || mediaRecorder.state === 'inactive') {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
             audioChunks = [];
-            
             mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
             mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
@@ -264,7 +271,6 @@
                     socket.emit('send_audio', { number: currentJid, audio: base64 });
                 };
             };
-            
             mediaRecorder.start();
             btn.classList.add('recording');
             btn.innerText = '⏹️';
