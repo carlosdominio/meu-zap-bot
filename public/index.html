@@ -16,9 +16,16 @@
         .chat-info { flex: 1; overflow: hidden; }
         
         .badge-msg { background: #00a884; color: white; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: bold; margin-left: 5px; }
-        .badge-unread { background: #e74c3c; animation: pulse 1.5s infinite; }
+        .badge-unread { background: #e74c3c; animation: pulse-unread 1.5s infinite; box-shadow: 0 0 10px rgba(231, 76, 60, 0.5); }
 
-        .btn-del-chat { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; padding: 5px; opacity: 0.7; }
+        @keyframes pulse-unread {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .btn-del-chat { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; padding: 5px; opacity: 0.7; transition: transform 0.2s; }
+        .btn-del-chat:hover { transform: scale(1.2); opacity: 1; }
         #main-chat { flex: 1; display: flex; flex-direction: column; background: #efeae2; position: relative; }
         #chat-header { background: #f0f2f5; padding: 10px 20px; border-bottom: 1px solid #ddd; height: 60px; display: flex; align-items: center; font-weight: bold; }
         #messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }

@@ -97,8 +97,10 @@ io.on('connection', (socket) => {
             const chats = db.get('chats').value() || {};
             if (chats[jid]) {
                 delete chats[jid];
-                await db.set('chats', chats).write();
+                // Forçamos uma nova referência de objeto para o lowdb detectar a mudança
+                await db.set('chats', { ...chats }).write();
                 io.emit('chat_deleted', jid);
+                console.log(`[Zap] Chat excluído: ${jid}`);
             }
         }
     });
@@ -109,7 +111,7 @@ io.on('connection', (socket) => {
             const chats = db.get('chats').value() || {};
             if (chats[jid]) {
                 chats[jid].atendimentoManual = status;
-                await db.set('chats', chats).write();
+                await db.set('chats', { ...chats }).write();
                 io.emit('status_atendimento', { jid, atendimentoManual: status });
             }
         }
@@ -120,7 +122,7 @@ io.on('connection', (socket) => {
             const chats = db.get('chats').value() || {};
             if (chats[jid]) {
                 chats[jid].unreadCount = 0;
-                await db.set('chats', chats).write();
+                await db.set('chats', { ...chats }).write();
             }
         }
     });
@@ -136,7 +138,6 @@ async function saveMessage(jid, msg, name) {
         chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: false, unreadCount: 0, lastUpdate: Date.now() };
     }
     
-    // Atualiza timestamp de atividade
     chats[jid].lastUpdate = Date.now();
 
     // Se a mensagem não é nossa, incrementamos o contador de não lidas
@@ -144,7 +145,9 @@ async function saveMessage(jid, msg, name) {
         chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
     }
     
-    if (jid.includes(sock?.user?.id?.split(':')[0] || 'none')) {
+    // Identificação Robusta do Próprio Número (Pedidos Zap)
+    const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0]; // Ex: 5511999999999
+    if (myJid && jid.includes(myJid)) {
         chats[jid].name = "Pedidos Zap 📦";
     } else if (name && name !== "Voce" && name !== "Robo") {
         chats[jid].name = name;
@@ -155,7 +158,7 @@ async function saveMessage(jid, msg, name) {
     chats[jid].messages.push(msg);
     if (chats[jid].messages.length > 100) chats[jid].messages.shift();
     
-    await db.set('chats', chats).write();
+    await db.set('chats', { ...chats }).write();
 }
 
 async function connectToWhatsApp() {
