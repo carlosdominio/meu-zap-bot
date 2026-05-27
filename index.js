@@ -115,6 +115,16 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('mark_seen', async (jid) => {
+        if (db) {
+            const chats = db.get('chats').value() || {};
+            if (chats[jid]) {
+                chats[jid].unreadCount = 0;
+                await db.set('chats', chats).write();
+            }
+        }
+    });
+
     socket.on('ping', (cb) => { if(typeof cb === 'function') cb(); });
 });
 
@@ -123,7 +133,15 @@ async function saveMessage(jid, msg, name) {
     
     const chats = db.get('chats').value() || {};
     if (!chats[jid]) {
-        chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: false };
+        chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: false, unreadCount: 0, lastUpdate: Date.now() };
+    }
+    
+    // Atualiza timestamp de atividade
+    chats[jid].lastUpdate = Date.now();
+
+    // Se a mensagem não é nossa, incrementamos o contador de não lidas
+    if (!msg.fromMe) {
+        chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
     }
     
     if (jid.includes(sock?.user?.id?.split(':')[0] || 'none')) {

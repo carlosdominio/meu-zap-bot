@@ -10,9 +10,14 @@
         #sidebar { width: 350px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; } 
         #sidebar-header { background: #f0f2f5; padding: 15px; font-weight: bold; border-bottom: 1px solid #ddd; }
         #chat-list { flex: 1; overflow-y: auto; }
-        .chat-item { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .chat-item.active { background: #ebebeb; }
+        .chat-item { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .chat-item.active { background: #ebebeb !important; }
+        .chat-item.unread { background: #e6fffa; border-left: 4px solid #38b2ac; }
         .chat-info { flex: 1; overflow: hidden; }
+        
+        .badge-msg { background: #00a884; color: white; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: bold; margin-left: 5px; }
+        .badge-unread { background: #e74c3c; animation: pulse 1.5s infinite; }
+
         .btn-del-chat { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; padding: 5px; opacity: 0.7; }
         #main-chat { flex: 1; display: flex; flex-direction: column; background: #efeae2; position: relative; }
         #chat-header { background: #f0f2f5; padding: 10px 20px; border-bottom: 1px solid #ddd; height: 60px; display: flex; align-items: center; font-weight: bold; }
@@ -84,55 +89,60 @@
 
     socket.on('new_msg', (msg) => {
         const jid = msg.sender;
-        if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [] };
+        if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now() };
+        
         if (!msg.fromMe && msg.pushName && msg.pushName !== "Voce" && msg.pushName !== "Robo") {
             chatData[jid].name = msg.pushName;
         }
 
-        // DEDUPLICAÇÃO: Só adiciona se o ID ainda não existir no histórico
+        // DEDUPLICAÇÃO
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
             chatData[jid].messages.push(msg);
+            chatData[jid].lastUpdate = Date.now();
+            
+            // Incrementa unread apenas se não for a conversa aberta e não for do robô
+            if (jid !== currentJid && !msg.fromMe) {
+                chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1;
+            }
+            
             if (jid === currentJid) renderMessage(msg);
         }
         updateChatList();
     });
 
-    socket.on('chat_deleted', (jid) => { 
-        delete chatData[jid]; 
-        if(currentJid === jid) { 
-            currentJid = null; 
-            document.getElementById('messages').innerHTML = ''; 
-            document.getElementById('chat-footer').style.display = 'none'; 
-            document.getElementById('human-control-toggle').style.display = 'none';
-            document.getElementById('current-chat-name').innerText = 'Selecione uma conversa';
-        } 
-        updateChatList(); 
-    });
-
-    socket.on('status_atendimento', (data) => {
-        if (chatData[data.jid]) {
-            chatData[data.jid].atendimentoManual = data.atendimentoManual;
-            if (data.jid === currentJid) {
-                const input = document.getElementById('human-toggle-input');
-                input.checked = data.atendimentoManual;
-                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';
-            }
-        }
-    });
-
     function updateChatList() {
         const listDiv = document.getElementById('chat-list');
         listDiv.innerHTML = '';
-        Object.keys(chatData).forEach(jid => {
+
+        // Ordenação: Mais recentes primeiro (baseado no lastUpdate)
+        const sortedJids = Object.keys(chatData).sort((a, b) => {
+            return (chatData[b].lastUpdate || 0) - (chatData[a].lastUpdate || 0);
+        });
+
+        sortedJids.forEach(jid => {
             const chat = chatData[jid];
             const item = document.createElement('div');
-            item.className = 'chat-item' + (jid === currentJid ? ' active' : '');
+            
+            // Classe unread se houver mensagens novas e não estiver aberta
+            const isUnread = chat.unreadCount > 0;
+            item.className = 'chat-item' + 
+                             (jid === currentJid ? ' active' : '') + 
+                             (isUnread ? ' unread' : '');
+            
             item.onclick = () => openChat(jid);
             const statusIcon = chat.atendimentoManual ? '👤' : '🤖';
+            const totalMsgs = chat.messages ? chat.messages.length : 0;
+
             item.innerHTML = `
                 <div class="chat-info">
-                    <strong>${chat.name || jid.split('@')[0]} ${statusIcon}</strong><br>
-                    <small style="color: #666;">Chat Ativo</small>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <strong>${chat.name || jid.split('@')[0]} ${statusIcon}</strong>
+                        ${isUnread ? `<span class="badge-msg badge-unread">${chat.unreadCount}</span>` : ''}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <small style="color: #666;">${totalMsgs} msgs totais</small>
+                        <small style="font-size: 10px; color: #999;">${new Date(chat.lastUpdate).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
+                    </div>
                 </div>
                 <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')">X</button>
             `;
@@ -142,6 +152,13 @@
 
     function openChat(jid) {
         currentJid = jid;
+        
+        // Zera contador de não lidas ao abrir e avisa o servidor
+        if (chatData[jid]) {
+            chatData[jid].unreadCount = 0;
+            socket.emit('mark_seen', jid);
+        }
+
         document.getElementById('chat-footer').style.display = 'flex';
         document.getElementById('human-control-toggle').style.display = 'flex';
         document.getElementById('current-chat-name').innerText = chatData[jid].name || jid.split('@')[0];
@@ -153,7 +170,6 @@
         const messagesDiv = document.getElementById('messages');
         messagesDiv.innerHTML = '';
         if (chatData[jid].messages) {
-            // Garante que não haja duplicatas visuais na abertura por algum erro no db.json
             const uniqueMsgs = [];
             const ids = new Set();
             chatData[jid].messages.forEach(m => {
