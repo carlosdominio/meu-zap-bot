@@ -140,14 +140,16 @@ async function saveMessage(jid, msg, name) {
     
     chats[jid].lastUpdate = Date.now();
 
-    // Se a mensagem não é nossa, incrementamos o contador de não lidas
-    if (!msg.fromMe) {
+    // Se a mensagem não é nossa, incrementamos o contador de não lidas.
+    // EXCEÇÃO: No "Pedidos Zap" (nosso número), sempre incrementamos se chegar atividade nova.
+    const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0];
+    const isSelf = myJid && jid.includes(myJid);
+
+    if (!msg.fromMe || isSelf) {
         chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
     }
     
-    // Identificação Robusta do Próprio Número (Pedidos Zap)
-    const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0]; // Ex: 5511999999999
-    if (myJid && jid.includes(myJid)) {
+    if (isSelf) {
         chats[jid].name = "Pedidos Zap 📦";
     } else if (name && name !== "Voce" && name !== "Robo") {
         chats[jid].name = name;
