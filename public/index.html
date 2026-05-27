@@ -109,7 +109,7 @@
     </div>
     <div id="messages"></div>
     <footer id="chat-footer" style="display: none;">
-        <button id="btn-record" class="btn-action" onclick="toggleRecording()">🎤</button>
+        <button id="btn-record" class="btn-action" onclick="toggleRecording()">ð¤</button>
         <input type="text" id="msg-input" placeholder="Digite uma mensagem..." onkeyup="handleKeyUp(event)">
         <button class="btn-action" onclick="enviar()">></button>
     </footer>
@@ -204,7 +204,7 @@
             item.className = 'chat-item' + (jid === currentJid ? ' active' : '') + (isUnread ? ' unread' : '');
             
             item.onclick = () => openChat(jid);
-            const statusIcon = chat.atendimentoManual ? '👤' : '🤖';
+            const statusIcon = chat.atendimentoManual ? 'ð¤' : 'ð¤';
             const totalMsgs = chat.messages ? chat.messages.length : 0;
 
             item.innerHTML = `
@@ -218,7 +218,7 @@
                         <small style="font-size: 10px; color: #999;">${new Date(chat.lastUpdate).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
                     </div>
                 </div>
-                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')" title="Apagar conversa">🗑️</button>
+                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')" title="Apagar conversa">ðï¸</button>
             `;
             listDiv.appendChild(item);
         });
@@ -353,11 +353,11 @@
             };
             mediaRecorder.start();
             btn.classList.add('recording');
-            btn.innerText = '⏹️';
+            btn.innerText = 'â¹ï¸';
         } else {
             mediaRecorder.stop();
             btn.classList.remove('recording');
-            btn.innerText = '🎤';
+            btn.innerText = 'ð¤';
         }
     }
 </script>
