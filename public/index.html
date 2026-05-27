@@ -16,7 +16,7 @@
         .chat-info { flex: 1; overflow: hidden; }
         
         .badge-msg { background: #00a884; color: white; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: bold; margin-left: 5px; }
-        .badge-unread { background: #e74c3c; animation: pulse-unread 1.5s infinite; box-shadow: 0 0 10px rgba(231, 76, 60, 0.5); }
+        .badge-unread { background: #e74c3c;   }
 
         @keyframes pulse-unread {
             0% { transform: scale(1); opacity: 1; }
@@ -174,6 +174,19 @@
             updateChatList();
         }
     });
+
+    
+    function updateUnreadTitle() {
+        const totalUnread = Object.values(chatData).reduce((sum, chat) => sum + (chat.unreadCount || 0), 0);
+        if (totalUnread > 0) {
+            document.title = `(${totalUnread}) Painel Zap`;
+            // Notifica o Admin (pai) se estiver em um iframe
+            window.parent.postMessage({ type: 'whatsapp_unread', count: totalUnread }, '*');
+        } else {
+            document.title = 'Painel Zap';
+            window.parent.postMessage({ type: 'whatsapp_unread', count: 0 }, '*');
+        }
+    }
 
     function updateChatList() {
         const listDiv = document.getElementById('chat-list');
