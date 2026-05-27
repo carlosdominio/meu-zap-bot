@@ -127,7 +127,8 @@
         document.getElementById('qr-overlay').style.display = (data.status === 'CONECTADO') ? 'none' : 'flex';
     });
     socket.on('qr', (url) => { const img = document.getElementById('qr-img'); img.src = url; img.style.display = 'block'; });
-    socket.on('history', (history) => { chatData = history || {}; updateChatList(); });
+    socket.on('history', (history) => { chatData = history || {}; updateChatList();
+        setInterval(updateUnreadTitle, 5000); });
 
     socket.on('new_msg', (msg) => {
         const jid = msg.sender;
