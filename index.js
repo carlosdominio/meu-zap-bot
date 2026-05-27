@@ -47,17 +47,8 @@ io.on('connection', (socket) => {
         try {
             let jid = data.number;
             if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
-            const sent = await sock.sendMessage(jid, { text: data.text });
-            const msgObj = { 
-                id: sent.key.id, 
-                text: data.text, 
-                fromMe: true, 
-                time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
-                sender: jid, 
-                pushName: "Voce" 
-            };
-            await saveMessage(jid, msgObj, "Voce");
-            io.emit('new_msg', msgObj);
+            // Apenas enviamos. O messages.upsert cuidará de salvar e avisar o painel.
+            await sock.sendMessage(jid, { text: data.text });
         } catch (e) { console.log('Erro ao enviar texto:', e); }
     });
 
@@ -84,6 +75,7 @@ io.on('connection', (socket) => {
                     .on('error', async (err) => {
                         console.log('Erro na conversão ffmpeg, enviando original:', err);
                         await sock.sendMessage(jid, { audio: buffer, mimetype: 'audio/mp4', ptt: true });
+                        if (fs.existsSync(tempWebm)) fs.unlinkSync(tempWebm);
                     })
                     .on('end', async () => {
                         const oggBuffer = fs.readFileSync(tempOgg);
@@ -93,21 +85,10 @@ io.on('connection', (socket) => {
                     })
                     .save(tempOgg);
             } catch (ffmpegErr) {
-                console.log('FFMPEG não configurado ou erro ao carregar:', ffmpegErr);
+                console.log('FFMPEG não configurado:', ffmpegErr);
                 await sock.sendMessage(jid, { audio: buffer, mimetype: 'audio/mp4', ptt: true });
+                if (fs.existsSync(tempWebm)) fs.unlinkSync(tempWebm);
             }
-
-            const msgObj = { 
-                id: 'aud_' + Date.now(), 
-                text: "🎤 Áudio enviado", 
-                audioUrl: data.audio, 
-                fromMe: true, 
-                time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
-                sender: jid, 
-                pushName: "Voce" 
-            };
-            await saveMessage(jid, msgObj, "Voce");
-            io.emit('new_msg', msgObj);
         } catch (e) { console.log('Erro ao enviar áudio:', e); }
     });
 
