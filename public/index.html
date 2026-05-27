@@ -49,9 +49,44 @@
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #00a884; }
         input:checked + .slider:before { transform: translateX(20px); }
+    
+    /* Modal Custom */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center;
+        z-index: 1000;
+    }
+    .modal-content {
+        background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;
+    }
+    .modal-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #333; }
+    .modal-text { font-size: 1rem; color: #666; margin-bottom: 20px; }
+    .modal-buttons { display: flex; gap: 10px; justify-content: center; }
+    .btn-modal {
+        padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold;
+        transition: 0.2s; min-width: 100px;
+    }
+    .btn-cancel { background: #f0f2f5; color: #333; }
+    .btn-cancel:hover { background: #e2e5e9; }
+    .btn-confirm-del { background: #ff4d4d; color: white; }
+    .btn-confirm-del:hover { background: #e60000; }
+
     </style>
 </head>
 <body>
+
+<div id="modal-confirm" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-title">Apagar Conversa?</div>
+        <div class="modal-text">Deseja realmente apagar esta conversa permanentemente? Esta ação não pode ser desfeita.</div>
+        <div class="modal-buttons">
+            <button class="btn-modal btn-cancel" onclick="closeModal()">Cancelar</button>
+            <button class="btn-modal btn-confirm-del" id="btn-modal-confirm">Apagar</button>
+        </div>
+    </div>
+</div>
+
 <div id="qr-overlay" style="display: flex;">
     <h2 id="status-text">Iniciando...</h2>
     <img id="qr-img" src="" alt="QR Code" style="width: 250px; margin: 20px; display: none;">
@@ -235,7 +270,38 @@
         socket.emit('toggle_atendimento', { jid: currentJid, status: checked });
     }
 
+    
+    let jidToDelete = null;
+
+    function openConfirmModal(jid) {
+        jidToDelete = jid;
+        document.getElementById('modal-confirm').style.display = 'flex';
+        document.getElementById('btn-modal-confirm').onclick = () => {
+            if (jidToDelete) {
+                socket.emit('delete_chat', jidToDelete);
+                closeModal();
+            }
+        };
+    }
+
+    function closeModal() {
+        document.getElementById('modal-confirm').style.display = 'none';
+        jidToDelete = null;
+    }
+
     function apagarConversa(e, jid) {
+        e.stopPropagation();
+        openConfirmModal(jid);
+    }
+
+    function apagarConversaAtual() {
+        if (currentJid) {
+            openConfirmModal(currentJid);
+        }
+    }
+
+    // Antigas funções que serão ignoradas ou substituídas
+    function _old_apagarConversa(e, jid) {
         e.stopPropagation();
         if (confirm('Apagar esta conversa?')) {
             socket.emit('delete_chat', jid);
