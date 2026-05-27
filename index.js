@@ -130,6 +130,17 @@ io.on('connection', (socket) => {
     socket.on('ping', (cb) => { if(typeof cb === 'function') cb(); });
 });
 
+async function verificarCaixaAberto() {
+    try {
+        const response = await fetch('https://garconnexpress.vercel.app/api/caixa/status');
+        const caixa = await response.json();
+        return !!caixa; // Retorna true se houver um caixa aberto
+    } catch (e) {
+        console.error("Erro ao verificar caixa:", e);
+        return true; // Fallback: assume aberto para não perder vendas em caso de erro na API
+    }
+}
+
 async function saveMessage(jid, msg, name) {
     if (!jid || jid.includes('@newsletter') || jid.includes('@broadcast')) return;
     
@@ -225,6 +236,17 @@ async function connectToWhatsApp() {
 
             // MENU DO ROBÔ (Apenas para texto)
             if (text && text !== "🎤 Áudio recebido") {
+                // VERIFICAÇÃO DE CAIXA (ESTABELECIMENTO ABERTO/FECHADO)
+                const caixaAberto = await verificarCaixaAberto();
+                if (!caixaAberto) {
+                    const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\n⏰ *Horário de Funcionamento:*\nDiariamente das 18h às 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
+                    const s = await sock.sendMessage(jid, { text: closedMsg });
+                    const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
+                    await saveMessage(jid, rObj, "Robo");
+                    io.emit('new_msg', rObj);
+                    return;
+                }
+
                 let reply = "";
                 const lowerText = text.toLowerCase();
 
