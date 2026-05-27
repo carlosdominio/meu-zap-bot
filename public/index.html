@@ -151,7 +151,7 @@
                         <small style="font-size: 10px; color: #999;">${new Date(chat.lastUpdate).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
                     </div>
                 </div>
-                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')">X</button>
+                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')" title="Apagar conversa">🗑️</button>
             `;
             listDiv.appendChild(item);
         });
