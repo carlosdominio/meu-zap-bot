@@ -143,7 +143,7 @@
             chatData[jid].messages.push(msg);
             chatData[jid].lastUpdate = Date.now();
             
-            if (jid !== currentJid && !msg.fromMe) {
+            if (jid !== currentJid && (!msg.fromMe || chatData[jid].name === "Pedidos Zap 📦")) {
                 chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1;
             }
 
