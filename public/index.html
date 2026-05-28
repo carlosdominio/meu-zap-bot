@@ -81,7 +81,7 @@
         z-index: 2000; cursor: pointer;
     }
     #image-viewer-img {
-        max-width: 90%; max-height: 90%; border-radius: 8px;
+        max-width: 90vw; max-height: 90vh; width: auto; height: auto; object-fit: contain; border-radius: 8px;
         box-shadow: 0 5px 25px rgba(0,0,0,0.5); cursor: default;
     }
     #image-viewer-close {
@@ -98,6 +98,7 @@
 <!-- Image Viewer Modal -->
 <div id="image-viewer-overlay" onclick="fecharImagem()">
     <span id="image-viewer-close" onclick="fecharImagem()">&times;</span>
+    <button id="image-viewer-delete" onclick="deletarImagemAtual(event)" style="position: absolute; bottom: 30px; right: 30px; background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: none;">🗑️ Apagar Foto</button>
     <img class="modal-content" id="image-viewer-img" onclick="event.stopPropagation()">
 </div>
 
@@ -300,7 +301,7 @@
             msgContent += `<audio controls class="audio-msg"><source src="${msg.audioUrl}" type="audio/ogg"></audio>`;
         }
         if (msg.imageUrl) {
-            msgContent += `<br><img src="${msg.imageUrl}" onclick="abrirImagem(this.src)" style="max-width: 250px; border-radius: 8px; margin-top: 5px; cursor: pointer;" title="Clique para ampliar">`;
+            msgContent += `<br><img src="${msg.imageUrl}" onclick="abrirImagem(this.src, '${msg.id}', ${msg.fromMe ? 'true' : 'false'})" style="max-width: 250px; border-radius: 8px; margin-top: 5px; cursor: pointer;" title="Clique para ampliar">`;
         }
         
         div.innerHTML = msgContent + '<small style="display:block; text-align:right; font-size:10px; margin-top:5px; opacity:0.6;">' + msg.time + '</small>';
@@ -413,14 +414,44 @@
         }
     }
 
-    function abrirImagem(url) {
+    let currentViewerMsgId = null;
+    let currentViewerFromMe = null;
+
+    function abrirImagem(url, msgId, fromMe) {
         document.getElementById('image-viewer-img').src = url;
         document.getElementById('image-viewer-overlay').style.display = 'flex';
+        
+        currentViewerMsgId = msgId;
+        currentViewerFromMe = fromMe;
+        
+        // Só mostra a opção de apagar se soubermos a qual mensagem a foto pertence
+        const btnDelete = document.getElementById('image-viewer-delete');
+        if (msgId && btnDelete) {
+            btnDelete.style.display = 'block';
+        } else if (btnDelete) {
+            btnDelete.style.display = 'none';
+        }
     }
 
     function fecharImagem() {
         document.getElementById('image-viewer-overlay').style.display = 'none';
         document.getElementById('image-viewer-img').src = '';
+        currentViewerMsgId = null;
+    }
+
+    function deletarImagemAtual(event) {
+        event.stopPropagation();
+        if (currentViewerMsgId && currentJid) {
+            if (confirm('Deseja realmente APAGAR esta imagem para você e para o cliente?')) {
+                socket.emit('delete_msg', { jid: currentJid, id: currentViewerMsgId, fromMe: currentViewerFromMe });
+                
+                // Remove visualmente da tela
+                const msgEl = document.getElementById('msg-' + currentViewerMsgId);
+                if (msgEl) msgEl.remove();
+                
+                fecharImagem();
+            }
+        }
     }
 
     function abrirImagem(url) {

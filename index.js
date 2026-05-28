@@ -52,6 +52,31 @@ io.on('connection', (socket) => {
         } catch (e) { console.log('Erro ao enviar texto:', e); }
     });
 
+    socket.on('delete_msg', async (data) => {
+        if (!sock || statusConexao !== "CONECTADO") return;
+        try {
+            const jid = data.jid;
+            const msgId = data.id;
+            const fromMe = data.fromMe;
+
+            // Delete from WhatsApp for everyone (or just for me if time limit passed)
+            await sock.sendMessage(jid, { delete: { remoteJid: jid, fromMe: fromMe, id: msgId } });
+
+            // Delete from local DB history
+            const chats = db.get('chats').value() || {};
+            if (chats[jid] && chats[jid].messages) {
+                chats[jid].messages = chats[jid].messages.filter(m => m.id !== msgId);
+                await db.set('chats', chats).write();
+            }
+            
+            // Notify frontend
+            io.emit('history', chats);
+            console.log(`[BOT] Mensagem ${msgId} apagada com sucesso!`);
+        } catch (err) {
+            console.error('Erro ao deletar mensagem:', err);
+        }
+    });
+
     socket.on('send_image', async (data) => {
         if (!sock || statusConexao !== "CONECTADO") return;
         try {
