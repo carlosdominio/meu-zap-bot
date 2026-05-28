@@ -26,6 +26,18 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 }); // 100 MB Limit for images/audio
+
+// --- AUTO-PING PARA MANTER 24H NO RENDER ---
+if (process.env.RENDER_EXTERNAL_HOSTNAME) {
+    const RENDER_URL = `https://${process.env.RENDER_EXTERNAL_HOSTNAME}.onrender.com`;
+    setInterval(() => {
+        http.get(RENDER_URL, (res) => {
+            console.log(`Self-ping: Status ${res.statusCode}`);
+        }).on('error', (err) => {
+            console.log('Self-ping error:', err.message);
+        });
+    }, 1000 * 60 * 10); // Ping a cada 10 minutos
+}
 const port = process.env.PORT || 3000;
 
 app.use(express.static('public'));
