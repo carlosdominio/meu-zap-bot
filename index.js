@@ -243,6 +243,7 @@ async function connectToWhatsApp() {
             
             let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
             let audioUrl = null;
+            let imageUrl = null;
 
             // Tratamento de Áudio Recebido
             if (msg.message.audioMessage) {
@@ -257,13 +258,27 @@ async function connectToWhatsApp() {
                 } catch (err) { console.log("Erro ao baixar áudio:", err); }
             }
 
-            if (!text && !audioUrl) return;
+            // Tratamento de Imagem Recebida
+            if (msg.message.imageMessage) {
+                try {
+                    const stream = await downloadContentFromMessage(msg.message.imageMessage, 'image');
+                    let buffer = Buffer.from([]);
+                    for await (const chunk of stream) {
+                        buffer = Buffer.concat([buffer, chunk]);
+                    }
+                    imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+                    text = "🖼️ Imagem recebida";
+                } catch (err) { console.log("Erro ao baixar imagem:", err); }
+            }
+
+            if (!text && !audioUrl && !imageUrl) return;
 
             const msgObj = { 
                 id: msg.key.id, 
                 from: jid,
                 text: text, 
                 audioUrl: audioUrl,
+                imageUrl: imageUrl,
                 fromMe: fromMe, 
                 time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
                 sender: jid, 
