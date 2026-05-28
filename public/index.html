@@ -7,9 +7,13 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #d1d7db; height: 100vh; display: flex; overflow: hidden; }
-        #sidebar { width: 350px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        body.no-scroll { overflow: hidden !important; }
+        #sidebar { width: 350px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; height: 100vh; }
         #sidebar-header { background: #f0f2f5; padding: 15px; font-weight: bold; border-bottom: 1px solid #ddd; }
-        #chat-list { flex: 1; overflow-y: auto; }
+        #chat-list { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #00a884 transparent; }
+        #chat-list::-webkit-scrollbar { width: 6px; }
+        #chat-list::-webkit-scrollbar-thumb { background: #00a884; border-radius: 10px; }
+        
         .chat-item { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
         .chat-item.active { background: #ebebeb !important; }
         .chat-item.unread { background: #e6fffa; border-left: 4px solid #38b2ac; }
@@ -70,7 +74,7 @@
         .msg:hover .btn-msg-del { opacity: 1; }
         .btn-msg-del:hover { color: #e74c3c; }
         #image-viewer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 2000; cursor: pointer; }
-        #image-viewer-img { max-width: 90vw; max-height: 90vh; width: auto; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); cursor: default; }
+        #image-viewer-img { max-width: 98vw; max-height: 98vh; width: auto; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); cursor: default; }
         #image-viewer-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         #image-viewer-close:hover { color: #ccc; }
     </style>
@@ -306,6 +310,7 @@
         const btnDelete = document.getElementById('image-viewer-delete');
         img.src = url;
         overlay.style.display = 'flex';
+        document.body.classList.add('no-scroll');
         currentViewerMsgId = msgId;
         currentViewerFromMe = fromMe;
         if (msgId && btnDelete) { btnDelete.style.display = 'block'; } else { if (btnDelete) btnDelete.style.display = 'none'; }
@@ -313,6 +318,7 @@
     function fecharImagem() {
         document.getElementById('image-viewer-overlay').style.display = 'none';
         document.getElementById('image-viewer-img').src = '';
+        document.body.classList.remove('no-scroll');
         currentViewerMsgId = null;
     }
     function closeModalImagem() {
