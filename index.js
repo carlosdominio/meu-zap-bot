@@ -209,7 +209,7 @@ async function connectToWhatsApp() {
                         buffer = Buffer.concat([buffer, chunk]);
                     }
                     audioUrl = `data:audio/ogg;base64,${buffer.toString('base64')}`;
-                    text = "Ã°ÂÂÂ¤ ÃÂudio recebido";
+                    text = "🎙️ ÃÂudio recebido";
                 } catch (err) { console.log("Erro ao baixar áudio:", err); }
             }
 
@@ -235,13 +235,13 @@ async function connectToWhatsApp() {
             if (atendimentoManual) return;
 
             // MENU DO ROBÃÂ (Apenas para texto)
-            if (text && text !== "Ã°ÂÂÂ¤ ÃÂudio recebido") {
+            if (text && text !== "🎙️ ÃÂudio recebido") {
                 // VERIFICAÃÂÃÂO DE CAIXA (ESTABELECIMENTO ABERTO/FECHADO)
                 const caixaAberto = await verificarCaixaAberto();
                 if (!caixaAberto) {
                     const closedMsg = `Olá ${pushName}! Ã°ÂÂÂ Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\nâ° *Horário de Funcionamento:*\nDiariamente das 18h Ã s 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
                     const s = await sock.sendMessage(jid, { text: closedMsg });
-                    const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "RobÃ´ Ã°ÂÂ¤Â" };
+                    const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
                     await saveMessage(jid, rObj, "Robo");
                     io.emit('new_msg', rObj);
                     return;
@@ -291,7 +291,7 @@ async function connectToWhatsApp() {
 
                 if (reply) {
                     const s = await sock.sendMessage(jid, { text: reply });
-                    const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "RobÃ´ Ã°ÂÂ¤Â" };
+                    const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
                     await saveMessage(jid, rObj, "Robo");
                     io.emit('new_msg', rObj);
                 }

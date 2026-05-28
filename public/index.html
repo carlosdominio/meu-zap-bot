@@ -13,7 +13,8 @@
         .chat-item { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
         .chat-item.active { background: #ebebeb !important; }
         .chat-item.unread { background: #e6fffa; border-left: 4px solid #38b2ac; }
-        .chat-info { flex: 1; overflow: hidden; }
+        .chat-info { flex: 1; overflow: hidden; min-width: 0; max-width: 250px; }
+        .chat-info strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         
         .badge-msg { background: #00a884; color: white; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: bold; margin-left: 5px; }
         .badge-unread { background: #e74c3c;   }
@@ -97,9 +98,9 @@
 </div>
 <div id="main-chat">
     <div id="chat-header">
-        <span id="current-chat-name" style="flex: 1;">Selecione uma conversa</span>
+        <span id="current-chat-name" style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Selecione uma conversa</span>
         <div id="human-control-toggle" style="display: none; align-items: center; gap: 8px;">
-            <span id="status-label" style="font-size: 12px; color: #666;">RobÃ´ Ativo</span>
+            <span id="status-label" style="font-size: 12px; color: #666;">Robô Ativo</span>
             <label class="switch">
                 <input type="checkbox" id="human-toggle-input" onchange="toggleHumanControl(this.checked)">
                 <span class="slider round"></span>
@@ -109,7 +110,7 @@
     </div>
     <div id="messages"></div>
     <footer id="chat-footer" style="display: none;">
-        <button id="btn-record" class="btn-action" onclick="toggleRecording()">Ã°ÂÂÂ¤</button>
+        <button id="btn-record" class="btn-action" onclick="toggleRecording()">🎙️</button>
         <input type="text" id="msg-input" placeholder="Digite uma mensagem..." onkeyup="handleKeyUp(event)">
         <button class="btn-action" onclick="enviar()">></button>
     </footer>
@@ -145,6 +146,11 @@
             if (jid !== currentJid && !msg.fromMe) {
                 chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1;
             }
+
+            // FIX: Notificar sempre o pai (Admin) sobre novas mensagens, mesmo se o chat estiver aberto
+            if (!msg.fromMe) {
+                window.parent.postMessage({ type: 'whatsapp_new_activity', jid: jid, active: (jid === currentJid) }, '*'), '*');
+            }
             
             if (jid === currentJid) renderMessage(msg);
         }
@@ -170,7 +176,7 @@
             if (data.jid === currentJid) {
                 const input = document.getElementById('human-toggle-input');
                 input.checked = data.atendimentoManual;
-                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'RobÃ´ Ativo';
+                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';
             }
             updateChatList();
         }
@@ -204,7 +210,7 @@
             item.className = 'chat-item' + (jid === currentJid ? ' active' : '') + (isUnread ? ' unread' : '');
             
             item.onclick = () => openChat(jid);
-            const statusIcon = chat.atendimentoManual ? 'Ã°ÂÂÂ¤' : 'Ã°ÂÂ¤Â';
+            const statusIcon = chat.atendimentoManual ? '👤' : '🤖';
             const totalMsgs = chat.messages ? chat.messages.length : 0;
 
             item.innerHTML = `
@@ -218,7 +224,7 @@
                         <small style="font-size: 10px; color: #999;">${new Date(chat.lastUpdate).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
                     </div>
                 </div>
-                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')" title="Apagar conversa">Ã°ÂÂÂÃ¯Â¸Â</button>
+                <button class="btn-del-chat" onclick="apagarConversa(event, '${jid}')" title="Apagar conversa">🗑️</button>
             `;
             listDiv.appendChild(item);
         });
@@ -237,7 +243,7 @@
         
         const isManual = chatData[jid].atendimentoManual || false;
         document.getElementById('human-toggle-input').checked = isManual;
-        document.getElementById('status-label').innerText = isManual ? 'Humano Ativo' : 'RobÃ´ Ativo';
+        document.getElementById('status-label').innerText = isManual ? 'Humano Ativo' : 'Robô Ativo';
 
         const messagesDiv = document.getElementById('messages');
         messagesDiv.innerHTML = '';
@@ -353,11 +359,11 @@
             };
             mediaRecorder.start();
             btn.classList.add('recording');
-            btn.innerText = 'Ã¢ÂÂ¹Ã¯Â¸Â';
+            btn.innerText = '⏹️';
         } else {
             mediaRecorder.stop();
             btn.classList.remove('recording');
-            btn.innerText = 'Ã°ÂÂÂ¤';
+            btn.innerText = '🎙️';
         }
     }
 </script>
