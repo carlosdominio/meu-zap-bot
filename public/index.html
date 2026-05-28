@@ -98,7 +98,7 @@
 <!-- Image Viewer Modal -->
 <div id="image-viewer-overlay" onclick="fecharImagem()">
     <span id="image-viewer-close" onclick="fecharImagem()">&times;</span>
-    <button id="image-viewer-delete" onclick="deletarImagemAtual(event)" style="position: absolute; bottom: 30px; right: 30px; background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: none;">🗑️ Apagar Foto</button>
+    <button id="image-viewer-delete" onclick="deletarImagemAtual(event)" style="position: absolute; bottom: 30px; right: 30px; position: fixed; bottom: 40px; right: 40px; background: #ff4d4d; color: white; border: 2px solid white; padding: 15px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 18px; box-shadow: 0 5px 20px rgba(0,0,0,0.8); z-index: 2100; display: none;">🗑️ Apagar Foto</button>
     <img class="modal-content" id="image-viewer-img" onclick="event.stopPropagation()">
 </div>
 
@@ -418,18 +418,23 @@
     let currentViewerFromMe = null;
 
     function abrirImagem(url, msgId, fromMe) {
-        document.getElementById('image-viewer-img').src = url;
-        document.getElementById('image-viewer-overlay').style.display = 'flex';
+        console.log('Abrindo imagem:', url, 'ID:', msgId);
+        const img = document.getElementById('image-viewer-img');
+        const overlay = document.getElementById('image-viewer-overlay');
+        const btnDelete = document.getElementById('image-viewer-delete');
+        
+        img.src = url;
+        overlay.style.display = 'flex';
         
         currentViewerMsgId = msgId;
         currentViewerFromMe = fromMe;
         
-        // Só mostra a opção de apagar se soubermos a qual mensagem a foto pertence
-        const btnDelete = document.getElementById('image-viewer-delete');
         if (msgId && btnDelete) {
             btnDelete.style.display = 'block';
-        } else if (btnDelete) {
-            btnDelete.style.display = 'none';
+            console.log('Botão de deletar ativado');
+        } else {
+            if (btnDelete) btnDelete.style.display = 'none';
+            console.log('Botão de deletar ocultado (falta ID)');
         }
     }
 
