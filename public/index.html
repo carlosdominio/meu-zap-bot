@@ -72,6 +72,17 @@
         </div>
     </div>
 </div>
+<div id="modal-confirm-imagem" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-title">Apagar Foto?</div>
+        <div class="modal-text">Deseja realmente APAGAR esta imagem para você e para o cliente? Esta ação não pode ser desfeita.</div>
+        <div class="modal-buttons">
+            <button class="btn-modal btn-cancel" onclick="closeModalImagem()">Cancelar</button>
+            <button class="btn-modal btn-confirm-del" id="btn-modal-confirm-imagem">Apagar para Todos</button>
+        </div>
+    </div>
+</div>
+
 <div id="qr-overlay" style="display: flex;">
     <h2 id="status-text">Iniciando...</h2>
     <img id="qr-img" src="" alt="QR Code" style="width: 250px; margin: 20px; display: none;">
@@ -270,15 +281,21 @@
         document.getElementById('image-viewer-img').src = '';
         currentViewerMsgId = null;
     }
+    function closeModalImagem() {
+        document.getElementById('modal-confirm-imagem').style.display = 'none';
+    }
+
     function deletarImagemAtual(event) {
         event.stopPropagation();
         if (currentViewerMsgId && currentJid) {
-            if (confirm('Deseja realmente APAGAR esta imagem para você e para o cliente?')) {
+            document.getElementById('modal-confirm-imagem').style.display = 'flex';
+            document.getElementById('btn-modal-confirm-imagem').onclick = () => {
                 socket.emit('delete_msg', { jid: currentJid, id: currentViewerMsgId, fromMe: currentViewerFromMe });
                 const msgEl = document.getElementById('msg-' + currentViewerMsgId);
                 if (msgEl) msgEl.remove();
+                closeModalImagem();
                 fecharImagem();
-            }
+            };
         }
     }
 </script>
