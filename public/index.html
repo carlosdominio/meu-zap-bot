@@ -110,6 +110,8 @@
     </div>
     <div id="messages"></div>
     <footer id="chat-footer" style="display: none;">
+        <button id="btn-image" class="btn-action" onclick="document.getElementById('image-upload').click()" style="background: #3498db; margin-right: 5px;">🖼️</button>
+        <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="enviarImagem(this)">
         <button id="btn-record" class="btn-action" onclick="toggleRecording()">🎙️</button>
         <input type="text" id="msg-input" placeholder="Digite uma mensagem..." onkeyup="handleKeyUp(event)">
         <button class="btn-action" onclick="enviar()">></button>
@@ -362,6 +364,19 @@
             mediaRecorder.stop();
             btn.classList.remove('recording');
             btn.innerText = '🎙️';
+        }
+    }
+
+    function enviarImagem(input) {
+        if (input.files && input.files[0] && currentJid) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                socket.emit('send_image', { number: currentJid, image: base64Image });
+            };
+            reader.readAsDataURL(file);
+            input.value = '';
         }
     }
 </script>

@@ -52,6 +52,25 @@ io.on('connection', (socket) => {
         } catch (e) { console.log('Erro ao enviar texto:', e); }
     });
 
+    socket.on('send_image', async (data) => {
+        if (!sock || statusConexao !== "CONECTADO") return;
+        try {
+            let jid = data.number;
+            if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+
+            const base64Data = data.image.split(';base64,').pop();
+            const buffer = Buffer.from(base64Data, 'base64');
+            
+            const s = await sock.sendMessage(jid, { image: buffer });
+            const rObj = { id: s.key.id, text: '🖼️ Imagem enviada', fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖", imageUrl: data.image };
+            
+            await saveMessage(jid, rObj, "Robo");
+            io.emit('new_msg', rObj);
+        } catch (err) {
+            console.error('Erro ao enviar imagem:', err);
+        }
+    });
+
     socket.on('send_audio', async (data) => {
         if (!sock || statusConexao !== "CONECTADO") return;
         try {
