@@ -239,7 +239,7 @@ async function connectToWhatsApp() {
                 // VERIFICAÃÂÃÂO DE CAIXA (ESTABELECIMENTO ABERTO/FECHADO)
                 const caixaAberto = await verificarCaixaAberto();
                 if (!caixaAberto) {
-                    const closedMsg = `Olá ${pushName}! Ã°ÂÂÂ Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\nâ° *Horário de Funcionamento:*\nDiariamente das 18h Ã s 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
+                    const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\nâ° *Horário de Funcionamento:*\nDiariamente das 18h Ã s 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
                     const s = await sock.sendMessage(jid, { text: closedMsg });
                     const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
                     await saveMessage(jid, rObj, "Robo");
@@ -251,18 +251,18 @@ async function connectToWhatsApp() {
                 const lowerText = text.toLowerCase();
 
                 if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
-                    reply = `Olá ${pushName}! Ã°ÂÂÂ Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1Ã¯Â¸ÂÃ¢ÂÂ£ - Ver Cardápio Digital Ã°ÂÂÂ\n2Ã¯Â¸ÂÃ¢ÂÂ£ - Fazer um Pedido Ã°ÂÂÂ\n3Ã¯Â¸ÂÃ¢ÂÂ£ - PromoÃ§ões do Dia Ã°ÂÂÂ¥\n4Ã¯Â¸ÂÃ¢ÂÂ£ - EndereÃ§o e Horário Ã°ÂÂÂ\n5Ã¯Â¸ÂÃ¢ÂÂ£ - Falar com o Atendente Ã°ÂÂÂ¨Ã¢ÂÂÃ°ÂÂÂ»\n\n_Digite apenas o número da opção desejada._`;
+                    reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1Ã¯Â¸ÂÃ¢ÂÂ£ - Ver Cardápio Digital 📖\n2Ã¯Â¸ÂÃ¢ÂÂ£ - Fazer um Pedido 🛒\n3Ã¯Â¸ÂÃ¢ÂÂ£ - Promoções do Dia 🔥\n4Ã¯Â¸ÂÃ¢ÂÂ£ - Endereço e Horário 📍\n5Ã¯Â¸ÂÃ¢ÂÂ£ - Falar com o Atendente Ã°ÂÂÂ¨Ã¢ÂÂÃ°ÂÂÂ»\n\n_Digite apenas o número da opção desejada._`;
                 } else {
                     if (lowerText === '1') {
-                        reply = `Ã°ÂÂÂ *CARDÃÂPIO DIGITAL*\n\nPara visualizar nossos produtos, vocÃª pode acessar nosso link:\nhttps://garconnexpress.vercel.app/cardapio/\n\nÃ°ÂÂÂ¡ *Dica:* Se vocÃª estiver em uma de nossas mesas, utilize o *QR Code* fixado nela para fazer o seu pedido diretamente!`;
+                        reply = `📖 *CARDÃÂPIO DIGITAL*\n\nPara visualizar nossos produtos, vocÃª pode acessar nosso link:\nhttps://garconnexpress.vercel.app/cardapio/\n\nÃ°ÂÂÂ¡ *Dica:* Se vocÃª estiver em uma de nossas mesas, utilize o *QR Code* fixado nela para fazer o seu pedido diretamente!`;
                     } else if (lowerText === '2') {
-                        reply = `Ã°ÂÂÂ *FAZER UM PEDIDO*\n\nPara sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e vocÃª poderá realizar seu pedido de forma rápida! Ã°ÂÂÂ\n\nÃ°ÂÂÂ¬ *Dúvidas?* Em caso de dúvida, basta chamar o garÃ§om mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
+                        reply = `🛒 *FAZER UM PEDIDO*\n\nPara sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e vocÃª poderá realizar seu pedido de forma rápida! 🚀\n\nÃ°ÂÂÂ¬ *Dúvidas?* Em caso de dúvida, basta chamar o garÃ§om mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
                     } else if (lowerText === '3') {
                         try {
                             const response = await fetch('https://garconnexpress.vercel.app/api/menu');
                             const menu = await response.json();
                             const promos = menu.filter(item => item.em_promocao && (item.visivel === true || item.visivel === 1));
-                            let promoMsg = "Ã°ÂÂÂ¥ *PROMOÃÂÃÂES DO DIA*\n\n";
+                            let promoMsg = "🔥 *PROMOÃÂÃÂES DO DIA*\n\n";
                             if (promos.length > 0) {
                                 promos.forEach(p => {
                                     const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
@@ -270,14 +270,14 @@ async function connectToWhatsApp() {
                                 });
                                 promoMsg += "_Aproveite que é por tempo limitado!_";
                             } else {
-                                promoMsg += "No momento não temos promoÃ§ões ativas, mas fique de olho no nosso cardápio! Ã°ÂÂÂ";
+                                promoMsg += "No momento não temos promoÃ§ões ativas, mas fique de olho no nosso cardápio! 😉";
                             }
                             reply = promoMsg;
                         } catch (e) {
-                            reply = "Ã°ÂÂÂ¥ *PROMOÃÂÃÂES DO DIA*\n\nNo momento não conseguimos carregar as promoÃ§ões. Por favor, tente novamente em instantes ou veja no nosso cardápio digital!";
+                            reply = "🔥 *PROMOÃÂÃÂES DO DIA*\n\nNo momento não conseguimos carregar as promoÃ§ões. Por favor, tente novamente em instantes ou veja no nosso cardápio digital!";
                         }
                     } else if (lowerText === '4') {
-                        reply = "Ã°ÂÂÂ *ENDEREÃÂO E HORÃÂRIO*\n\nÃ°ÂÂÂ  EndereÃ§o: rua democrito gracindo 132 ponta grossa\nâ° Horário: Diariamente das 18h Ã s 02:00";
+                        reply = "📍 *ENDEREÃÂO E HORÃÂRIO*\n\nÃ°ÂÂÂ  Endereço: rua democrito gracindo 132 ponta grossa\nâ° Horário: Diariamente das 18h Ã s 02:00";
                     } else if (lowerText === '5') {
                         reply = "Ã°ÂÂÂ¨Ã¢ÂÂÃ°ÂÂÂ» *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com vocÃª em breve!";
                         const chats = db.get('chats').value() || {};
