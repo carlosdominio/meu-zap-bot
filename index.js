@@ -271,17 +271,21 @@ https://garconnexpress.vercel.app/cardapio/
 
 🏠 *Dica:* Se você estiver no estabelecimento, pode fazer o pedido diretamente pelo link acima para agilizar seu atendimento!`;
                     } else if (lowerText === '2') {
-                        reply = `🛒 *FAZER UM PEDIDO*\n\nPara sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e você poderá realizar seu pedido de forma rápida! 🚀\n\nÃ°ÂÂÂ¬ *Dúvidas?* Em caso de dúvida, basta chamar o garçom mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
+                        reply = `🛒 *FAZER UM PEDIDO*
+
+Para sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e você poderá realizar seu pedido de forma rápida! 🚀
+
+💡 *Dúvidas?* Em caso de dúvida, basta chamar o garçom mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
                     } else if (lowerText === '3') {
                         try {
                             const response = await fetch('https://garconnexpress.vercel.app/api/menu');
                             const menu = await response.json();
                             const promos = menu.filter(item => item.em_promocao && (item.visivel === true || item.visivel === 1));
-                            let promoMsg = "🔥 *PROMOÃÂÃÂES DO DIA*\n\n";
+                            let promoMsg = "🔥 *PROMOÇÕES DO DIA*\n\n";
                             if (promos.length > 0) {
                                 promos.forEach(p => {
                                     const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
-                                    promoMsg += `âÂÂ *${p.nome}*\nÃ°ÂÂÂ° ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\n\n`;
+                                    promoMsg += `✨ *${p.nome}*\n💰 ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\n\n`;
                                 });
                                 promoMsg += "_Aproveite que é por tempo limitado!_";
                             } else {
@@ -289,11 +293,11 @@ https://garconnexpress.vercel.app/cardapio/
                             }
                             reply = promoMsg;
                         } catch (e) {
-                            reply = "🔥 *PROMOÃÂÃÂES DO DIA*\n\nNo momento não conseguimos carregar as promoções. Por favor, tente novamente em instantes ou veja no nosso cardápio digital!";
+                            reply = "Desculpe, ocorreu um erro ao consultar as promoções. Tente novamente mais tarde.";
                         }
-                    } else if (lowerText === '4') {
-                        reply = "📍 *ENDEREÃÂO E HORÃÂRIO*\n\nÃ°ÂÂÂ  Endereço: rua democrito gracindo 132 ponta grossa\nâ° Horário: Diariamente das 18h Ã s 02:00";
-                    } else if (lowerText === '5') {
+                    } } else if (lowerText === '4') {
+                        reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 Endereço: Rua Demócrito Gracindo, 132 - Ponta Grossa\n🕒 Horário: Diariamente das 18h às 02:00";
+                    } } else if (lowerText === '5') {
                         reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
                         const chats = db.get('chats').value() || {};
                         if (chats[jid]) {
