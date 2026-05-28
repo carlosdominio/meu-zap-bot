@@ -148,8 +148,7 @@
             }
 
             // FIX: Notificar sempre o pai (Admin) sobre novas mensagens e mensagens enviadas
-            window.parent.postMessage({ type: 'whatsapp_new_activity', jid: jid, active: (jid === currentJid), fromMe: msg.fromMe }, '*');, '*');
-            }
+            window.parent.postMessage({ type: 'whatsapp_new_activity', jid: jid, active: (jid === currentJid), fromMe: msg.fromMe }, '*');
             
             if (jid === currentJid) renderMessage(msg);
         }
