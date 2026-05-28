@@ -242,7 +242,15 @@ async function connectToWhatsApp() {
             const { connection, qr } = update;
             if (qr) { QRCode.toDataURL(qr).then(url => { lastQr = url; io.emit('qr', url); }); statusConexao = "AGUARDANDO QR"; io.emit('status', {status: statusConexao}); }
             if (connection === 'open') { statusConexao = "CONECTADO"; lastQr = null; io.emit('status', {status: statusConexao}); console.log('Bot Pronto'); }
-            if (connection === 'close') { setTimeout(connectToWhatsApp, 5000); statusConexao = "DESCONECTADO"; io.emit('status', {status: statusConexao}); }
+            if (connection === 'close') { 
+                const shouldReconnect = update.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+                console.log('Conexão encerrada. Motivo:', update.lastDisconnect?.error, 'Tentando reconectar:', shouldReconnect);
+                if (shouldReconnect) {
+                    setTimeout(connectToWhatsApp, 5000); 
+                }
+                statusConexao = "DESCONECTADO"; 
+                io.emit('status', {status: statusConexao}); 
+            }); }
         });
 
         sock.ev.on('messages.upsert', async (m) => {
