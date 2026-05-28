@@ -27,9 +27,9 @@
 
         .btn-del-chat { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; padding: 5px; opacity: 0.7; transition: transform 0.2s; }
         .btn-del-chat:hover { transform: scale(1.2); opacity: 1; }
-        #main-chat { flex: 1; display: flex; flex-direction: column; background: #efeae2; position: relative; }
+        #main-chat { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #efeae2; position: relative; }
         #chat-header { background: #f0f2f5; padding: 10px 20px; border-bottom: 1px solid #ddd; height: 60px; display: flex; align-items: center; font-weight: bold; }
-        #messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        #messages { flex: 1; min-height: 0; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         .msg { max-width: 70%; padding: 10px 15px; border-radius: 8px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .msg-recebida { align-self: flex-start; background: white; }
         .msg-enviada { align-self: flex-end; background: #d9fdd3; }
@@ -279,7 +279,7 @@
             msgContent += `<br><img src="${msg.imageUrl}" style="max-width: 250px; border-radius: 8px; margin-top: 5px;">`;
         }
         
-        div.innerHTML = msgContent + `<small style="display:block; text-align:right; font-size:10px; margin-top:5px; opacity:0.6;">${msg.time}</small>`;
+        div.innerHTML = msgContent + '<small style="display:block; text-align:right; font-size:10px; margin-top:5px; opacity:0.6;">' + msg.time + '</small>';
         
         document.getElementById('messages').appendChild(div);
         scrollToBottom();
