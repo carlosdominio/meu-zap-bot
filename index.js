@@ -297,7 +297,7 @@ Para sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mes
                         }
                     } else if (lowerText === '4') {
                         reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 Endereço: Rua Demócrito Gracindo, 132 - Ponta Grossa\n🕒 Horário: Diariamente das 18h às 02:00";
-                    } } else if (lowerText === '5') {
+                    } else if (lowerText === '5') {
                         reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
                         const chats = db.get('chats').value() || {};
                         if (chats[jid]) {
