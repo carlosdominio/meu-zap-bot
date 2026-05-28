@@ -152,7 +152,7 @@ async function saveMessage(jid, msg, name) {
     chats[jid].lastUpdate = Date.now();
 
     // Se a mensagem não é nossa, incrementamos o contador de não lidas.
-    // EXCEÃÂÃÂO: No "Pedidos Zap" (nosso número), sempre incrementamos se chegar atividade nova.
+    // EXCEÇÃO: No "Pedidos Zap" (nosso número), sempre incrementamos se chegar atividade nova.
     const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0];
     const isSelf = myJid && jid.includes(myJid);
 
@@ -161,7 +161,7 @@ async function saveMessage(jid, msg, name) {
     }
     
     if (isSelf) {
-        chats[jid].name = "Pedidos Zap Ã°ÂÂÂ¦";
+        chats[jid].name = "Pedidos Zap 📦";
     } else if (name && name !== "Voce" && name !== "Robo") {
         chats[jid].name = name;
     }
@@ -200,7 +200,7 @@ async function connectToWhatsApp() {
             let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
             let audioUrl = null;
 
-            // Tratamento de ÃÂudio Recebido
+            // Tratamento de Áudio Recebido
             if (msg.message.audioMessage) {
                 try {
                     const stream = await downloadContentFromMessage(msg.message.audioMessage, 'audio');
@@ -209,7 +209,7 @@ async function connectToWhatsApp() {
                         buffer = Buffer.concat([buffer, chunk]);
                     }
                     audioUrl = `data:audio/ogg;base64,${buffer.toString('base64')}`;
-                    text = "🎙️ ÃÂudio recebido";
+                    text = "🎙️ Áudio recebido";
                 } catch (err) { console.log("Erro ao baixar áudio:", err); }
             }
 
@@ -234,12 +234,12 @@ async function connectToWhatsApp() {
             const atendimentoManual = db.get(['chats', jid, 'atendimentoManual']).value() || false;
             if (atendimentoManual) return;
 
-            // MENU DO ROBÃÂ (Apenas para texto)
-            if (text && text !== "🎙️ ÃÂudio recebido") {
-                // VERIFICAÃÂÃÂO DE CAIXA (ESTABELECIMENTO ABERTO/FECHADO)
+            // MENU DO ROBÔ (Apenas para texto)
+            if (text && text !== "🎙️ Áudio recebido") {
+                // VERIFICAÇÃO DE CAIXA (ESTABELECIMENTO ABERTO/FECHADO)
                 const caixaAberto = await verificarCaixaAberto();
                 if (!caixaAberto) {
-                    const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\nâ° *Horário de Funcionamento:*\nDiariamente das 18h Ã s 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
+                    const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\n⏰ *Horário de Funcionamento:*\nDiariamente das 18h às 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
                     const s = await sock.sendMessage(jid, { text: closedMsg });
                     const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
                     await saveMessage(jid, rObj, "Robo");

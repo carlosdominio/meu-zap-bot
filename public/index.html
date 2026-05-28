@@ -147,9 +147,8 @@
                 chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1;
             }
 
-            // FIX: Notificar sempre o pai (Admin) sobre novas mensagens, mesmo se o chat estiver aberto
-            if (!msg.fromMe) {
-                window.parent.postMessage({ type: 'whatsapp_new_activity', jid: jid, active: (jid === currentJid) }, '*');
+            // FIX: Notificar sempre o pai (Admin) sobre novas mensagens e mensagens enviadas
+            window.parent.postMessage({ type: 'whatsapp_new_activity', jid: jid, active: (jid === currentJid), fromMe: msg.fromMe }, '*');, '*');
             }
             
             if (jid === currentJid) renderMessage(msg);
