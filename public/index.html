@@ -127,7 +127,7 @@
         document.getElementById('status-text').innerText = data.status;
         document.getElementById('qr-overlay').style.display = (data.status === 'CONECTADO') ? 'none' : 'flex';
     });
-    socket.on('qr', (url) => { const img = document.getElementById('qr-img'); img.src = url; img.style.display = 'block'; });
+    socket.on('qr', (url) => { const img = document.getElementById('qr-img'); img.src = url; img.style.display = 'block'; document.getElementById('qr-overlay').style.display = 'flex'; });
     socket.on('history', (history) => { chatData = history || {}; updateChatList();
         setInterval(updateUnreadTitle, 5000); });
 
