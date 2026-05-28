@@ -97,7 +97,7 @@ io.on('connection', (socket) => {
             const chats = db.get('chats').value() || {};
             if (chats[jid]) {
                 delete chats[jid];
-                // ForÃ§amos uma nova referÃªncia de objeto para o lowdb detectar a mudanÃ§a
+                // Forçamos uma nova referÃªncia de objeto para o lowdb detectar a mudança
                 await db.set('chats', { ...chats }).write();
                 io.emit('chat_deleted', jid);
                 console.log(`[Zap] Chat excluído: ${jid}`);
@@ -251,12 +251,27 @@ async function connectToWhatsApp() {
                 const lowerText = text.toLowerCase();
 
                 if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
-                    reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1Ã¯Â¸ÂÃ¢ÂÂ£ - Ver Cardápio Digital 📖\n2Ã¯Â¸ÂÃ¢ÂÂ£ - Fazer um Pedido 🛒\n3Ã¯Â¸ÂÃ¢ÂÂ£ - Promoções do Dia 🔥\n4Ã¯Â¸ÂÃ¢ÂÂ£ - Endereço e Horário 📍\n5Ã¯Â¸ÂÃ¢ÂÂ£ - Falar com o Atendente Ã°ÂÂÂ¨Ã¢ÂÂÃ°ÂÂÂ»\n\n_Digite apenas o número da opção desejada._`;
+                    reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.
+
+Como posso te ajudar hoje?
+
+1️⃣ - Ver Cardápio Digital 📖
+2️⃣ - Fazer um Pedido 🛒
+3️⃣ - Promoções do Dia 🔥
+4️⃣ - Endereço e Horário 📍
+5️⃣ - Falar com o Atendente 👨‍💻
+
+_Digite apenas o número da opção desejada._`;
                 } else {
                     if (lowerText === '1') {
-                        reply = `📖 *CARDÃÂPIO DIGITAL*\n\nPara visualizar nossos produtos, vocÃª pode acessar nosso link:\nhttps://garconnexpress.vercel.app/cardapio/\n\nÃ°ÂÂÂ¡ *Dica:* Se vocÃª estiver em uma de nossas mesas, utilize o *QR Code* fixado nela para fazer o seu pedido diretamente!`;
+                        reply = `📖 *CARDÁPIO DIGITAL*
+
+Para visualizar nossos produtos, você pode acessar nosso link:
+https://garconnexpress.vercel.app/cardapio/
+
+🏠 *Dica:* Se você estiver no estabelecimento, pode fazer o pedido diretamente pelo link acima para agilizar seu atendimento!`;
                     } else if (lowerText === '2') {
-                        reply = `🛒 *FAZER UM PEDIDO*\n\nPara sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e vocÃª poderá realizar seu pedido de forma rápida! 🚀\n\nÃ°ÂÂÂ¬ *Dúvidas?* Em caso de dúvida, basta chamar o garÃ§om mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
+                        reply = `🛒 *FAZER UM PEDIDO*\n\nPara sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e você poderá realizar seu pedido de forma rápida! 🚀\n\nÃ°ÂÂÂ¬ *Dúvidas?* Em caso de dúvida, basta chamar o garçom mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
                     } else if (lowerText === '3') {
                         try {
                             const response = await fetch('https://garconnexpress.vercel.app/api/menu');
@@ -270,16 +285,16 @@ async function connectToWhatsApp() {
                                 });
                                 promoMsg += "_Aproveite que é por tempo limitado!_";
                             } else {
-                                promoMsg += "No momento não temos promoÃ§ões ativas, mas fique de olho no nosso cardápio! 😉";
+                                promoMsg += "No momento não temos promoções ativas, mas fique de olho no nosso cardápio! 😉";
                             }
                             reply = promoMsg;
                         } catch (e) {
-                            reply = "🔥 *PROMOÃÂÃÂES DO DIA*\n\nNo momento não conseguimos carregar as promoÃ§ões. Por favor, tente novamente em instantes ou veja no nosso cardápio digital!";
+                            reply = "🔥 *PROMOÃÂÃÂES DO DIA*\n\nNo momento não conseguimos carregar as promoções. Por favor, tente novamente em instantes ou veja no nosso cardápio digital!";
                         }
                     } else if (lowerText === '4') {
                         reply = "📍 *ENDEREÃÂO E HORÃÂRIO*\n\nÃ°ÂÂÂ  Endereço: rua democrito gracindo 132 ponta grossa\nâ° Horário: Diariamente das 18h Ã s 02:00";
                     } else if (lowerText === '5') {
-                        reply = "Ã°ÂÂÂ¨Ã¢ÂÂÃ°ÂÂÂ» *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com vocÃª em breve!";
+                        reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
                         const chats = db.get('chats').value() || {};
                         if (chats[jid]) {
                             chats[jid].atendimentoManual = true;
