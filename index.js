@@ -97,7 +97,7 @@ io.on('connection', (socket) => {
             const chats = db.get('chats').value() || {};
             if (chats[jid]) {
                 delete chats[jid];
-                // Forçamos uma nova referÃªncia de objeto para o lowdb detectar a mudança
+                // Forçamos uma nova referência de objeto para o lowdb detectar a mudança
                 await db.set('chats', { ...chats }).write();
                 io.emit('chat_deleted', jid);
                 console.log(`[Zap] Chat excluído: ${jid}`);
@@ -281,7 +281,7 @@ https://garconnexpress.vercel.app/cardapio/
                             if (promos.length > 0) {
                                 promos.forEach(p => {
                                     const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
-                                    promoMsg += `Ã¢ÂÂ *${p.nome}*\nÃ°ÂÂÂ° ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\n\n`;
+                                    promoMsg += `âÂÂ *${p.nome}*\nÃ°ÂÂÂ° ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\n\n`;
                                 });
                                 promoMsg += "_Aproveite que é por tempo limitado!_";
                             } else {
