@@ -130,7 +130,7 @@
         <button id="btn-image" class="btn-action" onclick="document.getElementById('image-upload').click()" style="background: #3498db; margin-right: 5px;">🖼️</button>
         <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="enviarImagem(this)">
         <button id="btn-record" class="btn-action" onclick="toggleRecording()">🎙️</button>
-        <input type="text" id="msg-input" placeholder="Digite uma mensagem..." onkeyup="handleKeyUp(event)">
+        <input type="text" id="msg-input" placeholder="Digite uma message..." onkeyup="handleKeyUp(event)">
         <button class="btn-action" onclick="enviar()">></button>
     </footer>
 </div>
@@ -212,8 +212,12 @@
     }
     function openChat(jid) {
         currentJid = jid;
-        // O contador só some quando clicar na mensagem, não ao abrir o chat
-        // if (chatData[jid]) { chatData[jid].unreadCount = 0; socket.emit('mark_seen', jid); }
+        // Restaurado: O contador some ao selecionar o chat no sidebar
+        if (chatData[jid]) { 
+            chatData[jid].unreadCount = 0; 
+            socket.emit('mark_seen', jid); 
+            updateUnreadTitle();
+        }
         document.getElementById('chat-footer').style.display = 'flex';
         document.getElementById('human-control-toggle').style.display = 'flex';
         document.getElementById('current-chat-name').innerText = chatData[jid].name || jid.split('@')[0];
@@ -237,7 +241,7 @@
         div.id = 'msg-' + msg.id;
         div.className = 'msg ' + (msg.fromMe ? 'msg-enviada' : 'msg-recebida');
         
-        // Limpa o contador ao clicar na mensagem
+        // Mantido: Limpa o contador ao clicar na bolha da mensagem
         div.onclick = () => {
             if (currentJid && chatData[currentJid] && chatData[currentJid].unreadCount > 0) {
                 chatData[currentJid].unreadCount = 0;
