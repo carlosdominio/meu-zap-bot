@@ -41,6 +41,9 @@ if (process.env.RENDER_EXTERNAL_HOSTNAME) {
 const port = process.env.PORT || 3000;
 
 app.use(express.static('public'));
+// Rota de Health Check para evitar que o Render hiberne e o serviço pare
+app.get('/health', (req, res) => res.send('OK'));
+
 
 // Rota para servir áudios baixados
 if (!fs.existsSync('public/audios')) fs.mkdirSync('public/audios', { recursive: true });
@@ -401,3 +404,12 @@ Para sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mes
 initDB().then(() => {
     server.listen(port, () => connectToWhatsApp());
 });
+// KEEP ALIVE: Auto-ping para evitar hibernação no Render (Plano Gratuito)
+const RENDER_URL = process.env.RENDER_EXTERNAL_URL;
+if (RENDER_URL) {
+    setInterval(() => {
+        fetch(`${RENDER_URL}/health`)
+            .then(() => console.log('💓 Keep-Alive: Ping enviado com sucesso'))
+            .catch(err => console.error('💔 Keep-Alive: Erro no ping:', err.message));
+    }, 5 * 60 * 1000); // A cada 5 minutos
+}
