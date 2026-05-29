@@ -141,6 +141,16 @@
     let chatData = {};
     let mediaRecorder;
     let audioChunks = [];
+    let tabAtiva = true; // Controla se a aba do Zap está visível no Admin
+
+    // Ouve mensagens do painel pai (Admin)
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'tab_change') {
+            tabAtiva = event.data.active;
+            console.log("Aba Zap ativa:", tabAtiva);
+        }
+    });
+
     socket.on('status', (data) => {
         document.getElementById('status-text').innerText = data.status;
         document.getElementById('qr-overlay').style.display = (data.status === 'CONECTADO') ? 'none' : 'flex';
@@ -149,6 +159,16 @@
     socket.on('history', (history) => { chatData = history || {}; updateChatList(); setInterval(updateUnreadTitle, 5000); });       
     socket.on('new_msg', (msg) => {
         const jid = msg.sender;
+        
+        // NOVO: Se o admin não estiver na aba do Zap e chegar uma mensagem, desceleciona o chat atual
+        if (!tabAtiva && currentJid) {
+            currentJid = null;
+            document.getElementById('messages').innerHTML = '';
+            document.getElementById('chat-footer').style.display = 'none';
+            document.getElementById('human-control-toggle').style.display = 'none';
+            document.getElementById('current-chat-name').innerText = 'Selecione uma conversa';
+        }
+
         if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now() };      
         if (!msg.fromMe && msg.pushName && msg.pushName !== 'Voce' && msg.pushName !== 'Robo') { chatData[jid].name = msg.pushName; }
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
@@ -212,7 +232,7 @@
     }
     function openChat(jid) {
         currentJid = jid;
-        // Restaurado: O contador some ao selecionar o chat no sidebar
+        // O contador some ao selecionar o chat no sidebar
         if (chatData[jid]) { 
             chatData[jid].unreadCount = 0; 
             socket.emit('mark_seen', jid); 
@@ -241,7 +261,7 @@
         div.id = 'msg-' + msg.id;
         div.className = 'msg ' + (msg.fromMe ? 'msg-enviada' : 'msg-recebida');
         
-        // Mantido: Limpa o contador ao clicar na bolha da mensagem
+        // Limpa o contador ao clicar na bolha da mensagem
         div.onclick = () => {
             if (currentJid && chatData[currentJid] && chatData[currentJid].unreadCount > 0) {
                 chatData[currentJid].unreadCount = 0;
