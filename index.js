@@ -365,6 +365,11 @@ async function connectToWhatsApp() {
                 }
             } catch (e) { console.error('Erro no processamento:', e); }
         });
+    } catch (err) {
+        console.error('Erro na conexão:', err);
+        setTimeout(connectToWhatsApp, 5000);
+    }
+}
 
 initDB().then(() => {
     server.listen(port, () => connectToWhatsApp());
