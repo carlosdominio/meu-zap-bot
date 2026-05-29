@@ -331,10 +331,20 @@ _Aguardamos seu pedido quando estivermos abertos!_`;
 \
 Como posso te ajudar hoje?\
 \
+
+
 1️⃣ - Ver Cardápio Digital 📖\
+
+
 2️⃣ - Fazer um Pedido 🛒\
+
+
 3️⃣ - Promoções do Dia 🔥\
+
+
 4️⃣ - Endereço e Horário 📍\
+
+
 5️⃣ - Falar com o Atendente 👨‍💻\
 \
 _Digite apenas o número da opção desejada._`;
@@ -364,6 +374,7 @@ Para sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mes
                                     promos.forEach(p => {
                                         const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
                                         promoMsg += `✨ *${p.nome}*\
+
 💰 ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\
 \
 `;
@@ -377,8 +388,14 @@ Para sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mes
                         } else if (lowerText === '4') {
                             reply = "📍 *ENDEREÇO E HORÁRIO*\
 \
-🏠 Endereço: Rua Demócrito Gracindo, 132 - Ponta Grossa\
-🕒 Horário: Diariamente das 18h às 02:00";
+
+
+🏠 *Endereço:*
+ Rua Demócrito Gracindo, 132 - Ponta Grossa\
+
+
+🕒 *Horário:*
+ Diariamente das 18h às 02:00";
                         } else if (lowerText === '5') {
                             reply = "👨‍💻 *ATENDIMENTO HUMANO*\
 \
