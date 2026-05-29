@@ -327,57 +327,50 @@ _Aguardamos seu pedido quando estivermos abertos!_`;
                     const lowerText = text.toLowerCase();
 
                     if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
-                        reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\
-\
-Como posso te ajudar hoje?\
-\
+reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.
 
+Como posso te ajudar hoje?
 
-1️⃣ - Ver Cardápio Digital 📖\
+1️⃣ - Ver Cardápio Digital 📖
 
+2️⃣ - Fazer um Pedido 🛒
 
-2️⃣ - Fazer um Pedido 🛒\
+3️⃣ - Promoções do Dia 🔥
 
+4️⃣ - Endereço e Horário 📍
 
-3️⃣ - Promoções do Dia 🔥\
+5️⃣ - Falar com o Atendente 👨‍💻
 
-
-4️⃣ - Endereço e Horário 📍\
-
-
-5️⃣ - Falar com o Atendente 👨‍💻\
-\
+_Digite apenas o número da opção desejada._`;
 _Digite apenas o número da opção desejada._`;
                     } else {
                         if (lowerText === '1') {
-                            reply = `📖 *CARDÁPIO DIGITAL*\
-\
-Para visualizar nossos produtos, você pode acessar nosso link:\
-https://garconnexpress.vercel.app/cardapio/\
-\
-🏠 *Dica:* Se você estiver no estabelecimento, pode fazer o pedido diretamente pelo link acima para agilizar seu atendimento!`;
+                            reply = "📖 *CARDÁPIO DIGITAL*\n\nPara visualizar nossos produtos, você pode acessar nosso link:\nhttps://garconnexpress.vercel.app/cardapio/\n\n🏠 *Dica:* Se você estiver no estabelecimento, pode fazer o pedido diretamente pelo link acima para agilizar seu atendimento!";
                         } else if (lowerText === '2') {
-                            reply = `🛒 *FAZER UM PEDIDO*\
-\
-Para sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e você poderá realizar seu pedido de forma rápida! 🚀\
-\
-💡 *Dúvidas?* Em caso de dúvida, basta chamar o garçom mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
+                            reply = "🛒 *FAZER UM PEDIDO*\n\nPara sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa.\n\nEle abrirá o cardápio completo e você poderá realizar seu pedido de forma rápida!\n\n🚀💡 *Dúvidas?*\n\nEm caso de dúvida, basta chamar o garçom mais próximo ou dirigir-se ao balcão.\n\nEstamos aqui para ajudar!";
                         } else if (lowerText === '3') {
                             try {
                                 const response = await fetch('https://garconnexpress.vercel.app/api/menu');
                                 const menu = await response.json();
-                                const promos = menu.filter(item => item.em_promocao && (item.visivel === true || item.visivel === 1));
-                                let promoMsg = "🔥 *PROMOÇÕES DO DIA*\
-\
-";
+                                const promos = menu.filter(item => (item.em_promocao === true || item.em_promocao === 1) && (item.visivel === true || item.visivel === 1));
+                                let promoMsg = "🔥 *PROMOÇÕES DO DIA*\n\n";
                                 if (promos.length > 0) {
                                     promos.forEach(p => {
-                                        const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
-                                        promoMsg += `✨ *${p.nome}*\
+reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.
 
-💰 ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\
-\
-`;
+Como posso te ajudar hoje?
+
+1️⃣ - Ver Cardápio Digital 📖
+
+2️⃣ - Fazer um Pedido 🛒
+
+3️⃣ - Promoções do Dia 🔥
+
+4️⃣ - Endereço e Horário 📍
+
+5️⃣ - Falar com o Atendente 👨‍💻
+
+_Digite apenas o número da opção desejada._`;
                                     });
                                     promoMsg += "_Aproveite que é por tempo limitado!_";
                                 } else {
@@ -386,7 +379,7 @@ Para sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mes
                                 reply = promoMsg;
                             } catch (e) { reply = "Desculpe, ocorreu um erro ao consultar as promoções."; }
                         } else if (lowerText === '4') {
-                            reply = "CORRIGIDO";
+                            reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n⏰ *Horário:* Diariamente das 18h às 02:00";
                         } else if (lowerText === '5') {
                             reply = "👨‍💻 *ATENDIMENTO HUMANO*\
 \
