@@ -250,7 +250,7 @@ async function connectToWhatsApp() {
                 }
                 statusConexao = "DESCONECTADO"; 
                 io.emit('status', {status: statusConexao}); 
-            }); }
+            }
         });
 
         sock.ev.on('messages.upsert', async (m) => {
