@@ -308,7 +308,7 @@ async function connectToWhatsApp() {
                 if (text && text !== "🎤 Áudio recebido") {
                     const caixaAberto = await verificarCaixaAberto();
                     if (!caixaAberto) {
-                        const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\n🕒 *Horário de Funcionamento:*\nDiariamente das 18h às 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
+                        const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\n🕒 *Horário de Funcionamento:*\nDiariamente das 18h às 02:00 de Terça a Domingo\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
                         const s = await sock.sendMessage(jid, { text: closedMsg });
                         const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
                         await saveMessage(jid, rObj, "Robo");
@@ -344,7 +344,7 @@ async function connectToWhatsApp() {
                                 reply = promoMsg;
                             } catch (e) { reply = "Desculpe, ocorreu um erro ao consultar as promoções."; }
                         } else if (lowerText === '4') {
-                            reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n⏰ *Horário:* Diariamente das 18h às 02:00";
+                            reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n⏰ *Horário:* Diariamente das 18h às 02:00 de Terça a Domingo";
                         } else if (lowerText === '5') {
                             reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento.\n\nUm atendente humano já foi notificado e irá falar com você em breve!";
                             const chats = db.get('chats').value() || {};
