@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
-const { Server } = require('socket.io');
-const QRCode = require('qrcode');       
+const { Server } = require('socket.io');  
+const QRCode = require('qrcode');
 const pino = require('pino');
 const path = require('path');
 const fs = require('fs');
@@ -25,19 +25,8 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 }); // 100 MB Limit for images/audio
+const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 }); // 100 MB Limit for images/audio        
 
-// --- AUTO-PING PARA MANTER 24H NO RENDER ---
-if (process.env.RENDER_EXTERNAL_HOSTNAME) {
-    const RENDER_URL = `https://${process.env.RENDER_EXTERNAL_HOSTNAME}.onrender.com`;
-    setInterval(() => {
-        http.get(RENDER_URL, (res) => {
-            console.log(`Self-ping: Status ${res.statusCode}`);
-        }).on('error', (err) => {
-            console.log('Self-ping error:', err.message);
-        });
-    }, 1000 * 60 * 10); // Ping a cada 10 minutos
-}
 const port = process.env.PORT || 3000;
 
 app.use(express.static('public'));
@@ -83,7 +72,7 @@ io.on('connection', (socket) => {
                 chats[jid].messages = chats[jid].messages.filter(m => m.id !== msgId);
                 await db.set('chats', chats).write();
             }
-            
+
             // Notify frontend
             io.emit('history', chats);
             console.log(`[BOT] Mensagem ${msgId} apagada com sucesso!`);
@@ -100,10 +89,10 @@ io.on('connection', (socket) => {
 
             const base64Data = data.image.split(';base64,').pop();
             const buffer = Buffer.from(base64Data, 'base64');
-            
+
             const s = await sock.sendMessage(jid, { image: buffer });
             const rObj = { id: s.key.id, text: '🖼️ Imagem enviada', fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖", imageUrl: data.image };
-            
+
             await saveMessage(jid, rObj, "Robo");
             io.emit('new_msg', rObj);
         } catch (err) {
@@ -116,13 +105,13 @@ io.on('connection', (socket) => {
         try {
             let jid = data.number;
             if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
-            
+
             const buffer = Buffer.from(data.audio.split(',')[1], 'base64');
             const tempWebm = path.join(__dirname, `temp_${Date.now()}.webm`);
             const tempOgg = path.join(__dirname, `temp_${Date.now()}.ogg`);
-            
+
             fs.writeFileSync(tempWebm, buffer);
-            
+
             try {
                 const ffmpeg = require('fluent-ffmpeg');
                 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
@@ -138,7 +127,7 @@ io.on('connection', (socket) => {
                     })
                     .on('end', async () => {
                         const oggBuffer = fs.readFileSync(tempOgg);
-                        await sock.sendMessage(jid, { audio: oggBuffer, mimetype: 'audio/ogg; codecs=opus', ptt: true });
+                        await sock.sendMessage(jid, { audio: oggBuffer, mimetype: 'audio/ogg; codecs=opus', ptt: true }); 
                         if (fs.existsSync(tempWebm)) fs.unlinkSync(tempWebm);
                         if (fs.existsSync(tempOgg)) fs.unlinkSync(tempOgg);
                     })
@@ -202,34 +191,32 @@ async function verificarCaixaAberto() {
 
 async function saveMessage(jid, msg, name) {
     if (!jid || jid.includes('@newsletter') || jid.includes('@broadcast')) return;
-    
+
     const chats = db.get('chats').value() || {};
     if (!chats[jid]) {
         chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: false, unreadCount: 0, lastUpdate: Date.now() };
     }
-    
+
     chats[jid].lastUpdate = Date.now();
 
-    // Se a mensagem não é nossa, incrementamos o contador de não lidas.
-    // EXCEÇÃO: No "Pedidos Zap" (nosso número), sempre incrementamos se chegar atividade nova.
     const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0];
     const isSelf = myJid && jid.includes(myJid);
 
     if (!msg.fromMe || isSelf) {
         chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
     }
-    
+
     if (isSelf) {
         chats[jid].name = "Pedidos Zap 📦";
     } else if (name && name !== "Voce" && name !== "Robo") {
         chats[jid].name = name;
     }
-    
+
     if (chats[jid].messages.some(m => m.id === msg.id)) return;
 
     chats[jid].messages.push(msg);
     if (chats[jid].messages.length > 100) chats[jid].messages.shift();
-    
+
     await db.set('chats', { ...chats }).write();
 }
 
@@ -245,171 +232,187 @@ async function connectToWhatsApp() {
             const { connection, qr } = update;
             if (qr) { QRCode.toDataURL(qr).then(url => { lastQr = url; io.emit('qr', url); }); statusConexao = "AGUARDANDO QR"; io.emit('status', {status: statusConexao}); }
             if (connection === 'open') { statusConexao = "CONECTADO"; lastQr = null; io.emit('status', {status: statusConexao}); console.log('Bot Pronto'); }
-            if (connection === 'close') { 
-                const shouldReconnect = update.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+            if (connection === 'close') {
+                const shouldReconnect = update.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;  
                 console.log('Conexão encerrada. Motivo:', update.lastDisconnect?.error, 'Tentando reconectar:', shouldReconnect);
                 if (shouldReconnect) {
+                    console.log('🔄 Reconectando em 5 segundos...');
                     setTimeout(connectToWhatsApp, 5000); 
+                } else {
+                    console.log('⚠️ Sessão finalizada (Logout). Removendo credenciais...');
+                    if (fs.existsSync('auth_info_baileys')) {
+                        fs.rmSync('auth_info_baileys', { recursive: true, force: true });
+                    }
+                    setTimeout(connectToWhatsApp, 2000);
                 }
-                statusConexao = "DESCONECTADO"; 
-                io.emit('status', {status: statusConexao}); 
+                statusConexao = "DESCONECTADO";
+                io.emit('status', {status: statusConexao});
             }
         });
 
         sock.ev.on('messages.upsert', async (m) => {
-            const msg = m.messages[0];
-            if (!msg.message) return;
+            try {
+                const msg = m.messages[0];
+                if (!msg.message) return;
 
-            const jid = msg.key.remoteJid;
-            const fromMe = msg.key.fromMe;
-            const pushName = fromMe ? "Voce" : (msg.pushName || jid.split('@')[0]);
-            
-            let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
-            let audioUrl = null;
-            let imageUrl = null;
+                const jid = msg.key.remoteJid;
+                const fromMe = msg.key.fromMe;
+                const pushName = fromMe ? "Voce" : (msg.pushName || jid.split('@')[0]);
 
-            // Tratamento de Áudio Recebido
-            if (msg.message.audioMessage) {
-                try {
-                    const stream = await downloadContentFromMessage(msg.message.audioMessage, 'audio');
-                    let buffer = Buffer.from([]);
-                    for await (const chunk of stream) {
-                        buffer = Buffer.concat([buffer, chunk]);
-                    }
-                    audioUrl = `data:audio/ogg;base64,${buffer.toString('base64')}`;
-                    text = "🎙️ Áudio recebido";
-                } catch (err) { console.log("Erro ao baixar áudio:", err); }
-            }
+                let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
+                let audioUrl = null;
+                let imageUrl = null;
 
-            // Tratamento de Imagem Recebida
-            if (msg.message.imageMessage) {
-                try {
-                    const stream = await downloadContentFromMessage(msg.message.imageMessage, 'image');
-                    let buffer = Buffer.from([]);
-                    for await (const chunk of stream) {
-                        buffer = Buffer.concat([buffer, chunk]);
-                    }
-                    imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
-                    text = "🖼️ Imagem recebida";
-                } catch (err) { console.log("Erro ao baixar imagem:", err); }
-            }
-
-            if (!text && !audioUrl && !imageUrl) return;
-
-            const msgObj = { 
-                id: msg.key.id, 
-                from: jid,
-                text: text, 
-                audioUrl: audioUrl,
-                imageUrl: imageUrl,
-                fromMe: fromMe, 
-                time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
-                sender: jid, 
-                pushName: pushName
-            };
-
-            await saveMessage(jid, msgObj, pushName);
-            io.emit('new_msg', msgObj);
-
-            if (fromMe) return;
-
-            const atendimentoManual = db.get(['chats', jid, 'atendimentoManual']).value() || false;
-            if (atendimentoManual) return;
-
-            // MENU DO ROBÔ (Apenas para texto)
-            if (text && text !== "🎙️ Áudio recebido") {
-                // VERIFICAÇÃO DE CAIXA (ESTABELECIMENTO ABERTO/FECHADO)
-                const caixaAberto = await verificarCaixaAberto();
-                if (!caixaAberto) {
-                    const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\n⏰ *Horário de Funcionamento:*\nDiariamente das 18h às 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
-                    const s = await sock.sendMessage(jid, { text: closedMsg });
-                    const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
-                    await saveMessage(jid, rObj, "Robo");
-                    io.emit('new_msg', rObj);
-                    return;
+                if (msg.message.audioMessage) {
+                    try {
+                        const stream = await downloadContentFromMessage(msg.message.audioMessage, 'audio');
+                        let buffer = Buffer.from([]);
+                        for await (const chunk of stream) { buffer = Buffer.concat([buffer, chunk]); }
+                        audioUrl = `data:audio/ogg;base64,${buffer.toString('base64')}`;
+                        text = "🎙️ Áudio recebido";
+                    } catch (err) { console.log("Erro ao baixar áudio:", err); }
                 }
 
-                let reply = "";
-                const lowerText = text.toLowerCase();
+                if (msg.message.imageMessage) {
+                    try {
+                        const stream = await downloadContentFromMessage(msg.message.imageMessage, 'image');
+                        let buffer = Buffer.from([]);
+                        for await (const chunk of stream) { buffer = Buffer.concat([buffer, chunk]); }
+                        imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+                        text = "🖼️ Imagem recebida";
+                    } catch (err) { console.log("Erro ao baixar imagem:", err); }
+                }
 
-                if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
-                    reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.
+                if (!text && !audioUrl && !imageUrl) return;
 
-Como posso te ajudar hoje?
+                const msgObj = {
+                    id: msg.key.id,
+                    from: jid,
+                    text: text,
+                    audioUrl: audioUrl,
+                    imageUrl: imageUrl,
+                    fromMe: fromMe,
+                    time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }),
+                    sender: jid,
+                    pushName: pushName
+                };
 
-1️⃣ - Ver Cardápio Digital 📖
-2️⃣ - Fazer um Pedido 🛒
-3️⃣ - Promoções do Dia 🔥
-4️⃣ - Endereço e Horário 📍
-5️⃣ - Falar com o Atendente 👨‍💻
+                await saveMessage(jid, msgObj, pushName);
+                io.emit('new_msg', msgObj);
 
+                if (fromMe) return;
+
+                const atendimentoManual = db.get(['chats', jid, 'atendimentoManual']).value() || false;
+                if (atendimentoManual) return;
+
+                if (text && text !== "🎙️ Áudio recebido") {
+                    const caixaAberto = await verificarCaixaAberto();
+                    if (!caixaAberto) {
+                        const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\
+\
+Informamos que nosso estabelecimento encontra-se *FECHADO* no momento.\
+\
+⏰ *Horário de Funcionamento:*\
+Diariamente das 18h às 02:00\
+\
+_Aguardamos seu pedido quando estivermos abertos!_`;
+                        const s = await sock.sendMessage(jid, { text: closedMsg });
+                        const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
+                        await saveMessage(jid, rObj, "Robo");
+                        io.emit('new_msg', rObj);
+                        return;
+                    }
+
+                    let reply = "";
+                    const lowerText = text.toLowerCase();
+
+                    if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
+                        reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\
+\
+Como posso te ajudar hoje?\
+\
+1️⃣ - Ver Cardápio Digital 📖\
+2️⃣ - Fazer um Pedido 🛒\
+3️⃣ - Promoções do Dia 🔥\
+4️⃣ - Endereço e Horário 📍\
+5️⃣ - Falar com o Atendente 👨‍💻\
+\
 _Digite apenas o número da opção desejada._`;
-                } else {
-                    if (lowerText === '1') {
-                        reply = `📖 *CARDÁPIO DIGITAL*
-
-Para visualizar nossos produtos, você pode acessar nosso link:
-https://garconnexpress.vercel.app/cardapio/
-
+                    } else {
+                        if (lowerText === '1') {
+                            reply = `📖 *CARDÁPIO DIGITAL*\
+\
+Para visualizar nossos produtos, você pode acessar nosso link:\
+https://garconnexpress.vercel.app/cardapio/\
+\
 🏠 *Dica:* Se você estiver no estabelecimento, pode fazer o pedido diretamente pelo link acima para agilizar seu atendimento!`;
-                    } else if (lowerText === '2') {
-                        reply = `🛒 *FAZER UM PEDIDO*
-
-Para sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e você poderá realizar seu pedido de forma rápida! 🚀
-
+                        } else if (lowerText === '2') {
+                            reply = `🛒 *FAZER UM PEDIDO*\
+\
+Para sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa. Ele abrirá o cardápio completo e você poderá realizar seu pedido de forma rápida! 🚀\
+\
 💡 *Dúvidas?* Em caso de dúvida, basta chamar o garçom mais próximo ou dirigir-se ao balcão. Estamos aqui para ajudar!`;
-                    } else if (lowerText === '3') {
-                        try {
-                            const response = await fetch('https://garconnexpress.vercel.app/api/menu');
-                            const menu = await response.json();
-                            const promos = menu.filter(item => item.em_promocao && (item.visivel === true || item.visivel === 1));
-                            let promoMsg = "🔥 *PROMOÇÕES DO DIA*\n\n";
-                            if (promos.length > 0) {
-                                promos.forEach(p => {
-                                    const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
-                                    promoMsg += `✨ *${p.nome}*\n💰 ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\n\n`;
-                                });
-                                promoMsg += "_Aproveite que é por tempo limitado!_";
-                            } else {
-                                promoMsg += "No momento não temos promoções ativas, mas fique de olho no nosso cardápio! 😉";
+                        } else if (lowerText === '3') {
+                            try {
+                                const response = await fetch('https://garconnexpress.vercel.app/api/menu');
+                                const menu = await response.json();
+                                const promos = menu.filter(item => item.em_promocao && (item.visivel === true || item.visivel === 1));
+                                let promoMsg = "🔥 *PROMOÇÕES DO DIA*\
+\
+";
+                                if (promos.length > 0) {
+                                    promos.forEach(p => {
+                                        const precoOriginal = p.preco_original ? `~R$ ${parseFloat(p.preco_original).toFixed(2)}~ ` : "";
+                                        promoMsg += `✨ *${p.nome}*\
+💰 ${precoOriginal}*R$ ${parseFloat(p.preco).toFixed(2)}*\
+\
+`;
+                                    });
+                                    promoMsg += "_Aproveite que é por tempo limitado!_";
+                                } else {
+                                    promoMsg += "No momento não temos promoções ativas, mas fique de olho no nosso cardápio! 😉";
+                                }
+                                reply = promoMsg;
+                            } catch (e) { reply = "Desculpe, ocorreu um erro ao consultar as promoções."; }
+                        } else if (lowerText === '4') {
+                            reply = "📍 *ENDEREÇO E HORÁRIO*\
+\
+🏠 Endereço: Rua Demócrito Gracindo, 132 - Ponta Grossa\
+🕒 Horário: Diariamente das 18h às 02:00";
+                        } else if (lowerText === '5') {
+                            reply = "👨‍💻 *ATENDIMENTO HUMANO*\
+\
+Aguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
+                            const chats = db.get('chats').value() || {};
+                            if (chats[jid]) {
+                                chats[jid].atendimentoManual = true;
+                                await db.set('chats', chats).write();
+                                io.emit('status_atendimento', { jid, atendimentoManual: true });
                             }
-                            reply = promoMsg;
-                        } catch (e) {
-                            reply = "Desculpe, ocorreu um erro ao consultar as promoções. Tente novamente mais tarde.";
-                        }
-                    } else if (lowerText === '4') {
-                        reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 Endereço: Rua Demócrito Gracindo, 132 - Ponta Grossa\n🕒 Horário: Diariamente das 18h às 02:00";
-                    } else if (lowerText === '5') {
-                        reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
-                        const chats = db.get('chats').value() || {};
-                        if (chats[jid]) {
-                            chats[jid].atendimentoManual = true;
-                            await db.set('chats', chats).write();
-                            io.emit('status_atendimento', { jid, atendimentoManual: true });
                         }
                     }
-                }
 
-                if (reply) {
-                    const s = await sock.sendMessage(jid, { text: reply });
-                    const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
-                    await saveMessage(jid, rObj, "Robo");
-                    io.emit('new_msg', rObj);
+                    if (reply) {
+                        const s = await sock.sendMessage(jid, { text: reply });
+                        const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
+                        await saveMessage(jid, rObj, "Robo");
+                        io.emit('new_msg', rObj);
+                    }
                 }
-            }
+            } catch (e) { console.error('❌ ERRO NO PROCESSAMENTO DE MENSAGEM:', e); }
         });
-    } catch (err) { setTimeout(connectToWhatsApp, 5000); }
+    } catch (err) { console.error('❌ ERRO NA CONEXÃO WHATSAPP:', err); setTimeout(connectToWhatsApp, 5000); }
 }
 
 initDB().then(() => {
     server.listen(port, () => connectToWhatsApp());
 });
-// KEEP ALIVE: Auto-ping para evitar hibernação no Render (Plano Gratuito)
+
 const RENDER_URL = process.env.RENDER_EXTERNAL_URL;
 if (RENDER_URL) {
     setInterval(() => {
         fetch(`${RENDER_URL}/health`)
             .then(() => console.log('💓 Keep-Alive: Ping enviado com sucesso'))
             .catch(err => console.error('💔 Keep-Alive: Erro no ping:', err.message));
-    }, 5 * 60 * 1000); // A cada 5 minutos
+    }, 5 * 60 * 1000);
 }
