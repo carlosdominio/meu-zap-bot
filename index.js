@@ -269,7 +269,7 @@ async function connectToWhatsApp() {
                         let buffer = Buffer.from([]);
                         for await (const chunk of stream) { buffer = Buffer.concat([buffer, chunk]); }
                         audioUrl = `data:audio/ogg;base64,${buffer.toString('base64')}`;
-                        text = "🎙️ Áudio recebido";
+                        text = "🎤 Áudio recebido";
                     } catch (err) { console.log("Erro ao baixar áudio:", err); }
                 }
 
@@ -305,17 +305,10 @@ async function connectToWhatsApp() {
                 const atendimentoManual = db.get(['chats', jid, 'atendimentoManual']).value() || false;
                 if (atendimentoManual) return;
 
-                if (text && text !== "🎙️ Áudio recebido") {
+                if (text && text !== "🎤 Áudio recebido") {
                     const caixaAberto = await verificarCaixaAberto();
                     if (!caixaAberto) {
-                        const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\
-\
-Informamos que nosso estabelecimento encontra-se *FECHADO* no momento.\
-\
-⏰ *Horário de Funcionamento:*\
-Diariamente das 18h às 02:00\
-\
-_Aguardamos seu pedido quando estivermos abertos!_`;
+                        const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\n🕒 *Horário de Funcionamento:*\nDiariamente das 18h às 02:00\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
                         const s = await sock.sendMessage(jid, { text: closedMsg });
                         const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
                         await saveMessage(jid, rObj, "Robo");
@@ -327,22 +320,7 @@ _Aguardamos seu pedido quando estivermos abertos!_`;
                     const lowerText = text.toLowerCase();
 
                     if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
-reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.
-
-Como posso te ajudar hoje?
-
-1️⃣ - Ver Cardápio Digital 📖
-
-2️⃣ - Fazer um Pedido 🛒
-
-3️⃣ - Promoções do Dia 🔥
-
-4️⃣ - Endereço e Horário 📍
-
-5️⃣ - Falar com o Atendente 👨‍💻
-
-_Digite apenas o número da opção desejada._`;
-_Digite apenas o número da opção desejada._`;
+                        reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1️⃣ - Ver Cardápio Digital 📖\n\n2️⃣ - Fazer um Pedido 🛒\n\n3️⃣ - Promoções do Dia 🔥\n\n4️⃣ - Endereço e Horário 📍\n\n5️⃣ - Falar com o Atendente 👨‍💻\n\n_Digite apenas o número da opção desejada._`;
                     } else {
                         if (lowerText === '1') {
                             reply = "📖 *CARDÁPIO DIGITAL*\n\nPara visualizar nossos produtos, você pode acessar nosso link:\nhttps://garconnexpress.vercel.app/cardapio/\n\n🏠 *Dica:* Se você estiver no estabelecimento, pode fazer o pedido diretamente pelo link acima para agilizar seu atendimento!";
@@ -356,21 +334,8 @@ _Digite apenas o número da opção desejada._`;
                                 let promoMsg = "🔥 *PROMOÇÕES DO DIA*\n\n";
                                 if (promos.length > 0) {
                                     promos.forEach(p => {
-reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.
-
-Como posso te ajudar hoje?
-
-1️⃣ - Ver Cardápio Digital 📖
-
-2️⃣ - Fazer um Pedido 🛒
-
-3️⃣ - Promoções do Dia 🔥
-
-4️⃣ - Endereço e Horário 📍
-
-5️⃣ - Falar com o Atendente 👨‍💻
-
-_Digite apenas o número da opção desejada._`;
+                                        const precoOriginal = p.preco_original ? "~R$ " + parseFloat(p.preco_original).toFixed(2) + "~ " : "";
+                                        promoMsg += "✨ *" + p.nome + "*\n💰 " + precoOriginal + "*R$ " + parseFloat(p.preco).toFixed(2) + "*\n\n";
                                     });
                                     promoMsg += "_Aproveite que é por tempo limitado!_";
                                 } else {
@@ -381,9 +346,7 @@ _Digite apenas o número da opção desejada._`;
                         } else if (lowerText === '4') {
                             reply = "📍 *ENDEREÇO E HORÁRIO*\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n⏰ *Horário:* Diariamente das 18h às 02:00";
                         } else if (lowerText === '5') {
-                            reply = "👨‍💻 *ATENDIMENTO HUMANO*\
-\
-Aguarde um momento. Um atendente humano já foi notificado e irá falar com você em breve!";
+                            reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento.\n\nUm atendente humano já foi notificado e irá falar com você em breve!";
                             const chats = db.get('chats').value() || {};
                             if (chats[jid]) {
                                 chats[jid].atendimentoManual = true;
@@ -400,10 +363,8 @@ Aguarde um momento. Um atendente humano já foi notificado e irá falar com voc�
                         io.emit('new_msg', rObj);
                     }
                 }
-            } catch (e) { console.error('❌ ERRO NO PROCESSAMENTO DE MENSAGEM:', e); }
+            } catch (e) { console.error('Erro no processamento:', e); }
         });
-    } catch (err) { console.error('❌ ERRO NA CONEXÃO WHATSAPP:', err); setTimeout(connectToWhatsApp, 5000); }
-}
 
 initDB().then(() => {
     server.listen(port, () => connectToWhatsApp());
