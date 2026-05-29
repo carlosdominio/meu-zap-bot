@@ -305,15 +305,12 @@
     let currentViewerMsgId = null;
     let currentViewerFromMe = null;
     function abrirImagem(url, msgId, fromMe) {
-        const img = document.getElementById('image-viewer-img');
-        const overlay = document.getElementById('image-viewer-overlay');
-        const btnDelete = document.getElementById('image-viewer-delete');
-        img.src = url;
-        overlay.style.display = 'flex';
-        document.body.classList.add('no-scroll');
+        // Salva para possível exclusão (caso precise apagar enquanto vê)
         currentViewerMsgId = msgId;
         currentViewerFromMe = fromMe;
-        if (msgId && btnDelete) { btnDelete.style.display = 'block'; } else { if (btnDelete) btnDelete.style.display = 'none'; }
+
+        // Envia para o Painel Admin (Pai) abrir em TELA CHEIA REAL fora do iframe
+        window.parent.postMessage({ type: 'open_image_fullscreen', url: url }, '*');
     }
     function fecharImagem() {
         document.getElementById('image-viewer-overlay').style.display = 'none';
