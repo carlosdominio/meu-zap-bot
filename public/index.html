@@ -13,7 +13,7 @@
         #chat-list { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #00a884 transparent; }
         #chat-list::-webkit-scrollbar { width: 6px; }
         #chat-list::-webkit-scrollbar-thumb { background: #00a884; border-radius: 10px; }
-        
+
         .chat-item { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
         .chat-item.active { background: #ebebeb !important; }
         .chat-item.unread { background: #e6fffa; border-left: 4px solid #38b2ac; }
@@ -24,10 +24,10 @@
         @keyframes pulse-unread { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         .btn-del-chat { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; padding: 5px; opacity: 0.7; transition: transform 0.2s; }
         .btn-del-chat:hover { transform: scale(1.2); opacity: 1; }
-        #main-chat { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #efeae2; position: relative; }
+        #main-chat { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #efeae2; position: relative; }      
         #chat-header { background: #f0f2f5; padding: 10px 20px; border-bottom: 1px solid #ddd; height: 60px; display: flex; align-items: center; font-weight: bold; }
         #messages { flex: 1; min-height: 0; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 70%; padding: 10px 15px; border-radius: 8px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .msg { max-width: 70%; padding: 10px 15px; border-radius: 8px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; } 
         .msg-recebida { align-self: flex-start; background: white; }
         .msg-enviada { align-self: flex-end; background: #d9fdd3; }
         .audio-msg { min-width: 200px; }
@@ -88,7 +88,7 @@
 <div id="modal-confirm" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-title">Apagar Conversa?</div>
-        <div class="modal-text">Deseja realmente apagar esta conversa permanentemente? Esta ação não pode ser desfeita.</div>
+        <div class="modal-text">Deseja realmente apagar esta conversa permanentemente? Esta ação não pode ser desfeita.</div>    
         <div class="modal-buttons">
             <button class="btn-modal btn-cancel" onclick="closeModal()">Cancelar</button>
             <button class="btn-modal btn-confirm-del" id="btn-modal-confirm">Apagar</button>
@@ -146,15 +146,18 @@
         document.getElementById('qr-overlay').style.display = (data.status === 'CONECTADO') ? 'none' : 'flex';
     });
     socket.on('qr', (url) => { const img = document.getElementById('qr-img'); img.src = url; img.style.display = 'block'; document.getElementById('qr-overlay').style.display = 'flex'; });
-    socket.on('history', (history) => { chatData = history || {}; updateChatList(); setInterval(updateUnreadTitle, 5000); });
+    socket.on('history', (history) => { chatData = history || {}; updateChatList(); setInterval(updateUnreadTitle, 5000); });       
     socket.on('new_msg', (msg) => {
         const jid = msg.sender;
-        if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now() };
+        if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now() };      
         if (!msg.fromMe && msg.pushName && msg.pushName !== 'Voce' && msg.pushName !== 'Robo') { chatData[jid].name = msg.pushName; }
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
             chatData[jid].messages.push(msg);
             chatData[jid].lastUpdate = Date.now();
-            if (jid !== currentJid && (!msg.fromMe || chatData[jid].name === 'Pedidos Zap 📦')) { chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1; }
+            // Contador incrementa sempre que não for mensagem enviada por nós (ou se for o bot de pedidos)
+            if (!msg.fromMe || chatData[jid].name === 'Pedidos Zap 📦') { 
+                chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1; 
+            }
             window.parent.postMessage({ type: 'whatsapp_new_activity', jid: jid, active: (jid === currentJid), fromMe: msg.fromMe }, '*');
             if (jid === currentJid) renderMessage(msg);
         }
@@ -177,7 +180,7 @@
             if (data.jid === currentJid) {
                 const input = document.getElementById('human-toggle-input');
                 input.checked = data.atendimentoManual;
-                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';
+                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';        
             }
             updateChatList();
         }
@@ -195,7 +198,7 @@
     function updateChatList() {
         const listDiv = document.getElementById('chat-list');
         listDiv.innerHTML = '';
-        const sortedJids = Object.keys(chatData).sort((a, b) => (chatData[b].lastUpdate || 0) - (chatData[a].lastUpdate || 0));
+        const sortedJids = Object.keys(chatData).sort((a, b) => (chatData[b].lastUpdate || 0) - (chatData[a].lastUpdate || 0));     
         sortedJids.forEach(jid => {
             const chat = chatData[jid];
             const item = document.createElement('div');
@@ -209,7 +212,8 @@
     }
     function openChat(jid) {
         currentJid = jid;
-        if (chatData[jid]) { chatData[jid].unreadCount = 0; socket.emit('mark_seen', jid); }
+        // O contador só some quando clicar na mensagem, não ao abrir o chat
+        // if (chatData[jid]) { chatData[jid].unreadCount = 0; socket.emit('mark_seen', jid); }
         document.getElementById('chat-footer').style.display = 'flex';
         document.getElementById('human-control-toggle').style.display = 'flex';
         document.getElementById('current-chat-name').innerText = chatData[jid].name || jid.split('@')[0];
@@ -233,12 +237,22 @@
         div.id = 'msg-' + msg.id;
         div.className = 'msg ' + (msg.fromMe ? 'msg-enviada' : 'msg-recebida');
         
+        // Limpa o contador ao clicar na mensagem
+        div.onclick = () => {
+            if (currentJid && chatData[currentJid] && chatData[currentJid].unreadCount > 0) {
+                chatData[currentJid].unreadCount = 0;
+                socket.emit('mark_seen', currentJid);
+                updateChatList();
+                updateUnreadTitle();
+            }
+        };
+
         let msgContent = '<button class="btn-msg-del" onclick="confirmarDeletarMsg(\'' + msg.id + '\', ' + (msg.fromMe ? 'true' : 'false') + ')" title="Apagar mensagem">🗑️</button>';
-        
+
         if (msg.text) msgContent += '<p>' + msg.text + '</p>';
         if (msg.audioUrl) msgContent += '<audio controls class="audio-msg"><source src="' + msg.audioUrl + '" type="audio/ogg"></audio>';
         if (msg.imageUrl) msgContent += '<br><img src="' + msg.imageUrl + '" onclick="abrirImagem(this.src, \'' + msg.id + '\', ' + (msg.fromMe ? 'true' : 'false') + ')" style="max-width: 250px; border-radius: 8px; margin-top: 5px; cursor: pointer;" title="Clique para ampliar">';
-        
+
         div.innerHTML = msgContent + '<small style="display:block; text-align:right; font-size:10px; margin-top:5px; opacity:0.6;">' + msg.time + '</small>';
         document.getElementById('messages').appendChild(div);
         scrollToBottom();
@@ -255,7 +269,7 @@
             closeModalImagem();
         };
     }
-    function scrollToBottom() { const msgDiv = document.getElementById('messages'); msgDiv.scrollTop = msgDiv.scrollHeight; }
+    function scrollToBottom() { const msgDiv = document.getElementById('messages'); msgDiv.scrollTop = msgDiv.scrollHeight; }       
     function handleKeyUp(e) { if (e.key === 'Enter') enviar(); }
     function toggleHumanControl(checked) { if (!currentJid) return; socket.emit('toggle_atendimento', { jid: currentJid, status: checked }); }
     let jidToDelete = null;
@@ -287,7 +301,7 @@
             };
             mediaRecorder.start();
             btn.classList.add('recording');
-            btn.innerText = '⏹️';
+            btn.innerText = '🔴';
         } else {
             mediaRecorder.stop();
             btn.classList.remove('recording');
