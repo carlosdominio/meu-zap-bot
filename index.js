@@ -359,7 +359,8 @@ async function connectToWhatsApp() {
 
                 if (fromMe) return;
 
-                const atendimentoManual = db.get(['chats', jid, 'atendimentoManual']).value() || false;
+                const chats = db.get('chats').value() || {};
+                const atendimentoManual = chats[jid] ? chats[jid].atendimentoManual : false;
                 if (atendimentoManual) return;
 
                 if (text && text !== "🎤 Áudio recebido") {
