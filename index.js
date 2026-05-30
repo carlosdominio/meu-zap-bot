@@ -56,13 +56,13 @@ app.post('/api/notify-delivery', async (req, res) => {
                 }
                 db.set('chats', { ...chats }).write();
             }
-            message = '? *PEDIDO RECEBIDO!* (Ref: #'+pedidoId+')\n\nOl�! Seu pedido j� est� em nosso sistema. ??\n\n? *Tempo estimado de preparo:* '+tempoEstimado+'\n\nAvisaremos voc� assim que ele for para a cozinha! ??';
+            message = '✅ *PEDIDO RECEBIDO!* (Ref: #'+pedidoId+')\n\nOl�! Seu pedido j� est� em nosso sistema. ??\n\n? *Tempo estimado de preparo:* '+tempoEstimado+'\n\nAvisaremos voc� assim que ele for para a cozinha! ??';
             break;
         case 'preparando':
             message = '?? *SEU PEDIDO EST� SENDO PREPARADO!*\n\n�timas not�cias! O chef j� come�ou a preparar seu pedido #'+pedidoId+'. ??\n\nLogo ele sair� para entrega! ??';
             break;
         case 'saiu_entrega':
-            message = '?? *SAIU PARA ENTREGA!*\n\nSeu pedido #'+pedidoId+' j� est� a caminho! ??\n\n?? *Prazo de entrega:* '+tempoEstimado+'\n\nPrepare a mesa que estamos chegando! ???';
+            message = '🛵 *SAIU PARA ENTREGA!*\n\nSeu pedido #'+pedidoId+' j� est� a caminho! ??\n\n?? *Prazo de entrega:* '+tempoEstimado+'\n\nPrepare a mesa que estamos chegando! ???';
             break;
         default:
             return res.status(400).json({ error: 'Status inv�lido' });
@@ -383,7 +383,7 @@ async function connectToWhatsApp() {
                         if (lowerText === '1') {
                             reply = "📖 *CARDÁPIO DIGITAL*\n\nPara visualizar nossos produtos, você pode acessar nosso link:\nhttps://garconnexpress.vercel.app/cardapio/\n\n🏠 *Dica:* Se você estiver no estabelecimento, pode fazer o pedido diretamente pelo link acima para agilizar seu atendimento!";
                         } else if (lowerText === '2') {
-                            reply = "🛒 *FAZER UM PEDIDO*\n\nPara sua maior comodidade, pedimos que utilize o *QR Code* localizado na sua mesa.\n\nEle abrirá o cardápio completo e você poderá realizar seu pedido de forma rápida!\n\n🚀💡 *Dúvidas?*\n\nEm caso de dúvida, basta chamar o garçom mais próximo ou dirigir-se ao balcão.\n\nEstamos aqui para ajudar!";
+                            reply = "🛒 *FAZER UM PEDIDO*\n\nPara sua maior comodidade, utilize o link do nosso Cardápio Digital:\nhttps://garconnexpress.vercel.app/cardapio/\n\n📍 *Dica:* Se estiver no estabelecimento, use o *QR Code* na sua mesa para um pedido mais rápido!\n\n🚀💡 *Dúvidas?*\nBasta chamar o garçom ou dirigir-se ao balcão.";
                         } else if (lowerText === '3') {
                             try {
                                 const response = await fetch('https://garconnexpress.vercel.app/api/menu');
