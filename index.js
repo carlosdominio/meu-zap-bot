@@ -33,7 +33,7 @@ app.use(express.static('public'));
 // Rota de Health Check para evitar que o Render hiberne e o serviÃ§o pare
 app.get('/health', (req, res) => res.send('OK'));
 
-// ROTA PARA NOTIFICAÇÕES DE STATUS DE DELIVERY (VERCEL -> ROBÔ)
+// ROTA PARA NOTIFICAï¿½ï¿½ES DE STATUS DE DELIVERY (VERCEL -> ROBï¿½)
 app.post('/api/notify-delivery', async (req, res) => {
     const { number, status, pedidoId, tempo } = req.body;
     if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'Bot desconectado' });
@@ -46,16 +46,26 @@ app.post('/api/notify-delivery', async (req, res) => {
 
     switch (status) {
         case 'recebido':
-            message = '? *PEDIDO RECEBIDO!* (Ref: #'+pedidoId+')\n\nOlá! Seu pedido já está em nosso sistema. ??\n\n? *Tempo estimado de preparo:* '+tempoEstimado+'\n\nAvisaremos você assim que ele for para a cozinha! ??';
+            // Ativa atendimento manual para novos pedidos de delivery
+            if (db) {
+                const chats = db.get('chats').value() || {};
+                if (!chats[jid]) {
+                    chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: true, unreadCount: 0, lastUpdate: Date.now() };
+                } else {
+                    chats[jid].atendimentoManual = true;
+                }
+                db.set('chats', { ...chats }).write();
+            }
+            message = '? *PEDIDO RECEBIDO!* (Ref: #'+pedidoId+')\n\nOlï¿½! Seu pedido jï¿½ estï¿½ em nosso sistema. ??\n\n? *Tempo estimado de preparo:* '+tempoEstimado+'\n\nAvisaremos vocï¿½ assim que ele for para a cozinha! ??';
             break;
         case 'preparando':
-            message = '?? *SEU PEDIDO ESTÁ SENDO PREPARADO!*\n\nÓtimas notícias! O chef já começou a preparar seu pedido #'+pedidoId+'. ??\n\nLogo ele sairá para entrega! ??';
+            message = '?? *SEU PEDIDO ESTï¿½ SENDO PREPARADO!*\n\nï¿½timas notï¿½cias! O chef jï¿½ comeï¿½ou a preparar seu pedido #'+pedidoId+'. ??\n\nLogo ele sairï¿½ para entrega! ??';
             break;
         case 'saiu_entrega':
-            message = '?? *SAIU PARA ENTREGA!*\n\nSeu pedido #'+pedidoId+' já está a caminho! ??\n\n?? *Prazo de entrega:* '+tempoEstimado+'\n\nPrepare a mesa que estamos chegando! ???';
+            message = '?? *SAIU PARA ENTREGA!*\n\nSeu pedido #'+pedidoId+' jï¿½ estï¿½ a caminho! ??\n\n?? *Prazo de entrega:* '+tempoEstimado+'\n\nPrepare a mesa que estamos chegando! ???';
             break;
         default:
-            return res.status(400).json({ error: 'Status inválido' });
+            return res.status(400).json({ error: 'Status invï¿½lido' });
     }
 
     try {
@@ -66,13 +76,13 @@ app.post('/api/notify-delivery', async (req, res) => {
             fromMe: true, 
             time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
             sender: jid, 
-            pushName: 'Robô ??' 
+            pushName: 'Robï¿½ ??' 
         };
         await saveMessage(jid, rObj, 'Robo');
         io.emit('new_msg', rObj);
         res.json({ success: true });
     } catch (e) {
-        console.error('Erro ao enviar notificação de delivery:', e);
+        console.error('Erro ao enviar notificaï¿½ï¿½o de delivery:', e);
         res.status(500).json({ error: e.message });
     }
 });
@@ -201,11 +211,14 @@ io.on('connection', (socket) => {
         const { jid, status } = data;
         if (db) {
             const chats = db.get('chats').value() || {};
-            if (chats[jid]) {
+            if (!chats[jid]) {
+                // Cria o chat caso nÃ£o exista para permitir ativar atendimento manual
+                chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: status, unreadCount: 0, lastUpdate: Date.now() };
+            } else {
                 chats[jid].atendimentoManual = status;
-                await db.set('chats', { ...chats }).write();
-                io.emit('status_atendimento', { jid, atendimentoManual: status });
             }
+            await db.set('chats', { ...chats }).write();
+            io.emit('status_atendimento', { jid, atendimentoManual: status });
         }
     });
 
