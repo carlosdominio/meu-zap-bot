@@ -56,7 +56,7 @@ app.post('/api/notify-delivery', async (req, res) => {
                 }
                 db.set('chats', { ...chats }).write();
             }
-            message = '✅ *PEDIDO RECEBIDO!* (Ref: #'+pedidoId+')\n\nOl�! Seu pedido j� est� em nosso sistema. ??\n\n? *Tempo estimado de preparo:* '+tempoEstimado+'\n\nAvisaremos voc� assim que ele for para a cozinha! ??';
+            message = '✅ *PEDIDO RECEBIDO!* (Ref: #'+pedidoId+')\n\nOl�! Seu pedido j� est� em nosso sistema. ??\n\n? *Tempo estimado de preparo:* '+tempoEstimado+'\n\nAvisaremos voc� assim que ele for para a cozinha! ??\n\n👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento.\n\nUm atendente humano já foi notificado e irá falar com você em breve!';
             break;
         case 'preparando':
             message = '?? *SEU PEDIDO EST� SENDO PREPARADO!*\n\n�timas not�cias! O chef j� come�ou a preparar seu pedido #'+pedidoId+'. ??\n\nLogo ele sair� para entrega! ??';
