@@ -33,6 +33,50 @@ app.use(express.static('public'));
 // Rota de Health Check para evitar que o Render hiberne e o serviÃ§o pare
 app.get('/health', (req, res) => res.send('OK'));
 
+// ROTA PARA NOTIFICAÇÕES DE STATUS DE DELIVERY (VERCEL -> ROBÔ)
+app.post('/api/notify-delivery', async (req, res) => {
+    const { number, status, pedidoId, tempo } = req.body;
+    if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'Bot desconectado' });
+
+    let jid = number;
+    if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+
+    let message = '';
+    const tempoEstimado = tempo || '30-50 min';
+
+    switch (status) {
+        case 'recebido':
+            message = '? *PEDIDO RECEBIDO!* (Ref: #'+pedidoId+')\n\nOlá! Seu pedido já está em nosso sistema. ??\n\n? *Tempo estimado de preparo:* '+tempoEstimado+'\n\nAvisaremos você assim que ele for para a cozinha! ??';
+            break;
+        case 'preparando':
+            message = '?? *SEU PEDIDO ESTÁ SENDO PREPARADO!*\n\nÓtimas notícias! O chef já começou a preparar seu pedido #'+pedidoId+'. ??\n\nLogo ele sairá para entrega! ??';
+            break;
+        case 'saiu_entrega':
+            message = '?? *SAIU PARA ENTREGA!*\n\nSeu pedido #'+pedidoId+' já está a caminho! ??\n\n?? *Prazo de entrega:* '+tempoEstimado+'\n\nPrepare a mesa que estamos chegando! ???';
+            break;
+        default:
+            return res.status(400).json({ error: 'Status inválido' });
+    }
+
+    try {
+        const s = await sock.sendMessage(jid, { text: message });
+        const rObj = { 
+            id: s.key.id, 
+            text: message, 
+            fromMe: true, 
+            time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
+            sender: jid, 
+            pushName: 'Robô ??' 
+        };
+        await saveMessage(jid, rObj, 'Robo');
+        io.emit('new_msg', rObj);
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Erro ao enviar notificação de delivery:', e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
 
 // Rota para servir Ã¡udios baixados
 if (!fs.existsSync('public/audios')) fs.mkdirSync('public/audios', { recursive: true });
