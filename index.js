@@ -1,3 +1,4 @@
+const qrcodeTerminal = require('qrcode-terminal');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');  
@@ -27,22 +28,16 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 }); // 100 MB Limit for images/audio        
 
-const port = process.env.PORT || 3000;
+const port = 3002;
 
 app.use(express.static('public'));
 // Rota de Health Check para evitar que o Render hiberne e o serviço pare
 app.get('/health', (req, res) => res.send('OK'));
 
-// ROTA PARA NOTIFICA��ES DE STATUS DE DELIVERY (VERCEL -> ROB�)
 // ROTA PARA NOTIFICAÇÕES DE STATUS DE DELIVERY (VERCEL -> ROBÔ)
 app.post('/api/notify-delivery', async (req, res) => {
     const { number, status, pedidoId, tempo } = req.body;
     console.log(`📦 [Bot] Notificação recebida: Status=${status}, Pedido=#${pedidoId}, Número=${number}`);
-    
-    if (!sock || statusConexao !== 'CONECTADO') {
-        console.log('⚠️ [Bot] Falha no envio: Bot desconectado');
-        return res.status(503).json({ error: 'Bot desconectado' });
-    }
 
     let jid = number;
     if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
@@ -50,13 +45,11 @@ app.post('/api/notify-delivery', async (req, res) => {
     let message = '';
     const tempoEstimado = tempo || '30-50 min';
 
-    // Busca nome do cliente no banco local se existir
     const chats = db ? db.get('chats').value() || {} : {};
     const clientName = (chats[jid] && chats[jid].name && chats[jid].name !== jid.split('@')[0]) ? chats[jid].name : 'cliente';
 
     switch (status) {
         case 'recebido':
-            // Ativa atendimento manual para novos pedidos de delivery
             if (db) {
                 if (!chats[jid]) {
                     chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: true, unreadCount: 0, lastUpdate: Date.now() };
@@ -64,9 +57,17 @@ app.post('/api/notify-delivery', async (req, res) => {
                     chats[jid].atendimentoManual = true;
                 }
                 await db.set('chats', { ...chats }).write();
-                console.log(`🙋‍♂️ [Bot] Atendimento MANUAL ativado para ${jid}`);
             }
-            message = `Boa noite ! ${clientName} que o pedido foi direcionado para preparo mais atualizações em breve.`;
+            
+            const myNumber = sock?.user?.id?.split(':')[0]?.split('@')[0];
+            const isAutoSend = jid.includes(myNumber);
+            
+            if (isAutoSend) {
+                console.log('⚠️ [Bot] Detectado auto-envio (Bot enviando para si mesmo). Ignorando notificação de "Boa noite" para evitar loop ou chat poluído.');
+                return res.json({ success: true, warning: 'auto_send_ignored' });
+            }
+
+            message = `Boa noite, ${clientName}! Seu pedido foi recebido e direcionado para o preparo. Enviaremos mais atualizações em breve.`;
             break;
         case 'preparando':
             message = '👨‍🍳 *SEU PEDIDO ESTÁ SENDO PREPARADO!*\n\nÓtimas notícias! O chef já começou a preparar seu pedido #'+pedidoId+'. 🍳\n\nLogo ele sairá para entrega! 🛵';
@@ -78,10 +79,18 @@ app.post('/api/notify-delivery', async (req, res) => {
             return res.status(400).json({ error: 'Status inválido' });
     }
 
+    // --- MODO DE SIMULAÇÃO (PARA TESTES SEM QR CODE) ---
+    if (!sock || statusConexao !== 'CONECTADO') {
+        console.log('⚠️ [Bot] Bot desconectado, mas tentará enviar assim que reconectar (ou falhará agora).');
+        // Se realmente não houver sock, não há o que fazer
+        if (!sock) return res.status(503).json({ error: 'Bot não inicializado' });
+    }
+    // ---------------------------------------------------
+
     try {
         console.log(`📤 [Bot] Enviando mensagem de delivery para ${jid}...`);
-        const s = await sock.sendMessage(jid, { text: message });
-        
+        const s = await sendHumanizedMessage(jid, { text: message });
+
         const rObj = {
             id: s.key.id,
             text: message,
@@ -90,10 +99,9 @@ app.post('/api/notify-delivery', async (req, res) => {
             sender: sock.user.id,
             pushName: 'Robô 🤖'
         };
-        
+
         await saveMessage(jid, rObj, 'Robo');
         io.emit('new_msg', rObj);
-        console.log(`✅ [Bot] Mensagem enviada com sucesso para ${jid}`);
         res.json({ success: true });
     } catch (e) {
         console.error('❌ [Bot] Erro ao enviar notificação de delivery:', e);
@@ -102,12 +110,40 @@ app.post('/api/notify-delivery', async (req, res) => {
 });
 
 
-// Rota para servir áudios baixados
-if (!fs.existsSync('public/audios')) fs.mkdirSync('public/audios', { recursive: true });
-
 let lastQr = null;
 let statusConexao = "DESCONECTADO";
 let sock = null;
+
+// --- FUNÇÃO DE HUMANIZAÇÃO (ANTI-BAN) ---
+async function sendHumanizedMessage(jid, content, options = {}) {
+    if (!sock || statusConexao !== "CONECTADO") return;
+    try {
+        // 1. Sinaliza presença (digitando ou gravando)
+        const presence = content.audio ? 'recording' : 'composing';
+        await sock.sendPresenceUpdate(presence, jid);
+
+        // 2. Calcula delay humano (2s a 5s base + tempo por caractere)
+        let delay = 2000 + (Math.random() * 3000);
+        if (content.text) {
+            delay += Math.min(content.text.length * 50, 7000); // No máximo 7s extras para textos longos
+        } else if (content.image || content.audio) {
+            delay += 3000; // Delay fixo para mídia
+        }
+
+        await new Promise(resolve => setTimeout(resolve, delay));
+
+        // 3. Envia a mensagem
+        const result = await sock.sendMessage(jid, content, options);
+
+        // 4. Para sinal de presença
+        await sock.sendPresenceUpdate('paused', jid);
+        return result;
+    } catch (e) {
+        console.error('❌ Erro no sendHumanizedMessage:', e);
+        throw e;
+    }
+}
+// ----------------------------------------
 
 io.on('connection', (socket) => {
     socket.emit('status', { status: statusConexao });
@@ -120,7 +156,7 @@ io.on('connection', (socket) => {
             let jid = data.number;
             if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
             // Apenas enviamos. O messages.upsert cuidará de salvar e avisar o painel.
-            await sock.sendMessage(jid, { text: data.text });
+            await sendHumanizedMessage(jid, { text: data.text });
         } catch (e) { console.log('Erro ao enviar texto:', e); }
     });
 
@@ -158,7 +194,7 @@ io.on('connection', (socket) => {
             const base64Data = data.image.split(';base64,').pop();
             const buffer = Buffer.from(base64Data, 'base64');
 
-            const s = await sock.sendMessage(jid, { image: buffer });
+            const s = await sendHumanizedMessage(jid, { image: buffer });
             const rObj = { id: s.key.id, text: '🖼️ Imagem enviada', fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖", imageUrl: data.image };
 
             await saveMessage(jid, rObj, "Robo");
@@ -190,19 +226,19 @@ io.on('connection', (socket) => {
                     .audioCodec('libopus')
                     .on('error', async (err) => {
                         console.log('Erro na conversão ffmpeg, enviando original:', err);
-                        await sock.sendMessage(jid, { audio: buffer, mimetype: 'audio/mp4', ptt: true });
+                        await sendHumanizedMessage(jid, { audio: buffer, mimetype: 'audio/mp4', ptt: true });
                         if (fs.existsSync(tempWebm)) fs.unlinkSync(tempWebm);
                     })
                     .on('end', async () => {
                         const oggBuffer = fs.readFileSync(tempOgg);
-                        await sock.sendMessage(jid, { audio: oggBuffer, mimetype: 'audio/ogg; codecs=opus', ptt: true }); 
+                        await sendHumanizedMessage(jid, { audio: oggBuffer, mimetype: 'audio/ogg; codecs=opus', ptt: true }); 
                         if (fs.existsSync(tempWebm)) fs.unlinkSync(tempWebm);
                         if (fs.existsSync(tempOgg)) fs.unlinkSync(tempOgg);
                     })
                     .save(tempOgg);
             } catch (ffmpegErr) {
                 console.log('FFMPEG não configurado:', ffmpegErr);
-                await sock.sendMessage(jid, { audio: buffer, mimetype: 'audio/mp4', ptt: true });
+                await sendHumanizedMessage(jid, { audio: buffer, mimetype: 'audio/mp4', ptt: true });
                 if (fs.existsSync(tempWebm)) fs.unlinkSync(tempWebm);
             }
         } catch (e) { console.log('Erro ao enviar áudio:', e); }
@@ -296,13 +332,19 @@ async function connectToWhatsApp() {
     try {
         const { version } = await fetchLatestBaileysVersion();
         const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
-        sock = makeWASocket({ version, auth: state, logger: pino({ level: 'error' }), browser: Browsers.appropriate('Painel Zap'), printQRInTerminal: false });
+        sock = makeWASocket({ version, auth: state, logger: pino({ level: 'error' }), browser: Browsers.appropriate('Painel Zap'),  });
         sock.ev.on('creds.update', saveCreds);
 
         sock.ev.on('connection.update', (update) => {
             const { connection, qr } = update;
-            if (qr) { QRCode.toDataURL(qr).then(url => { lastQr = url; io.emit('qr', url); }); statusConexao = "AGUARDANDO QR"; io.emit('status', {status: statusConexao}); }
-            if (connection === 'open') { statusConexao = "CONECTADO"; lastQr = null; io.emit('status', {status: statusConexao}); console.log('Bot Pronto'); }
+            if (qr) { 
+                qrcodeTerminal.generate(qr, { small: true });
+                console.log('📸 [WhatsApp] Novo QR Code gerado! Escaneie acima.');
+                QRCode.toDataURL(qr).then(url => { lastQr = url; io.emit('qr', url); }); 
+                statusConexao = "AGUARDANDO QR"; 
+                io.emit('status', {status: statusConexao}); 
+            }
+            if (connection === 'open') { statusConexao = "CONECTADO"; lastQr = null; io.emit('status', {status: statusConexao}); console.log('✅ Bot CONECTADO e Pronto!'); }
             if (connection === 'close') {
                 const shouldReconnect = update.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;  
                 console.log('Conexão encerrada. Motivo:', update.lastDisconnect?.error, 'Tentando reconectar:', shouldReconnect);
@@ -374,14 +416,31 @@ async function connectToWhatsApp() {
                 if (fromMe) return;
 
                 const chats = db.get('chats').value() || {};
-                const atendimentoManual = chats[jid] ? chats[jid].atendimentoManual : false;
-                if (atendimentoManual) return;
+                const atendimentoManual = (chats[jid] && chats[jid].atendimentoManual === true);
+                // --- FILTRO ANTI-BOAS-VINDAS PARA DELIVERY ---
+                const isDeliveryOrder = text && (text.includes('🛍️ *NOVO PEDIDO - DELIVERY*') || text.includes('🛵 DELIVERY'));
+                if (isDeliveryOrder) {
+                    console.log('📦 [Bot] Pedido de Delivery detectado. Ativando atendimento manual automático para:', jid);
+                    const chats = db.get('chats').value() || {};
+                    if (!chats[jid]) {
+                        chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: true, unreadCount: 0, lastUpdate: Date.now() };
+                    } else {
+                        chats[jid].atendimentoManual = true;
+                    }
+                    await db.set('chats', chats).write();
+                    io.emit('status_atendimento', { jid, atendimentoManual: true });
+                    return; // Aborta para não enviar mensagem de boas-vindas
+                }
+
+
+
+                if (atendimentoManual) { console.log('Atendimento manual ativo para:', jid); return; }
 
                 if (text && text !== "🎤 Áudio recebido") {
                     const caixaAberto = await verificarCaixaAberto();
                     if (!caixaAberto) {
                         const closedMsg = `Olá ${pushName}! 👋 Agradecemos o seu contato.\n\nInformamos que nosso estabelecimento encontra-se *FECHADO* no momento.\n\n🕒 *Horário de Funcionamento:*\nDiariamente das 18h às 02:00 de Terça a Domingo\n\n_Aguardamos seu pedido quando estivermos abertos!_`;
-                        const s = await sock.sendMessage(jid, { text: closedMsg });
+                        const s = await sendHumanizedMessage(jid, { text: closedMsg });
                         const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
                         await saveMessage(jid, rObj, "Robo");
                         io.emit('new_msg', rObj);
@@ -429,7 +488,7 @@ async function connectToWhatsApp() {
                     }
 
                     if (reply) {
-                        const s = await sock.sendMessage(jid, { text: reply });
+                        const s = await sendHumanizedMessage(jid, { text: reply });
                         const rObj = { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
                         await saveMessage(jid, rObj, "Robo");
                         io.emit('new_msg', rObj);
