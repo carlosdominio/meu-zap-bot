@@ -34,9 +34,15 @@ app.use(express.static('public'));
 app.get('/health', (req, res) => res.send('OK'));
 
 // ROTA PARA NOTIFICA��ES DE STATUS DE DELIVERY (VERCEL -> ROB�)
+// ROTA PARA NOTIFICAÇÕES DE STATUS DE DELIVERY (VERCEL -> ROBÔ)
 app.post('/api/notify-delivery', async (req, res) => {
     const { number, status, pedidoId, tempo } = req.body;
-    if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'Bot desconectado' });
+    console.log(`📦 [Bot] Notificação recebida: Status=${status}, Pedido=#${pedidoId}, Número=${number}`);
+    
+    if (!sock || statusConexao !== 'CONECTADO') {
+        console.log('⚠️ [Bot] Falha no envio: Bot desconectado');
+        return res.status(503).json({ error: 'Bot desconectado' });
+    }
 
     let jid = number;
     if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
@@ -44,52 +50,56 @@ app.post('/api/notify-delivery', async (req, res) => {
     let message = '';
     const tempoEstimado = tempo || '30-50 min';
 
+    // Busca nome do cliente no banco local se existir
+    const chats = db ? db.get('chats').value() || {} : {};
+    const clientName = (chats[jid] && chats[jid].name && chats[jid].name !== jid.split('@')[0]) ? chats[jid].name : 'cliente';
+
     switch (status) {
-                case 'recebido':
+        case 'recebido':
             // Ativa atendimento manual para novos pedidos de delivery
             if (db) {
-                const chats = db.get('chats').value() || {};
                 if (!chats[jid]) {
                     chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: true, unreadCount: 0, lastUpdate: Date.now() };
                 } else {
                     chats[jid].atendimentoManual = true;
                 }
-                db.set('chats', { ...chats }).write();
+                await db.set('chats', { ...chats }).write();
+                console.log(`🙋‍♂️ [Bot] Atendimento MANUAL ativado para ${jid}`);
             }
-            {
-                const chats = db ? db.get('chats').value() || {} : {};
-                const clientName = chats[jid] ? chats[jid].name : jid.split('@')[0];
-                message = 'Boa noite ! ' + clientName + ' que o pedido foi direcionado para preparo mais atualizações em breve.';
-            }
+            message = `Boa noite ! ${clientName} que o pedido foi direcionado para preparo mais atualizações em breve.`;
             break;
         case 'preparando':
-            message = '?? *SEU PEDIDO EST� SENDO PREPARADO!*\n\n�timas not�cias! O chef j� come�ou a preparar seu pedido #'+pedidoId+'. ??\n\nLogo ele sair� para entrega! ??';
+            message = '👨‍🍳 *SEU PEDIDO ESTÁ SENDO PREPARADO!*\n\nÓtimas notícias! O chef já começou a preparar seu pedido #'+pedidoId+'. 🍳\n\nLogo ele sairá para entrega! 🛵';
             break;
         case 'saiu_entrega':
-            message = '🛵 *SAIU PARA ENTREGA!*\n\nSeu pedido #'+pedidoId+' j� est� a caminho! ??\n\n?? *Prazo de entrega:* '+tempoEstimado+'\n\nPrepare a mesa que estamos chegando! ???';
+            message = '🛵 *SAIU PARA ENTREGA!*\n\nSeu pedido #'+pedidoId+' já está a caminho! 🚀\n\n🏁 *Prazo de entrega:* '+tempoEstimado+'\n\nPrepare a mesa que estamos chegando! 🍴';
             break;
         default:
-            return res.status(400).json({ error: 'Status inv�lido' });
+            return res.status(400).json({ error: 'Status inválido' });
     }
 
     try {
-        console.log('📝 [DEBUG-BOT] Mensagem Gerada:', message);
-        fs.appendFileSync('C:\\Users\\Admin\\meu-zap-bot\\bot_test.log', '--- MENSAGEM GERADA ---\n' + message + '\n-----------------------\n');
+        console.log(`📤 [Bot] Enviando mensagem de delivery para ${jid}...`);
         const s = await sock.sendMessage(jid, { text: message });
-        const rObj = { 
-            id: s.key.id, 
-            text: message, 
-            fromMe: true, 
-            time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), 
-            sender: jid, 
-            pushName: 'Rob� ??' 
+        
+        const rObj = {
+            id: s.key.id,
+            text: message,
+            fromMe: true,
+            time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }),
+            sender: sock.user.id,
+            pushName: 'Robô 🤖'
         };
+        
         await saveMessage(jid, rObj, 'Robo');
         io.emit('new_msg', rObj);
+        console.log(`✅ [Bot] Mensagem enviada com sucesso para ${jid}`);
         res.json({ success: true });
     } catch (e) {
-        console.error('Erro ao enviar notifica��o de delivery:', e);
+        console.error('❌ [Bot] Erro ao enviar notificação de delivery:', e);
         res.status(500).json({ error: e.message });
+    }
+});
     }
 });
 
