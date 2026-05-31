@@ -100,8 +100,6 @@ app.post('/api/notify-delivery', async (req, res) => {
         res.status(500).json({ error: e.message });
     }
 });
-    }
-});
 
 
 // Rota para servir áudios baixados
