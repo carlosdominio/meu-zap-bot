@@ -45,7 +45,7 @@ app.post('/api/notify-delivery', async (req, res) => {
     const tempoEstimado = tempo || '30-50 min';
 
     switch (status) {
-        case 'recebido':
+                case 'recebido':
             // Ativa atendimento manual para novos pedidos de delivery
             if (db) {
                 const chats = db.get('chats').value() || {};
@@ -56,7 +56,11 @@ app.post('/api/notify-delivery', async (req, res) => {
                 }
                 db.set('chats', { ...chats }).write();
             }
-            message = '✅ *PEDIDO RECEBIDO!* (Ref: #'+pedidoId+')\n\nOl�! Seu pedido j� est� em nosso sistema. ??\n\n? *Tempo estimado de preparo:* '+tempoEstimado+'\n\nAvisaremos voc� assim que ele for para a cozinha! ??\n\n👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento.\n\nUm atendente humano já foi notificado e irá falar com você em breve!';
+            {
+                const chats = db ? db.get('chats').value() || {} : {};
+                const clientName = chats[jid] ? chats[jid].name : jid.split('@')[0];
+                message = 'Boa noite ! ' + clientName + ' que o pedido foi direcionado para preparo mais atualizações em breve.';
+            }
             break;
         case 'preparando':
             message = '?? *SEU PEDIDO EST� SENDO PREPARADO!*\n\n�timas not�cias! O chef j� come�ou a preparar seu pedido #'+pedidoId+'. ??\n\nLogo ele sair� para entrega! ??';
@@ -69,6 +73,8 @@ app.post('/api/notify-delivery', async (req, res) => {
     }
 
     try {
+        console.log('📝 [DEBUG-BOT] Mensagem Gerada:', message);
+        fs.appendFileSync('C:\\Users\\Admin\\meu-zap-bot\\bot_test.log', '--- MENSAGEM GERADA ---\n' + message + '\n-----------------------\n');
         const s = await sock.sendMessage(jid, { text: message });
         const rObj = { 
             id: s.key.id, 
