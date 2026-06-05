@@ -29,6 +29,7 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 }); // 100 MB Limit for images/audio        
 
 const port = 3002;
+const DELIVERY_API_URL = process.env.DELIVERY_API_URL || 'http://localhost:3001/api/pedidos';
 
 app.use(express.static('public'));
 // Rota de Health Check para evitar que o Render hiberne e o serviço pare
@@ -451,29 +452,20 @@ async function connectToWhatsApp() {
                 // --- FILTRO ANTI-BOAS-VINDAS PARA DELIVERY ---
                 const isDeliveryOrder = text && (text.includes('🛍️ *NOVO PEDIDO - DELIVERY*') || text.includes('🛵 DELIVERY'));
                 if (isDeliveryOrder) {
-                    console.log('📦 [Bot] Pedido de Delivery detectado. Enviando confirmação para cliente:', jid);
-                    
-                    // Extrair pedidoId do texto
-                    const pedidoMatch = text.match(/#(\d+)/);
-                    const pedidoDetectado = pedidoMatch ? pedidoMatch[1] : null;
-                    
-                    const chats = db.get('chats').value() || {};
-                    if (!chats[jid]) {
-                        chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: false, unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoDetectado };
-                    } else {
+                    const match = text.match(/#(\d+)/);
+                    const pId = match ? match[1] : null;
+                    if (pId) {
+                        chats[jid] = chats[jid] || { name: pushName, messages: [], unreadCount: 0 };
+                        chats[jid].ultimoPedidoId = pId;
+                        chats[jid].activePedidoId = pId;
+                        chats[jid].atendimentoManual = false;
                         chats[jid].estado = 'delivery';
-                        if (!chats[jid].activePedidoId) chats[jid].activePedidoId = pedidoDetectado;
+                        if (db) await db.set('chats', { ...chats }).write();
+
+                        const welcome = 'Olá ' + pushName + '! 👋\n\n🛍️ *PEDIDO RECEBIDO!*\n\nSeu pedido *#' + pId + '* já está sendo preparado! 🚀\n\n1️⃣ - Ver Status 🛵\n2️⃣ - Atendente 👨‍💻';
+                        await sock.sendMessage(jid, { text: welcome });
+                        return;
                     }
-                    await db.set('chats', chats).write();
-                    
-                    // Mensagem de confirmação ao cliente
-                    const confirmMsg = `Olá! 👋 Seu pedido #${pedidoDetectado || ''} foi recebido e está em preparo. Mais atualizações em breve!`;
-                    const s = await sendHumanizedMessage(jid, { text: confirmMsg });
-                    const rObj = { id: s.key.id, text: confirmMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }), sender: jid, pushName: "Robô 🤖" };
-                    await saveMessage(jid, rObj, "Robo");
-                    io.emit('new_msg', rObj);
-                    io.emit('status_atendimento', { jid, atendimentoManual: false });
-                    return;
                 }
 
                 if (atendimentoManual) { console.log('Atendimento manual ativo para:', jid); return; }
@@ -504,20 +496,33 @@ async function connectToWhatsApp() {
                                 reply = "Não encontrei um pedido ativo para você no momento. 😕";
                             } else {
                                 try {
-                                    const resp = await fetch(`https://garconnexpress.vercel.app/api/pedidos/${pId}`);
+                                    const resp = await fetch(`${DELIVERY_API_URL}/${pId}`);
+                                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
                                     const ped = await resp.json();
+                                    console.log('📦 [Bot] Status do pedido #' + pId + ':', ped.status);
                                     const stMap = {
                                         'recebido': 'Recebido (Na fila da cozinha) 📝',
                                         'preparando': 'Sendo preparado pelo Chef 👨‍🍳',
                                         'pronto': 'Pronto e aguardando entrega! 🥡',
                                         'saiu_entrega': 'A caminho da sua casa! 🛵',
                                         'entregue': 'Entregue! Bom apetite! 😋',
+                                        'servido': 'Entregue! Bom apetite! 😋',
                                         'cancelado': 'Cancelado ❌',
                                         'aguardando_fechamento': 'Pronto/Entregue (Aguardando finalização) ✅'
                                     };
-                                    reply = `📦 *STATUS DO PEDIDO #${pId}*\n\nAtualmente seu pedido está: *${stMap[ped.status] || ped.status}*\n\nFique atento, te avisaremos qualquer mudança!`;
+                                    const statusLabel = stMap[ped.status] || ped.status || 'Processando...';
+                                    reply = `📦 *STATUS DO PEDIDO #${pId}*\n\nAtualmente seu pedido está: *${statusLabel}*\n\nFique atento, te avisaremos qualquer mudança!`;
                                 } catch (err) {
-                                    reply = "Não consegui consultar o status agora. Tente novamente em instantes! ⏳";
+                                    console.error('❌ [Bot] Erro ao buscar status local:', err.message);
+                                    // Tenta fallback para o Vercel se o local falhar (caso esteja testando cruzado)
+                                    try {
+                                        const respV = await fetch(`https://garconnexpress.vercel.app/api/pedidos/${pId}`);
+                                        const pedV = await respV.json();
+                                        const stLabelV = { 'recebido': 'Recebido 📝', 'preparando': 'Preparando 👨‍🍳', 'pronto': 'Pronto 🥡', 'saiu_entrega': 'A caminho 🛵', 'entregue': 'Entregue 😋' }[pedV.status] || pedV.status;
+                                        reply = `📦 *STATUS DO PEDIDO #${pId}* (Nuvem)\n\nAtualmente seu pedido está: *${stLabelV}*`;
+                                    } catch (e2) {
+                                        reply = "Não consegui consultar o status no momento. O servidor pode estar ocupado. Tente novamente em 1 minuto! ⏳";
+                                    }
                                 }
                             }
                         } else if (lowerText === '2') {
