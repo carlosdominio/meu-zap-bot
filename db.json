@@ -75,12 +75,78 @@
           "time": "18:13",
           "sender": "558293157048@s.whatsapp.net",
           "pushName": "Voce"
+        },
+        {
+          "id": "3EB032B8AE973EC460708E",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1277\n💰 O cliente solicitou a conta.",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:28",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0E161BE5B4FD3054B5B",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1276\n🗑️ O pedido foi removido do sistema.",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:28",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0246C330848B3429446",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1271\n🗑️ O pedido foi removido do sistema.",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:29",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0BA1D8C5D2B337D08C9",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1272\n🗑️ O pedido foi removido do sistema.",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:29",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0121D0E000348303BA2",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1273\n🗑️ O pedido foi removido do sistema.",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:29",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0F5746DAC956161D56A",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1275\n🗑️ O pedido foi removido do sistema.",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:29",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
         }
       ],
       "lastOrderId": "1226",
       "atendimentoManual": false,
-      "lastUpdate": 1780694024453,
-      "unreadCount": 3
+      "lastUpdate": 1780694968926,
+      "unreadCount": 9
     },
     "115328914817201@lid": {
       "name": "Carlos Leonidio",
@@ -411,11 +477,49 @@
           "time": "18:21",
           "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC18960B4A9FEE35DAA3FF142C84BDDD",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": false,
+          "time": "18:27",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB06F1AB750A1830B469C",
+          "text": "📦 *STATUS DO PEDIDO #1277*\n\nAtualmente seu pedido está: *A caminho da sua casa! 🛵*\n\nFique atento, te avisaremos qualquer mudança!",
+          "fromMe": true,
+          "time": "18:27",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "ACE12E7AB06344DF52DA27314551C1CC",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": false,
+          "time": "18:28",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0B4D7B7D75CAC3A0EAD",
+          "text": "📦 *STATUS DO PEDIDO #1277*\n\nAtualmente seu pedido está: *Entregue! Bom apetite! 😋*\n\nFique atento, te avisaremos qualquer mudança!",
+          "fromMe": true,
+          "time": "18:28",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
         }
       ],
       "atendimentoManual": false,
-      "unreadCount": 3,
-      "lastUpdate": 1780694467813,
+      "unreadCount": 5,
+      "lastUpdate": 1780694901230,
       "estado": "delivery",
       "activePedidoId": "1277",
       "ultimoPedidoId": "1277"

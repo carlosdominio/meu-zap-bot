@@ -506,9 +506,9 @@ async function connectToWhatsApp() {
                                         'pronto': 'Pronto e aguardando entrega! 🥡',
                                         'saiu_entrega': 'A caminho da sua casa! 🛵',
                                         'entregue': 'Entregue! Bom apetite! 😋',
-                                        'servido': 'Entregue! Bom apetite! 😋',
+                                        'servido': 'A caminho da sua casa! 🛵',
                                         'cancelado': 'Cancelado ❌',
-                                        'aguardando_fechamento': 'Pronto/Entregue (Aguardando finalização) ✅'
+                                        'aguardando_fechamento': 'Entregue! Bom apetite! 😋'
                                     };
                                     const statusLabel = stMap[ped.status] || ped.status || 'Processando...';
                                     reply = `📦 *STATUS DO PEDIDO #${pId}*\n\nAtualmente seu pedido está: *${statusLabel}*\n\nFique atento, te avisaremos qualquer mudança!`;
