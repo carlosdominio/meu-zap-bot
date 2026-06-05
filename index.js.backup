@@ -522,9 +522,9 @@ async function connectToWhatsApp() {
                             }
                         } else if (lowerText === '2') {
                             reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento.\n\nUm atendente humano já foi notificado!";
-                            chats[jid].atendimentoManual = false;
+                            chats[jid].atendimentoManual = true;
                             await db.set('chats', chats).write();
-                            io.emit('status_atendimento', { jid, atendimentoManual: false });
+                            io.emit('status_atendimento', { jid, atendimentoManual: true });
                         }
                     } else if (!['1', '2', '3', '4', '5'].includes(lowerText)) {
                         reply = `Olá ${pushName}! 👋 Seja bem-vindo ao *GuGA Bebidas*.\n\nComo posso te ajudar hoje?\n\n1️⃣ - Ver Cardápio Digital 📖\n\n2️⃣ - Fazer um Pedido 🛒\n\n3️⃣ - Promoções do Dia 🔥\n\n4️⃣ - Endereço e Horário 📍\n\n5️⃣ - Falar com o Atendente 👨‍💻\n\n_Digite apenas o número da opção desejada._`;
@@ -555,9 +555,9 @@ async function connectToWhatsApp() {
                         } else if (lowerText === '5') {
                             reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento.\n\nUm atendente humano já foi notificado e irá falar com você em breve!";
                             if (chats[jid]) {
-                                chats[jid].atendimentoManual = false;
+                                chats[jid].atendimentoManual = true;
                                 await db.set('chats', chats).write();
-                                io.emit('status_atendimento', { jid, atendimentoManual: false });
+                                io.emit('status_atendimento', { jid, atendimentoManual: true });
                             }
                         }
                     }

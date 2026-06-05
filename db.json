@@ -1,156 +1,222 @@
 {
   "chats": {
-    "147498538688743@lid": {
-      "name": "Jose Marcos",
+    "558293157048@s.whatsapp.net": {
+      "name": "Pedidos Zap 📦",
       "messages": [
         {
-          "id": "AC459D6E7A4E8C1D4757D066DCEBFB93",
-          "text": "Oi",
-          "fromMe": false,
-          "time": "11:20",
-          "sender": "147498538688743@lid",
-          "pushName": "Jose Marcos"
-        },
-        {
-          "id": "3EB0C270AACCC7AA48F7B2",
-          "text": "Olá Jose Marcos! 👋\n\n1 - Horário\n2 - Localização\n3 - Falar com Humano",
+          "id": "3EB081AC66187B15684116",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1225*\n📍 Mesa: DELIVERY #1225\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 13.20",
           "fromMe": true,
-          "time": "11:20",
-          "sender": "147498538688743@lid",
-          "pushName": "Robô 🤖"
+          "time": "18:22",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
         },
         {
-          "id": "AC49045642BC9EA3E1C707509E6A93F5",
-          "text": "3",
-          "fromMe": false,
-          "time": "11:20",
-          "sender": "147498538688743@lid",
-          "pushName": "Jose Marcos"
+          "id": "3EB02CBCF7BB0A0C0A11B8",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1226*\n📍 Mesa: DELIVERY #1226\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 6.60",
+          "fromMe": true,
+          "time": "18:27",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
         },
         {
-          "id": "ACE51B58863142190E29079BB3C1462A",
+          "id": "3EB0072A56DE804329A856",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1274*\n📍 Mesa: DELIVERY #1274\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "17:12",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        }
+      ],
+      "lastOrderId": "1226",
+      "atendimentoManual": false,
+      "lastUpdate": 1780690371804,
+      "unreadCount": 1
+    },
+    "115328914817201@lid": {
+      "name": "Carlos Leonidio",
+      "messages": [
+        {
+          "id": "AC96A9177C449186B19528339A01132A",
+          "from": "115328914817201@lid",
           "text": "1",
+          "audioUrl": null,
+          "imageUrl": null,
           "fromMe": false,
-          "time": "11:21",
-          "sender": "147498538688743@lid",
-          "pushName": "Jose Marcos"
+          "time": "17:10",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0AC91525E159E95EB54",
-          "text": "🕒 Horário: 08h às 18h.",
+          "id": "3EB01C4F66D8C4C8FC2C06",
+          "from": "115328914817201@lid",
+          "text": "ola",
+          "audioUrl": null,
+          "imageUrl": null,
           "fromMe": true,
-          "time": "11:21",
-          "sender": "147498538688743@lid",
+          "time": "17:10",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0F2D97E190CAA9EFCEC",
+          "text": "📖 *CARDÁPIO DIGITAL*\n\nPara visualizar nossos produtos, você pode acessar nosso link:\nhttps://garconnexpress.vercel.app/cardapio/\n\n🏠 *Dica:* Se você estiver no estabelecimento, pode fazer o pedido diretamente pelo link acima para agilizar seu atendimento!",
+          "fromMe": true,
+          "time": "17:10",
+          "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "ACD136C1F5CB7A19F7934FAE5A8D25AD",
-          "text": "2",
-          "fromMe": false,
-          "time": "11:21",
-          "sender": "147498538688743@lid",
-          "pushName": "Jose Marcos"
+          "id": "3EB0A7811AF9A6D256E6CF",
+          "from": "115328914817201@lid",
+          "text": "oi",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "17:10",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
         },
         {
-          "id": "3EB03AD76C0FEB6CE88E0B",
-          "text": "📍 Local: Rua Exemplo, 123.",
+          "id": "ACDEAC429C96C456DD521DEA48430052",
+          "from": "115328914817201@lid",
+          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1267\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Cerveja Skol 600ml (R$ 12.00)\n\n💵 *Subtotal:* R$ 12.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 15.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": false,
+          "time": "17:10",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0D76C11F3B354B5064C",
+          "text": "Olá! 👋 Seu pedido #1267 foi recebido e está em preparo. Mais atualizações em breve!",
           "fromMe": true,
-          "time": "11:21",
-          "sender": "147498538688743@lid",
+          "time": "17:11",
+          "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "AC8A31F4F08881BE45EA7BDAE1750809",
-          "text": "3",
+          "id": "AC41A0759B6B735E79DEFEDCC68AFE3D",
+          "from": "115328914817201@lid",
+          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1274\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 8294247688\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "audioUrl": null,
+          "imageUrl": null,
           "fromMe": false,
-          "time": "11:21",
-          "sender": "147498538688743@lid",
-          "pushName": "Jose Marcos"
+          "time": "17:12",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
         },
         {
-          "id": "AC3C770445A3BCF39DD301F66B675761",
-          "text": "Oi",
-          "fromMe": false,
-          "time": "11:23",
-          "sender": "147498538688743@lid",
-          "pushName": "Jose Marcos"
-        },
-        {
-          "id": "3EB04C301951D0F3C6B145",
-          "text": "Olá Jose Marcos! 👋\n\n1 - Horário\n2 - Localização\n3 - Falar com Humano",
+          "id": "3EB07090304AF5886F4255",
+          "text": "Olá! 👋 Seu pedido #1274 foi recebido e está em preparo. Mais atualizações em breve!",
           "fromMe": true,
-          "time": "11:23",
-          "sender": "147498538688743@lid",
+          "time": "17:13",
+          "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "AC49E38871CF52B08EF649B7C7918019",
-          "text": "3",
+          "id": "ACA389843709C93BAD8642F9584FC0E9",
+          "from": "115328914817201@lid",
+          "text": "Ok",
+          "audioUrl": null,
+          "imageUrl": null,
           "fromMe": false,
-          "time": "11:23",
-          "sender": "147498538688743@lid",
-          "pushName": "Jose Marcos"
+          "time": "17:13",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0ABDFC96FC41147833F",
-          "text": "👨‍💻 Aguarde um momento. Um atendente humano irá visualizar sua mensagem em breve e entrará em contato.",
+          "id": "3EB08291701B6E4E43ABFC",
+          "text": "Olá Carlos Leonidio! Seu pedido está em andamento. 🛵\n\nComo posso ajudar?\n\n1️⃣ - Ver Status do Pedido 📦\n\n2️⃣ - Falar com o Atendente 👨‍💻",
           "fromMe": true,
-          "time": "11:23",
-          "sender": "147498538688743@lid",
+          "time": "17:13",
+          "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB036BEE06F74AFCFD99E",
-          "text": "bom dia ! em que posso ajudar ? ",
+          "id": "AC864725812007239A5C4CD0D6CD4A5B",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": false,
+          "time": "17:13",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0C3A836357D1CD3675A",
+          "text": "📦 *STATUS DO PEDIDO #1267*\n\nAtualmente seu pedido está: *undefined*\n\nFique atento, te avisaremos qualquer mudança!",
           "fromMe": true,
-          "time": "11:24",
-          "sender": "147498538688743@lid",
-          "pushName": "Você"
+          "time": "17:13",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
         }
-      ]
+      ],
+      "atendimentoManual": false,
+      "unreadCount": 0,
+      "lastUpdate": 1780690438984,
+      "estado": "delivery",
+      "activePedidoId": "1267"
     },
-    "status@broadcast": {
-      "name": "Luiz Carlos",
-      "messages": []
-    },
-    "120363172867223601@newsletter": {
-      "name": "120363172867223601",
+    "8294247688@s.whatsapp.net": {
+      "name": "8294247688",
       "messages": [
         {
-          "id": "3EB032986B23A982A0D7CC",
-          "text": "Nova espécie de “monstro marinho” gigante é identificada por paleontólogos\n\n*Leia mais:* https://cnnbr.app/short/c861528708/\n\n*Pense bem, pense CNN*",
-          "fromMe": false,
-          "time": "11:36",
-          "sender": "120363172867223601@newsletter",
-          "pushName": "120363172867223601"
+          "id": "3EB066D75A3F9165118B64",
+          "text": "Olá! 👋\n\nSeu pedido #1274 foi recebido e está em preparo. Mais atualizações em breve!",
+          "fromMe": true,
+          "time": "17:12",
+          "sender": "558293157048:2@s.whatsapp.net",
+          "pushName": "Robô 🤖"
         }
-      ]
+      ],
+      "atendimentoManual": false,
+      "unreadCount": 0,
+      "lastUpdate": 1780690371433,
+      "estado": "delivery",
+      "activePedidoId": 1274
     },
-    "120363169274631787@newsletter": {
-      "name": "120363169274631787",
+    "558294247688@s.whatsapp.net": {
+      "name": "558294247688",
       "messages": [
         {
-          "id": "ACCF5F2481A176CAAA4AA48A4836388B",
-          "text": "*CÁSSIO FORA DA TEMPORADA! 🤕🚨*\n\nCássio sofre grave lesão joelho, terá que passar por cirurgia e não deve mais jogar no Cruzeiro em 2026\n\n⬇️⬇️⬇️\nhttps://www.espn.com.br/futebol/cruzeiro/artigo/_/id/16430685/cassio-sofre-grave-lesao-joelho-tera-passar-cirurgia-nao-deve-mais-jogar-cruzeiro-2026?ex_cid=whatsapp_br",
-          "fromMe": false,
-          "time": "11:42",
-          "sender": "120363169274631787@newsletter",
-          "pushName": "120363169274631787"
+          "id": "3EB066D75A3F9165118B64",
+          "from": "558294247688@s.whatsapp.net",
+          "text": "Olá! 👋\n\nSeu pedido #1274 foi recebido e está em preparo. Mais atualizações em breve!",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "17:12",
+          "sender": "558294247688@s.whatsapp.net",
+          "pushName": "Voce"
         }
-      ]
-    },
-    "120363173003902460@newsletter": {
-      "name": "120363173003902460",
-      "messages": [
-        {
-          "id": "3EB0865DA440355FA6E835",
-          "text": "",
-          "fromMe": false,
-          "time": "11:46",
-          "sender": "120363173003902460@newsletter",
-          "pushName": "120363173003902460"
-        }
-      ]
+      ],
+      "atendimentoManual": false,
+      "unreadCount": 0,
+      "lastUpdate": 1780690371537,
+      "estado": "normal",
+      "activePedidoId": null
     }
+  },
+  "pedidoIdToJid": {
+    "1218": "115328914817201@lid",
+    "1220": "115328914817201@lid",
+    "1223": "115328914817201@lid",
+    "1224": "558293157048@s.whatsapp.net",
+    "1225": "5582993225452@s.whatsapp.net",
+    "1226": "115328914817201@lid",
+    "1267": "115328914817201@s.whatsapp.net",
+    "7777": "558293157048@lid",
+    "8888": "558293157048@lid",
+    "9999": "5582993225452@s.whatsapp.net",
+    "12345": "558294247688@s.whatsapp.net",
+    "12346": "558294247688@s.whatsapp.net"
   }
 }
