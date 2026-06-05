@@ -136,6 +136,7 @@
 </div>
 <script src="/socket.io/socket.io.js"></script>
 <script>
+        const blockedNumbers = ['5582993225452', '82993225452']; // N�meros ocultos no chat UI
     const socket = io();
     let currentJid = null;
     let chatData = {};
@@ -159,6 +160,14 @@
     socket.on('history', (history) => { chatData = history || {}; updateChatList(); setInterval(updateUnreadTitle, 5000); });       
     socket.on('new_msg', (msg) => {
         const jid = msg.sender;
+        const cleanJid = jid.split('@')[0].split(':')[0];
+        
+        if (blockedNumbers.some(num => cleanJid.includes(num))) {
+            console.log('?? [LOG] Mensagem oculta recebida:', msg.text || 'm�dia', 'de:', jid);
+            // Se for um desses n�meros, apenas logamos no console e n�o processamos na UI
+            return;
+        }
+        
         
         // NOVO: Se o admin não estiver na aba do Zap e chegar uma mensagem, desceleciona o chat atual
         if (!tabAtiva && currentJid) {
@@ -221,6 +230,17 @@
         const sortedJids = Object.keys(chatData).sort((a, b) => (chatData[b].lastUpdate || 0) - (chatData[a].lastUpdate || 0));     
         sortedJids.forEach(jid => {
             const chat = chatData[jid];
+            const cleanJid = jid.split('@')[0].split(':')[0];
+            
+            // REGRA DE OURO: Se for o admin mas não for o chat de Pedidos Zap, esconde.
+            if (cleanJid.includes('558293157048') && chat.name !== 'Pedidos Zap 📦') {
+                return;
+            }
+            
+            if (blockedNumbers.some(num => cleanJid.includes(num))) {
+                console.log('🙈 [UI] Ocultando chat de sistema/admin:', jid);
+                return;
+              }
             const item = document.createElement('div');
             const isUnread = chat.unreadCount > 0;
             item.className = 'chat-item' + (jid === currentJid ? ' active' : '') + (isUnread ? ' unread' : '');
@@ -376,3 +396,4 @@
 </script>
 </body>
 </html>
+

@@ -141,12 +141,89 @@
           "time": "18:29",
           "sender": "558293157048@s.whatsapp.net",
           "pushName": "Voce"
+        },
+        {
+          "id": "3EB0923950A5E343B97FCD",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1278*\n📍 Mesa: DELIVERY #1278\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:31",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0D074109FC62845A031",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1278\n🗑️ O pedido foi removido do sistema.",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:42",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0E0D5356CEDA2F45C18",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1262\n🗑️ O pedido foi removido do sistema.",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:45",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0C6577164A060646C37",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1279*\n📍 Mesa: DELIVERY #1279\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:46",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB06F4EC1592288158100",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1279\n🗑️ O pedido foi removido do sistema.",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:47",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB01E235F86C8DCF1960C",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1280*\n📍 Mesa: DELIVERY #1280\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 15.00",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:48",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0F0BF757C2063DAAE24",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1281*\n📍 Mesa: DELIVERY #1281\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:55",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
         }
       ],
       "lastOrderId": "1226",
       "atendimentoManual": false,
-      "lastUpdate": 1780694968926,
-      "unreadCount": 9
+      "lastUpdate": 1780696507086,
+      "unreadCount": 0
     },
     "115328914817201@lid": {
       "name": "Carlos Leonidio",
@@ -515,14 +592,118 @@
           "time": "18:28",
           "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC468515A60D78DF327FE35E7E266F42",
+          "from": "115328914817201@lid",
+          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1278\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 127\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Água Mineral (R$ 4.00)\n\n💵 *Subtotal:* R$ 4.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 7.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": false,
+          "time": "18:31",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB06F4124D7B722719C38",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO!*\n\nSeu pedido *#1278* já está sendo preparado! 🚀\n\n1️⃣ - Ver Status 🛵\n2️⃣ - Atendente 👨‍💻",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:31",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "ACD4C6833C2FC8D7707C6A4F572B518F",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": false,
+          "time": "18:31",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0EC52C523E8CE27065E",
+          "text": "📦 *STATUS DO PEDIDO #1278*\n\nAtualmente seu pedido está: *Recebido (Na fila da cozinha) 📝*\n\nFique atento, te avisaremos qualquer mudança!",
+          "fromMe": true,
+          "time": "18:31",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC04395F62CDE1AB9FA633663A8BEAF6",
+          "from": "115328914817201@lid",
+          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1280\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 127\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Cerveja Skol 600ml (R$ 12.00)\n\n💵 *Subtotal:* R$ 12.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 15.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": false,
+          "time": "18:48",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0184426DD0931B6F7AC",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO!*\n\nSeu pedido *#1280* já está sendo preparado! 🚀\n\n1️⃣ - Ver Status 🛵\n2️⃣ - Atendente 👨‍💻",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:48",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "ACAB3E28E6F32FB720AFC2E6C4E7DE16",
+          "from": "115328914817201@lid",
+          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1281\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": false,
+          "time": "18:55",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB034B0471D588E23AE7A",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO!*\n\nSeu pedido *#1281* já está sendo preparado! 🚀\n\n1️⃣ - Ver Status 🛵\n2️⃣ - Atendente 👨‍💻",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:55",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "ACBCA741C6B00FE431CFBF37D5D38561",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": false,
+          "time": "18:55",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0BC64F5A6FAA91D7BB6",
+          "text": "📦 *STATUS DO PEDIDO #1281*\n\nAtualmente seu pedido está: *Recebido (Na fila da cozinha) 📝*\n\nFique atento, te avisaremos qualquer mudança!",
+          "fromMe": true,
+          "time": "18:55",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
         }
       ],
       "atendimentoManual": false,
-      "unreadCount": 5,
-      "lastUpdate": 1780694901230,
+      "unreadCount": 0,
+      "lastUpdate": 1780696541691,
       "estado": "delivery",
-      "activePedidoId": "1277",
-      "ultimoPedidoId": "1277"
+      "activePedidoId": "1281",
+      "ultimoPedidoId": "1281"
     },
     "82993225452@s.whatsapp.net": {
       "name": "82993225452",
@@ -542,13 +723,45 @@
           "time": "18:13",
           "sender": "558293157048:2@s.whatsapp.net",
           "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0DF48EE4C5597C49AF5",
+          "text": "Olá! 👋\n\nSeu pedido #1278 foi recebido e está em preparo. Mais atualizações em breve!",
+          "fromMe": true,
+          "time": "18:31",
+          "sender": "558293157048:2@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB06EDC86F35EF61A7C4C",
+          "text": "Olá! 👋\n\nSeu pedido #1279 foi recebido e está em preparo. Mais atualizações em breve!",
+          "fromMe": true,
+          "time": "18:46",
+          "sender": "558293157048:2@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB072AF360B080397470C",
+          "text": "Olá! 👋\n\nSeu pedido #1280 foi recebido e está em preparo. Mais atualizações em breve!",
+          "fromMe": true,
+          "time": "18:48",
+          "sender": "558293157048:2@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0187F6EF4F8E45AE6A5",
+          "text": "Olá! 👋\n\nSeu pedido #1281 foi recebido e está em preparo. Mais atualizações em breve!",
+          "fromMe": true,
+          "time": "18:55",
+          "sender": "558293157048:2@s.whatsapp.net",
+          "pushName": "Robô 🤖"
         }
       ],
       "atendimentoManual": false,
       "unreadCount": 0,
-      "lastUpdate": 1780694022518,
+      "lastUpdate": 1780696506367,
       "estado": "delivery",
-      "activePedidoId": 1277
+      "activePedidoId": 1281
     },
     "5582993225452@s.whatsapp.net": {
       "name": "5582993225452",
@@ -574,11 +787,55 @@
           "time": "18:13",
           "sender": "5582993225452@s.whatsapp.net",
           "pushName": "Voce"
+        },
+        {
+          "id": "3EB0DF48EE4C5597C49AF5",
+          "from": "5582993225452@s.whatsapp.net",
+          "text": "Olá! 👋\n\nSeu pedido #1278 foi recebido e está em preparo. Mais atualizações em breve!",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:31",
+          "sender": "5582993225452@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB06EDC86F35EF61A7C4C",
+          "from": "5582993225452@s.whatsapp.net",
+          "text": "Olá! 👋\n\nSeu pedido #1279 foi recebido e está em preparo. Mais atualizações em breve!",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:46",
+          "sender": "5582993225452@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB072AF360B080397470C",
+          "from": "5582993225452@s.whatsapp.net",
+          "text": "Olá! 👋\n\nSeu pedido #1280 foi recebido e está em preparo. Mais atualizações em breve!",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:48",
+          "sender": "5582993225452@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0187F6EF4F8E45AE6A5",
+          "from": "5582993225452@s.whatsapp.net",
+          "text": "Olá! 👋\n\nSeu pedido #1281 foi recebido e está em preparo. Mais atualizações em breve!",
+          "audioUrl": null,
+          "imageUrl": null,
+          "fromMe": true,
+          "time": "18:55",
+          "sender": "5582993225452@s.whatsapp.net",
+          "pushName": "Voce"
         }
       ],
       "atendimentoManual": false,
       "unreadCount": 0,
-      "lastUpdate": 1780694022632,
+      "lastUpdate": 1780696506419,
       "estado": "normal",
       "activePedidoId": null
     }
