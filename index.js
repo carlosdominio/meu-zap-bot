@@ -73,6 +73,10 @@ app.post('/api/notify-delivery', async (req, res) => {
         'pronto': 'está pronto e aguardando a entrega! 🥡',
         'saiu_entrega': 'acaba de sair para entrega! 🛵',
         'entregue': 'foi entregue! Bom apetite! 😋',
+        'servido': 'foi entregue! Bom apetite! 😋',
+        'concluido': 'foi entregue! Bom apetite! 😋',
+        'finalizado': 'foi entregue! Bom apetite! 😋',
+        'aguardando_fechamento': 'foi entregue! Bom apetite! 😋',
         'cancelado': 'foi cancelado. Se tiver dúvidas, entre em contato conosco. ❌'
     };
 
@@ -92,11 +96,13 @@ app.post('/api/notify-delivery', async (req, res) => {
                 unreadCount: 0, 
                 lastUpdate: Date.now(), 
                 estado: 'delivery', 
-                activePedidoId: pedidoId 
+                activePedidoId: pedidoId,
+                ultimoPedidoId: pedidoId
             };
         } else {
             chats[targetJid].estado = 'delivery';
             chats[targetJid].activePedidoId = pedidoId;
+            chats[targetJid].ultimoPedidoId = pedidoId;
             chats[targetJid].atendimentoManual = false;
         }
         await db.set('chats', chats).write();
