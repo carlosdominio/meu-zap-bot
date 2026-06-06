@@ -179,20 +179,32 @@ io.on('connection', (socket) => {
         }
     });
 });
-
 async function saveMessage(jid, msg, name) {
     if (!jid || jid.includes('@newsletter')) return;
     const chats = db.get('chats').value() || {};
-    if (!chats[jid]) chats[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'normal' };
+
+    // REGRA DE OURO: Identifica se é o próprio robô falando consigo mesmo
+    const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0];
+    const isSelf = myJid && jid.includes(myJid);
+
+    if (!chats[jid]) {
+        chats[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'normal' };
+    }
+
+    if (isSelf) {
+        chats[jid].name = "Pedidos Zap 📦";
+    } else if (name && name !== "Voce" && name !== "Robo") {
+        chats[jid].name = name;
+    }
+
     chats[jid].lastUpdate = Date.now();
-    if (!msg.fromMe) chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
-    if (name && name !== "Voce" && name !== "Robo") chats[jid].name = name;
+    if (!msg.fromMe || isSelf) chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
+
     if (chats[jid].messages.some(m => m.id === msg.id)) return;
     chats[jid].messages.push(msg);
     if (chats[jid].messages.length > 100) chats[jid].messages.shift();
     await db.set('chats', chats).write();
 }
-
 async function connectToWhatsApp() {
     const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
     const { version } = await fetchLatestBaileysVersion();
