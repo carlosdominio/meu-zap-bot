@@ -83,27 +83,25 @@ app.post('/api/notify-delivery', async (req, res) => {
     
     // MENSAGEM RICA DE ACOMPANHAMENTO
     const message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusMessages[status]}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
-// 3. ATUALIZAÇÃO DE ESTADO NO DB
-if (db) {
-    if (!chats[targetJid]) {
-        chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
+
+    if (db) {
+        if (!chats[targetJid]) {
+            chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
+        }
+
+        const isTerminalStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento', 'cancelado'].includes(status);
+        if (isTerminalStatus) {
+            console.log(`✅ [Bot] Pedido #${pedidoId} finalizado. Resetando estado.`);
+            chats[targetJid].estado = 'normal';
+            chats[targetJid].activePedidoId = null;
+        } else {
+            chats[targetJid].estado = 'delivery';
+            chats[targetJid].activePedidoId = pedidoId;
+        }
+
+        await db.set('chats', chats).write();
+        await db.get('pedidoIdToJid').set(String(pedidoId), targetJid).write();
     }
-
-    // TERMINAL STATUS: Se entregue, concluído ou cancelado, volta para o estado normal
-    const isTerminalStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento', 'cancelado'].includes(status);
-
-    if (isTerminalStatus) {
-        console.log(`✅ [Bot] Pedido #${pedidoId} finalizado. Resetando estado do cliente ${targetJid} para normal.`);
-        chats[targetJid].estado = 'normal';
-        chats[targetJid].activePedidoId = null; // Limpa o ID ativo
-    } else {
-        chats[targetJid].estado = 'delivery';
-        chats[targetJid].activePedidoId = pedidoId;
-    }
-
-    await db.set('chats', chats).write();
-    await db.get('pedidoIdToJid').set(String(pedidoId), targetJid).write();
-}
 
     if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'Bot offline' });
 
@@ -161,6 +159,17 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('toggle_atendimento', async (data) => {
+        const { jid, status } = data;
+        if (db) {
+            const chats = db.get('chats').value() || {};
+            if (!chats[jid]) chats[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0 };
+            chats[jid].atendimentoManual = status;
+            await db.set('chats', chats).write();
+            io.emit('status_atendimento', { jid, atendimentoManual: status });
+        }
+    });
+
     socket.on('delete_chat', async (jid) => {
         if (db) {
             const chats = db.get('chats').value() || {};
@@ -200,7 +209,6 @@ async function connectToWhatsApp() {
 
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update;
-        
         if (qr) {
             console.log('📸 [WhatsApp] Novo QR Code gerado!');
             qrcodeTerminal.generate(qr, { small: true });
@@ -208,23 +216,19 @@ async function connectToWhatsApp() {
             statusConexao = "AGUARDANDO QR";
             io.emit('status', { status: statusConexao });
         }
-
         if (connection === 'open') {
             statusConexao = "CONECTADO";
             lastQr = null;
             io.emit('status', { status: statusConexao });
             console.log('✅ Bot CONECTADO e Pronto!');
         }
-
         if (connection === 'close') {
             const reason = lastDisconnect?.error?.output?.statusCode;
             console.log('❌ Conexão fechada. Motivo:', reason);
             const shouldReconnect = reason !== DisconnectReason.loggedOut;
             if (shouldReconnect) {
-                console.log('🔄 Reconectando em 5s...');
                 setTimeout(connectToWhatsApp, 5000);
             } else {
-                console.log('⚠️ Sessão finalizada. Limpando dados...');
                 if (fs.existsSync('auth_info_baileys')) fs.rmSync('auth_info_baileys', { recursive: true, force: true });
                 setTimeout(connectToWhatsApp, 2000);
             }
@@ -247,23 +251,29 @@ async function connectToWhatsApp() {
 
         if (fromMe) return;
 
+        // --- TRAVA DE ATENDIMENTO HUMANO (SILÊNCIO TOTAL DO ROBÔ) ---
+        const chats = db.get('chats').value() || {};
+        if (chats[jid]?.atendimentoManual) {
+            console.log(`👤 [Humano] Atendimento manual ativo para ${jid}. Robô em silêncio.`);
+            return;
+        }
+
         const isOrder = text.includes('🛍️ *NOVO PEDIDO - DELIVERY*') || text.includes('🛵 DELIVERY');
         if (isOrder) {
             const pId = (text.match(/#(\d+)/) || [])[1];
             if (pId) {
                 await db.get('pedidoIdToJid').set(String(pId), jid).write();
-                const chats = db.get('chats').value();
-                chats[jid].activePedidoId = pId; chats[jid].estado = 'delivery';
+                chats[jid] = chats[jid] || { messages: [], unreadCount: 0 };
+                chats[jid].activePedidoId = pId; 
+                chats[jid].estado = 'delivery';
                 await db.set('chats', chats).write();
                 
                 const richWelcome = `Olá ${pushName}! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#${pId}* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻`;
-                
                 await sendHumanizedMessage(jid, { text: richWelcome });
                 return;
             }
         }
 
-        const chats = db.get('chats').value() || {};
         const chatData = chats[jid] || {};
         const estado = chatData.estado || 'normal';
         let reply = "";
@@ -277,7 +287,10 @@ async function connectToWhatsApp() {
                 reply = `📦 *STATUS #${pId}*: *${stMap[ped.status] || ped.status}*`;
             } catch (e) { reply = "Erro ao consultar status. 😕"; }
         } else if (estado === 'delivery' && text === '2') {
-            reply = "👨‍💻 Aguarde um momento, um atendente já foi notificado!";
+            reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento, um atendente já foi notificado e falará com você em instantes!";
+            chats[jid].atendimentoManual = true;
+            await db.set('chats', chats).write();
+            io.emit('status_atendimento', { jid, atendimentoManual: true });
         } else if (!['1','2','3','4','5'].includes(text)) {
             reply = `Olá ${pushName}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._`;
         } else {
@@ -290,7 +303,6 @@ async function connectToWhatsApp() {
                     const response = await fetch('https://garconnexpress.vercel.app/api/menu');
                     const menu = await response.json();
                     const promos = menu.filter(item => item.em_promocao && item.visivel);
-                    
                     if (promos.length > 0) {
                         reply = "🔥 *PROMOÇÕES IMPERDÍVEIS DE HOJE*\n\n" + promos.map(p => `✨ *${p.nome}*\n💰 Por apenas: *R$ ${parseFloat(p.preco).toFixed(2)}*\n`).join('\n') + "\n_Aproveite antes que acabe!_ 🏃💨";
                     } else {
@@ -301,6 +313,9 @@ async function connectToWhatsApp() {
                 reply = "📍 *ONDE ESTAMOS E QUANDO ABRIMOS*\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n_Venha nos visitar ou peça no conforto do seu sofá!_ 🏠🍻";
             } else if (text === '5') {
                 reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nEntendi! Já avisei a nossa equipe. Um de nossos atendentes falará com você em instantes.\n\n_Por favor, aguarde um momento..._";
+                chats[jid].atendimentoManual = true;
+                await db.set('chats', chats).write();
+                io.emit('status_atendimento', { jid, atendimentoManual: true });
             }
         }
 
