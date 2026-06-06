@@ -41,67 +41,76 @@ app.post('/api/notify-delivery', async (req, res) => {
     console.log(`📦 [Bot] Notificação recebida: Status=${status}, Pedido=#${pedidoId}, Número=${number}`);
 
     let jid = number;
-    if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
-
-    let message = '';
-    const tempoEstimado = tempo || '30-50 min';
+    if (jid && !jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
 
     const chats = db ? db.get('chats').value() || {} : {};
-    const clientName = (chats[jid] && chats[jid].name && chats[jid].name !== jid.split('@')[0]) ? chats[jid].name : 'cliente';
+    let targetJid = jid;
 
-    switch (status) {
-        case 'recebido':
-            const myNumber = sock?.user?.id?.split(':')[0]?.split('@')[0];
-            const isAutoSend = jid.includes(myNumber);
-            
-            if (isAutoSend) {
-                console.log('⚠️ [Bot] Detectado auto-envio. Ignorando para evitar loop.');
-                return res.json({ success: true, warning: 'auto_send_ignored' });
-            }
-            
-            // Configura estado para delivery
-            if (db) {
-                const chats = db.get('chats').value() || {};
-                if (!chats[jid]) {
-                    chats[jid] = { name: jid.split('@')[0], messages: [], atendimentoManual: false, unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
-                } else {
-                    chats[jid].estado = 'delivery';
-                    chats[jid].activePedidoId = pedidoId;
-                    chats[jid].atendimentoManual = false;
-                }
-                await db.set('chats', chats).write();
-            }
-
-            message = `Olá! 👋\n\nSeu pedido #${pedidoId} foi recebido e está em preparo. Mais atualizações em breve!`;
-            break;
-        case 'preparando':
-        case 'saiu_entrega':
-        case 'entregue':
-        case 'cancelado':
-            // Atualiza activePedidoId para todos os status
-            if (db) {
-                const chats = db.get('chats').value() || {};
-                if (chats[jid] && !chats[jid].activePedidoId) {
-                    chats[jid].activePedidoId = pedidoId;
-                    await db.set('chats', chats).write();
-                }
-            }
-            break;
-        default:
-            return res.status(400).json({ error: 'Status inválido' });
+    // 1. LOCALIZAÇÃO VIA BASE DE DADOS (Pelo ID do Pedido)
+    if (pedidoId && db) {
+        const foundJid = Object.keys(chats).find(k => 
+            String(chats[k].activePedidoId) === String(pedidoId) || 
+            String(chats[k].ultimoPedidoId) === String(pedidoId)
+        );
+        if (foundJid) {
+            console.log(`🔍 [Bot] JID localizado via Pedido #${pedidoId}: ${foundJid}`);
+            targetJid = foundJid;
+        }
     }
 
-    // --- MODO DE SIMULAÇÃO (PARA TESTES SEM QR CODE) ---
+    if (!targetJid) {
+        return res.status(400).json({ error: 'JID não identificado para este pedido' });
+    }
+
+    let message = '';
+    const chatData = chats[targetJid] || {};
+    const clientName = (chatData.name && chatData.name !== targetJid.split('@')[0]) ? chatData.name : 'cliente';
+
+    // 2. MAPEAMENTO DE MENSAGENS AUTOMÁTICAS
+    const statusMessages = {
+        'recebido': 'foi recebido e está em preparo! 📝',
+        'preparando': 'está sendo preparado pelo Chef! 👨‍🍳',
+        'pronto': 'está pronto e aguardando a entrega! 🥡',
+        'saiu_entrega': 'acaba de sair para entrega! 🛵',
+        'entregue': 'foi entregue! Bom apetite! 😋',
+        'cancelado': 'foi cancelado. Se tiver dúvidas, entre em contato conosco. ❌'
+    };
+
+    if (statusMessages[status]) {
+        message = `Olá ${clientName}! 👋\n\nSeu pedido #${pedidoId} ${statusMessages[status]}`;
+    } else {
+        return res.status(400).json({ error: 'Status inválido' });
+    }
+
+    // 3. ATUALIZAÇÃO DE ESTADO NO DB
+    if (db) {
+        if (!chats[targetJid]) {
+            chats[targetJid] = { 
+                name: targetJid.split('@')[0], 
+                messages: [], 
+                atendimentoManual: false, 
+                unreadCount: 0, 
+                lastUpdate: Date.now(), 
+                estado: 'delivery', 
+                activePedidoId: pedidoId 
+            };
+        } else {
+            chats[targetJid].estado = 'delivery';
+            chats[targetJid].activePedidoId = pedidoId;
+            chats[targetJid].atendimentoManual = false;
+        }
+        await db.set('chats', chats).write();
+    }
+
+    // --- MODO DE SEGURANÇA ---
     if (!sock || statusConexao !== 'CONECTADO') {
-        console.log('⚠️ [Bot] Bot desconectado, mas tentará enviar assim que reconectar (ou falhará agora).');
-        // Se realmente não houver sock, não há o que fazer
-        if (!sock) return res.status(503).json({ error: 'Bot não inicializado' });
+        console.log('⚠️ [Bot] Bot desconectado. Falha ao enviar notificação.');
+        return res.status(503).json({ error: 'Bot não inicializado ou desconectado' });
     }
-    // ---------------------------------------------------
 
     try {
-        console.log(`📤 [Bot] Enviando mensagem de delivery para ${jid}...`);
-        const s = await sendHumanizedMessage(jid, { text: message });
+        console.log(`📤 [Bot] Enviando notificação automática para ${targetJid}...`);
+        const s = await sendHumanizedMessage(targetJid, { text: message });
 
         const rObj = {
             id: s.key.id,
@@ -112,11 +121,11 @@ app.post('/api/notify-delivery', async (req, res) => {
             pushName: 'Robô 🤖'
         };
 
-        await saveMessage(jid, rObj, 'Robo');
+        await saveMessage(targetJid, rObj, 'Robo');
         io.emit('new_msg', rObj);
-        res.json({ success: true });
+        res.json({ success: true, targetJid });
     } catch (e) {
-        console.error('❌ [Bot] Erro ao enviar notificação de delivery:', e);
+        console.error('❌ [Bot] Erro ao enviar notificação:', e);
         res.status(500).json({ error: e.message });
     }
 });
