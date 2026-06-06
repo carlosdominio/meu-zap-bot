@@ -149,6 +149,12 @@ app.post('/api/notify-delivery', async (req, res) => {
         await db.get('pedidoIdToJid').set(String(pedidoId), targetJid).write();
     }
 
+    // --- FILTRO: SILENCIAR RECEBIMENTO PARA O CLIENTE ---
+    if (status === 'recebido') {
+        console.log(`ℹ️ [Bot] Pedido #${pedidoId} recebido. Notificação para o cliente pulada (apenas log).`);
+        return res.json({ success: true, info: 'Mensagem de recebimento desativada para o cliente' });
+    }
+
     if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'Bot offline' });
 
     try {
