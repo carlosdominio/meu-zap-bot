@@ -279,18 +279,29 @@ async function connectToWhatsApp() {
         } else if (estado === 'delivery' && text === '2') {
             reply = "👨‍💻 Aguarde um momento, um atendente já foi notificado!";
         } else if (!['1','2','3','4','5'].includes(text)) {
-            reply = `Olá ${pushName}! 👋 Bem-vindo ao *GuGA Bebidas*.\n\n1️⃣ - Ver Cardápio Digital 📖\n2️⃣ - Fazer um Pedido 🛒\n3️⃣ - Promoções 🔥\n4️⃣ - Endereço/Horário 📍\n5️⃣ - Atendente 👨‍💻`;
+            reply = `Olá ${pushName}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._`;
         } else {
-            if (text === '1') reply = "📖 Cardápio: https://garconnexpress.vercel.app/cardapio/";
-            else if (text === '2') reply = "🛒 Peça aqui: https://garconnexpress.vercel.app/cardapio/";
-            else if (text === '3') {
-                const response = await fetch('https://garconnexpress.vercel.app/api/menu');
-                const menu = await response.json();
-                const promos = menu.filter(item => item.em_promocao && item.visivel);
-                reply = promos.length ? "🔥 *PROMOÇÕES:* \n" + promos.map(p => `✨ *${p.nome}* - R$ ${p.preco}`).join('\n') : "Sem promoções hoje. 😉";
+            if (text === '1') {
+                reply = "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉";
+            } else if (text === '2') {
+                reply = "🛒 *FAZER UM PEDIDO AGORA*\n\nJá escolheu? Então não perca tempo! Peça agora pelo nosso sistema de Delivery:\n🔗 https://garconnexpress.vercel.app/delivery\n\n🚀 *Dica:* Seus dados ficam salvos para o próximo pedido ser ainda mais rápido!";
+            } else if (text === '3') {
+                try {
+                    const response = await fetch('https://garconnexpress.vercel.app/api/menu');
+                    const menu = await response.json();
+                    const promos = menu.filter(item => item.em_promocao && item.visivel);
+                    
+                    if (promos.length > 0) {
+                        reply = "🔥 *PROMOÇÕES IMPERDÍVEIS DE HOJE*\n\n" + promos.map(p => `✨ *${p.nome}*\n💰 Por apenas: *R$ ${parseFloat(p.preco).toFixed(2)}*\n`).join('\n') + "\n_Aproveite antes que acabe!_ 🏃💨";
+                    } else {
+                        reply = "No momento não temos promoções ativas, mas nossos preços continuam os melhores da região! 😉\n\nConfira tudo aqui: https://garconnexpress.vercel.app/delivery";
+                    }
+                } catch (e) { reply = "Ops! Tive um problema ao buscar as promoções. Mas você pode ver tudo no nosso cardápio: https://garconnexpress.vercel.app/delivery"; }
+            } else if (text === '4') {
+                reply = "📍 *ONDE ESTAMOS E QUANDO ABRIMOS*\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n_Venha nos visitar ou peça no conforto do seu sofá!_ 🏠🍻";
+            } else if (text === '5') {
+                reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nEntendi! Já avisei a nossa equipe. Um de nossos atendentes falará com você em instantes.\n\n_Por favor, aguarde um momento..._";
             }
-            else if (text === '4') reply = "📍 Rua Demócrito Gracindo, 132 - Ponta Grossa\n⏰ 18h às 02h (Ter a Dom)";
-            else if (text === '5') reply = "👨‍💻 Atendente notificado! Aguarde.";
         }
 
         if (reply) {
