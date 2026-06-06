@@ -83,17 +83,27 @@ app.post('/api/notify-delivery', async (req, res) => {
     
     // MENSAGEM RICA DE ACOMPANHAMENTO
     const message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusMessages[status]}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
-
-    if (db) {
-        if (!chats[targetJid]) {
-            chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
-        } else {
-            chats[targetJid].estado = 'delivery';
-            chats[targetJid].activePedidoId = pedidoId;
-        }
-        await db.set('chats', chats).write();
-        await db.get('pedidoIdToJid').set(String(pedidoId), targetJid).write();
+// 3. ATUALIZAÇÃO DE ESTADO NO DB
+if (db) {
+    if (!chats[targetJid]) {
+        chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
     }
+
+    // TERMINAL STATUS: Se entregue, concluído ou cancelado, volta para o estado normal
+    const isTerminalStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento', 'cancelado'].includes(status);
+
+    if (isTerminalStatus) {
+        console.log(`✅ [Bot] Pedido #${pedidoId} finalizado. Resetando estado do cliente ${targetJid} para normal.`);
+        chats[targetJid].estado = 'normal';
+        chats[targetJid].activePedidoId = null; // Limpa o ID ativo
+    } else {
+        chats[targetJid].estado = 'delivery';
+        chats[targetJid].activePedidoId = pedidoId;
+    }
+
+    await db.set('chats', chats).write();
+    await db.get('pedidoIdToJid').set(String(pedidoId), targetJid).write();
+}
 
     if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'Bot offline' });
 
