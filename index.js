@@ -64,23 +64,25 @@ app.post('/api/notify-delivery', async (req, res) => {
     if (!targetJid) return res.status(400).json({ error: 'JID não encontrado' });
 
     const statusMessages = {
-        'recebido': 'foi recebido e está em preparo! 📝',
-        'preparando': 'está sendo preparado pelo Chef! 👨‍🍳',
-        'pronto': 'está pronto e aguardando a entrega! 🥡',
-        'saiu_entrega': 'acaba de sair para entrega! 🛵',
-        'entregue': 'foi entregue! Bom apetite! 😋',
-        'servido': 'foi entregue! Bom apetite! 😋',
-        'concluido': 'foi entregue! Bom apetite! 😋',
-        'finalizado': 'foi entregue! Bom apetite! 😋',
-        'aguardando_fechamento': 'foi entregue! Bom apetite! 😋',
-        'cancelado': 'foi cancelado. ❌'
+        'recebido': 'foi recebido com sucesso e já está na nossa fila de produção! 📝',
+        'preparando': 'está sendo preparado com todo carinho pela nossa equipe! 👨‍🍳🔥',
+        'pronto': 'já está PRONTO e aguardando apenas o entregador! 🥡✨',
+        'saiu_entrega': 'acaba de SAIR PARA ENTREGA! Prepara o coração (e o estômago) que já estamos chegando! 🛵💨',
+        'entregue': 'foi ENTREGUE! Esperamos que aproveite muito. Bom apetite! 😋🥤',
+        'servido': 'foi ENTREGUE! Esperamos que aproveite muito. Bom apetite! 😋🥤',
+        'concluido': 'foi FINALIZADO com sucesso. Obrigado pela preferência! 🌟',
+        'finalizado': 'foi FINALIZADO com sucesso. Obrigado pela preferência! 🌟',
+        'aguardando_fechamento': 'foi ENTREGUE! Esperamos que aproveite muito. Bom apetite! 😋🥤',
+        'cancelado': 'foi CANCELADO. Se precisar de mais informações, por favor, chame um de nossos atendentes. ❌'
     };
 
     if (!statusMessages[status]) return res.status(400).json({ error: 'Status inválido' });
 
     const chatData = chats[targetJid] || {};
     const clientName = (chatData.name && chatData.name !== targetJid.split('@')[0]) ? chatData.name : 'cliente';
-    const message = `Olá ${clientName}! 👋\n\nSeu pedido #${pedidoId} ${statusMessages[status]}`;
+    
+    // MENSAGEM RICA DE ACOMPANHAMENTO
+    const message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusMessages[status]}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
 
     if (db) {
         if (!chats[targetJid]) {
@@ -243,7 +245,10 @@ async function connectToWhatsApp() {
                 const chats = db.get('chats').value();
                 chats[jid].activePedidoId = pId; chats[jid].estado = 'delivery';
                 await db.set('chats', chats).write();
-                await sendHumanizedMessage(jid, { text: `Olá ${pushName}! 👋 Pedido *#${pId}* recebido!\n\n1️⃣ - Ver Status 🛵\n2️⃣ - Atendente 👨‍💻` });
+                
+                const richWelcome = `Olá ${pushName}! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#${pId}* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻`;
+                
+                await sendHumanizedMessage(jid, { text: richWelcome });
                 return;
             }
         }
