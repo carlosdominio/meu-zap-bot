@@ -29,6 +29,52 @@ const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 })
 
 const port = 3002;
 const DELIVERY_API_URL = process.env.DELIVERY_API_URL || 'http://localhost:3001/api/pedidos';
+const INACTIVITY_THRESHOLD = 15 * 60 * 1000; // 15 minutos
+
+async function checkInactivity() {
+    if (!db || !sock || statusConexao !== 'CONECTADO') return;
+
+    const chats = db.get('chats').value() || {};
+    const now = Date.now();
+    let changed = false;
+
+    for (const jid in chats) {
+        const chat = chats[jid];
+        if (chat.atendimentoManual && (now - chat.lastUpdate) >= INACTIVITY_THRESHOLD) {
+            console.log(`⏰ [Timeout] Encerrando atendimento manual para ${jid} por inatividade.`);
+            chat.atendimentoManual = false;
+            changed = true;
+
+            // Notifica o painel
+            io.emit('status_atendimento', { jid, atendimentoManual: false });
+
+            // Envia mensagem ao cliente
+            const timeoutMsg = "Seu atendimento foi encerrado devido à inatividade. O assistente virtual voltou a operar. Se precisar de algo, é só mandar mensagem novamente! 🤖";
+            try {
+                const s = await sendHumanizedMessage(jid, { text: timeoutMsg });
+                const rObj = { 
+                    id: s?.key?.id || ('timeout-' + Date.now()), 
+                    text: timeoutMsg, 
+                    fromMe: true, 
+                    time: new Date().toLocaleTimeString('pt-BR'), 
+                    sender: sock.user.id, 
+                    pushName: 'Robô 🤖' 
+                };
+                // Atualiza o histórico local
+                if (!chat.messages) chat.messages = [];
+                chat.messages.push(rObj);
+                if (chat.messages.length > 100) chat.messages.shift();
+                io.emit('new_msg', rObj);
+            } catch (e) {
+                console.error(`❌ Erro ao enviar mensagem de timeout para ${jid}:`, e);
+            }
+        }
+    }
+
+    if (changed) {
+        await db.set('chats', chats).write();
+    }
+}
 
 app.use(express.static('public'));
 app.get('/health', (req, res) => res.send('OK'));
@@ -338,4 +384,7 @@ async function connectToWhatsApp() {
     });
 }
 
-initDB().then(() => server.listen(port, () => connectToWhatsApp()));
+initDB().then(() => {
+    server.listen(port, () => connectToWhatsApp());
+    setInterval(checkInactivity, 60000); // Checa a cada 1 minuto
+});
