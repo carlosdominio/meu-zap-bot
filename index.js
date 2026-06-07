@@ -347,15 +347,16 @@ async function connectToWhatsApp() {
             try {
                 const resp = await fetch(`${DELIVERY_API_URL}/${pId}`);
                 const ped = await resp.json();
-                const stMap = { 'recebido': 'Recebido 📝', 'preparando': 'Preparando 👨‍🍳', 'pronto': 'Pronto 🥡', 'saiu_entrega': 'A caminho 🛵', 'entregue': 'Entregue 😋' };
-                reply = `📦 *STATUS #${pId}*: *${stMap[ped.status] || ped.status}*`;
+                const stMap = { 'recebido': 'Preparando 👨‍🍳', 'preparando': 'Preparando 👨‍🍳', 'pronto': 'Pronto 🥡', 'saiu_entrega': 'A caminho 🛵', 'entregue': 'Entregue 😋' };
+                reply = `📦 *ACOMPANHAMENTO DO PEDIDO #${pId}*\n\nOlá ${pushName}, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *${stMap[ped.status] || ped.status}*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨`;
             } catch (e) { reply = "Erro ao consultar status. 😕"; }
         } else if (estado === 'delivery' && text === '2') {
-            reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nAguarde um momento, um atendente já foi notificado e falará com você em instantes!";
+            reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nEntendido! Já acionei nossa equipe. Um de nossos atendentes falará com você em instantes para tirar suas dúvidas ou resolver qualquer problema. 🚀\n\n⏳ *Tempo médio de espera:* 2 a 5 minutos.\n\n_Por favor, aguarde um momento..._";
             chats[jid].atendimentoManual = true;
             await db.set('chats', chats).write();
             io.emit('status_atendimento', { jid, atendimentoManual: true });
-        } else if (!['1','2','3','4','5'].includes(text)) {
+        }
+ else if (!['1','2','3','4','5'].includes(text)) {
             reply = `Olá ${pushName}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._`;
         } else {
             if (text === '1') {
