@@ -111,7 +111,16 @@
     <img id="qr-img" src="" alt="QR Code" style="width: 250px; margin: 20px; display: none;">
 </div>
 <div id="sidebar">
-    <div id="sidebar-header">Conversas</div>
+    <div id="sidebar-header">
+        Conversas
+        <div style="float: right; display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: normal;">
+            <span id="caixa-label">Caixa Aberto</span>
+            <label class="switch">
+                <input type="checkbox" id="caixa-toggle-input" onchange="toggleCaixa(this.checked)">
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </div>
     <div id="chat-list"></div>
 </div>
 <div id="main-chat">
@@ -214,6 +223,16 @@
             updateChatList();
         }
     });
+    socket.on('status_caixa', (status) => {
+        const input = document.getElementById('caixa-toggle-input');
+        input.checked = !status; // caixaFechado=true -> checked=false (UI diz Aberto se fehcado for false)
+        document.getElementById('caixa-label').innerText = status ? 'Caixa Fechado' : 'Caixa Aberto';
+        document.getElementById('caixa-label').style.color = status ? '#e74c3c' : '#00a884';
+    });
+    function toggleCaixa(checked) {
+        // UI checked (Aberto) -> caixaFechado = false
+        socket.emit('toggle_caixa', !checked);
+    }
     function updateUnreadTitle() {
         const totalUnread = Object.values(chatData).reduce((sum, chat) => sum + (chat.unreadCount || 0), 0);
         if (totalUnread > 0) {

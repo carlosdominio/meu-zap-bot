@@ -16,7 +16,7 @@ let db;
 
 async function initDB() {
     db = await low(adapter);
-    await db.defaults({ chats: {}, pedidoIdToJid: {} }).write();
+    await db.defaults({ chats: {}, pedidoIdToJid: {}, settings: { caixaFechado: false } }).write();
     console.log('✅ Banco de dados pronto');
 }
 
@@ -231,7 +231,10 @@ async function sendHumanizedMessage(jid, content, options = {}) {
 io.on('connection', (socket) => {
     socket.emit('status', { status: statusConexao });
     if (lastQr) socket.emit('qr', lastQr);
-    if (db) socket.emit('history', db.get('chats').value());
+    if (db) {
+        socket.emit('history', db.get('chats').value());
+        socket.emit('status_caixa', db.get('settings').value()?.caixaFechado || false);
+    }
 
     socket.on('send_msg', async (data) => {
         let jid = data.number;
@@ -264,6 +267,14 @@ io.on('connection', (socket) => {
             chats[jid].atendimentoManual = status;
             await db.set('chats', chats).write();
             io.emit('status_atendimento', { jid, atendimentoManual: status });
+        }
+    });
+
+    socket.on('toggle_caixa', async (status) => {
+        if (db) {
+            await db.get('settings').set('caixaFechado', status).write();
+            io.emit('status_caixa', status);
+            console.log(`🏪 [Loja] Caixa ${status ? 'FECHADO' : 'ABERTO'} manualmente.`);
         }
     });
 
@@ -302,6 +313,27 @@ async function saveMessage(jid, msg, name) {
     if (chats[jid].messages.length > 100) chats[jid].messages.shift();
     await db.set('chats', chats).write();
 }
+function isStoreOpen() {
+    if (!db) return true;
+    const settings = db.get('settings').value() || {};
+    if (settings.caixaFechado) return false;
+
+    // Obtém data/hora atual em Brasília (GMT-3)
+    const now = new Date();
+    const localized = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+    
+    const day = localized.getDay(); // 0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sab
+    const hour = localized.getHours();
+
+    // Horário: Terça (2) a Domingo (0) das 18h às 02h
+    // Noite (18h-23h)
+    const isNightOpen = (hour >= 18 && [2, 3, 4, 5, 6, 0].includes(day));
+    // Madrugada (00h-02h) - pertence ao turno do dia anterior
+    const isEarlyMorningOpen = (hour < 2 && [3, 4, 5, 6, 0, 1].includes(day));
+
+    return isNightOpen || isEarlyMorningOpen;
+}
+
 async function connectToWhatsApp() {
     const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
     const { version } = await fetchLatestBaileysVersion();
@@ -359,6 +391,17 @@ async function connectToWhatsApp() {
         io.emit('new_msg', msgObj);
 
         if (fromMe) return;
+
+        // --- TRAVA DE CAIXA FECHADO (FORA DO HORÁRIO) ---
+        if (!isStoreOpen()) {
+            console.log(`🔌 [Fechado] Mensagem de ${jid} ignorada por estar fora do horário.`);
+            const closedMsg = "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻";
+            const s = await sendHumanizedMessage(jid, { text: closedMsg });
+            if (s) {
+                await saveMessage(jid, { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+            }
+            return;
+        }
 
         // --- TRAVA DE ATENDIMENTO HUMANO (SILÊNCIO TOTAL DO ROBÔ) ---
         const chats = db.get('chats').value() || {};
