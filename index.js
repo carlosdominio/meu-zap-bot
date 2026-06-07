@@ -30,6 +30,27 @@ const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 })
 const port = 3002;
 const DELIVERY_API_URL = process.env.DELIVERY_API_URL || 'http://localhost:3001/api/pedidos';
 const INACTIVITY_THRESHOLD = 15 * 60 * 1000; // 15 minutos
+const CHAT_EXPIRY_THRESHOLD = 24 * 60 * 60 * 1000; // 24 horas
+
+async function cleanupOldChats() {
+    if (!db) return;
+    const chats = db.get('chats').value() || {};
+    const now = Date.now();
+    let changed = false;
+
+    for (const jid in chats) {
+        if (chats[jid].lastUpdate && (now - chats[jid].lastUpdate) >= CHAT_EXPIRY_THRESHOLD) {
+            console.log(`🧹 [Cleanup] Removendo chat inativo há mais de 24h: ${jid}`);
+            delete chats[jid];
+            changed = true;
+            io.emit('chat_deleted', jid);
+        }
+    }
+
+    if (changed) {
+        await db.set('chats', { ...chats }).write();
+    }
+}
 
 async function checkInactivity() {
     if (!db || !sock || statusConexao !== 'CONECTADO') return;
@@ -393,5 +414,7 @@ async function connectToWhatsApp() {
 
 initDB().then(() => {
     server.listen(port, () => connectToWhatsApp());
-    setInterval(checkInactivity, 60000); // Checa a cada 1 minuto
+    setInterval(checkInactivity, 60000); // Checa inatividade a cada 1 minuto
+    setInterval(cleanupOldChats, 3600000); // Limpa chats antigos a cada 1 hora
+    cleanupOldChats(); // Limpeza inicial ao ligar o robô
 });
