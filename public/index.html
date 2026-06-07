@@ -295,7 +295,23 @@
 
         let msgContent = '<button class="btn-msg-del" onclick="confirmarDeletarMsg(\'' + msg.id + '\', ' + (msg.fromMe ? 'true' : 'false') + ')" title="Apagar mensagem">🗑️</button>';
 
-        if (msg.text) msgContent += '<p>' + msg.text + '</p>';
+        if (msg.text) {
+            let textToShow = msg.text;
+            
+            // Filtro GLOBAL e mais robusto
+            // Procura o padrão de Telefone e oculta o número, mantendo o rótulo
+            const telRegex = /(?:Tel|Telefone):?\s*\*?\s*([\d\s\-\(\)\+]{8,20})/gi;
+            
+            if (textToShow.match(telRegex)) {
+                textToShow = textToShow.replace(telRegex, (match, p1) => {
+                    const cleanNum = p1.trim();
+                    console.log('%c📱 [TELEFONE DETECTADO]: ' + cleanNum, 'background: #00a884; color: white; padding: 2px 5px; border-radius: 3px; font-weight: bold;');
+                    return match.replace(p1, ' [Número no Console ↗️] ');
+                });
+            }
+            
+            msgContent += '<p style="white-space: pre-wrap;">' + textToShow + '</p>';
+        }
         if (msg.audioUrl) msgContent += '<audio controls class="audio-msg"><source src="' + msg.audioUrl + '" type="audio/ogg"></audio>';
         if (msg.imageUrl) msgContent += '<br><img src="' + msg.imageUrl + '" onclick="abrirImagem(this.src, \'' + msg.id + '\', ' + (msg.fromMe ? 'true' : 'false') + ')" style="max-width: 250px; border-radius: 8px; margin-top: 5px; cursor: pointer;" title="Clique para ampliar">';
 

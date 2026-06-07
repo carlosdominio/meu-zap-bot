@@ -27,8 +27,32 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 });
 
-const port = 3002;
+const port = process.env.PORT || 3002;
 const DELIVERY_API_URL = process.env.DELIVERY_API_URL || 'http://localhost:3001/api/pedidos';
+
+app.get('/qr', (req, res) => {
+    if (statusConexao === 'CONECTADO') {
+        res.send('<html><body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#e5ddd5;"> <div style="background:white;padding:40px;border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);text-align:center;"> <h1 style="color:#075e54;">✅ Bot Conectado!</h1> <p style="color:#555;">O robô já está operando normalmente.</p> </div> </body></html>');
+    } else if (lastQr) {
+        res.send(`
+            <html>
+                <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#e5ddd5;margin:0;">
+                    <div style="background:white;padding:40px;border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);text-align:center;">
+                        <h2 style="color:#075e54;margin-bottom:20px;">📸 Escaneie para Conectar</h2>
+                        <div style="background:#eee;padding:20px;border-radius:10px;display:inline-block;">
+                            <img src="${lastQr}" style="width:300px;height:300px;display:block;" />
+                        </div>
+                        <p style="margin-top:20px;color:#666;">Status: <strong style="color:#25d366;">${statusConexao}</strong></p>
+                        <p style="font-size:12px;color:#999;">A página atualiza sozinha a cada 5 segundos.</p>
+                    </div>
+                    <script>setTimeout(() => { location.reload(); }, 5000);</script>
+                </body>
+            </html>
+        `);
+    } else {
+        res.send('<html><body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#e5ddd5;"> <div style="background:white;padding:40px;border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);text-align:center;"> <h2 style="color:#075e54;">⏳ Gerando QR Code...</h2> <p style="color:#666;">Aguarde alguns segundos e a página irá carregar o código.</p> </div> <script>setTimeout(() => { location.reload(); }, 3000);</script> </body></html>');
+    }
+});
 const INACTIVITY_THRESHOLD = 15 * 60 * 1000; // 15 minutos
 const CHAT_EXPIRY_THRESHOLD = 24 * 60 * 60 * 1000; // 24 horas
 
