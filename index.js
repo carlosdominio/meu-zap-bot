@@ -16,7 +16,7 @@ let db;
 
 async function initDB() {
     db = await low(adapter);
-    await db.defaults({ chats: {}, pedidoIdToJid: {}, settings: { caixaFechado: false } }).write();
+    await db.defaults({ chats: {}, pedidoIdToJid: {}, settings: { caixaFechado: false }, lastNotifications: {}, surveysSent: {} }).write();
     console.log('✅ Banco de dados pronto');
 }
 
@@ -136,6 +136,15 @@ app.post('/api/notify-delivery', async (req, res) => {
     let targetJid = jid;
 
     if (pedidoId && db) {
+        // --- PREVENÇÃO DE DUPLICIDADE (MENSAGEM REPETIDA) ---
+        const lastNotif = db.get('lastNotifications').value() || {};
+        if (lastNotif[pedidoId] === status) {
+            console.log(`⚠️ [Bot] Notificação duplicada para Pedido #${pedidoId} (Status: ${status}). Ignorando para não enviar duas vezes.`);
+            return res.json({ success: true, info: 'Notificação já enviada' });
+        }
+        lastNotif[pedidoId] = status;
+        await db.set('lastNotifications', lastNotif).write();
+
         const mapping = db.get('pedidoIdToJid').value() || {};
         if (mapping[pedidoId]) {
             targetJid = mapping[pedidoId];
@@ -207,6 +216,31 @@ app.post('/api/notify-delivery', async (req, res) => {
         const rObj = { id: s.key.id, text: message, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: sock.user.id, pushName: 'Robô 🤖' };
         await saveMessage(targetJid, rObj, 'Robo');
         io.emit('new_msg', rObj);
+
+        // --- MENSAGEM DE PESQUISA DE SATISFAÇÃO (APENAS UMA VEZ POR PEDIDO) ---
+        const isSurveyStatus = ['entregue', 'servido', 'aguardando_fechamento'].includes(status);
+        if (isSurveyStatus && pedidoId) {
+            const surveysSent = db.get('surveysSent').value() || {};
+            if (!surveysSent[pedidoId]) {
+                surveysSent[pedidoId] = true;
+                await db.set('surveysSent', surveysSent).write();
+
+                const surveyMessage = `Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+                
+                setTimeout(async () => {
+                    if (!sock || statusConexao !== 'CONECTADO') return;
+                    try {
+                        const s2 = await sendHumanizedMessage(targetJid, { text: surveyMessage });
+                        if (s2) {
+                            const rObj2 = { id: s2.key.id, text: surveyMessage, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: sock.user.id, pushName: 'Robô 🤖' };
+                            await saveMessage(targetJid, rObj2, 'Robo');
+                            io.emit('new_msg', rObj2);
+                        }
+                    } catch (e) { console.error('❌ [Bot] Erro ao enviar pesquisa:', e.message); }
+                }, 8000); // 8 segundos após a notificação
+            }
+        }
+
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -411,7 +445,24 @@ async function connectToWhatsApp() {
 
         // --- TRAVA DE ATENDIMENTO HUMANO (SILÊNCIO TOTAL DO ROBÔ) ---
         if (chatData?.atendimentoManual) {
-            console.log(`👤 [Humano] Atendimento manual ativo para ${jid}. Robô em silêncio.`);
+            console.log(`👤 [Humano] Atendimento manual ativo for ${jid}. Robô em silêncio.`);
+            return;
+        }
+
+        // --- RESPOSTA À PESQUISA DE SATISFAÇÃO ---
+        const isSurveyResponse = ['1','2','3','4','5'].includes(text) && (Date.now() - (chatData.lastUpdate || 0) < 30 * 60 * 1000); // 30 minutos de validade
+        if (isSurveyResponse && chatData.estado !== 'delivery') {
+            const rating = parseInt(text);
+            let thanks = "";
+            if (rating >= 4) {
+                thanks = "Ficamos muito felizes que você gostou! 😍 Obrigado pela nota máxima! Sua satisfação é o que nos move. Até a próxima! 🍻";
+            } else if (rating === 3) {
+                thanks = "Obrigado pelo seu feedback! 👍 Vamos trabalhar para que sua próxima experiência seja nota 5. Se tiver alguma sugestão, pode mandar aqui! 📝";
+            } else {
+                thanks = "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar. Se quiser falar mais sobre o ocorrido, digite *5* para falar com um atendente.";
+            }
+            await sendHumanizedMessage(jid, { text: thanks });
+            await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
             return;
         }
 
