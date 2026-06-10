@@ -395,7 +395,11 @@ async function connectToWhatsApp() {
         if (fromMe) return;
 
         // --- TRAVA DE CAIXA FECHADO (FORA DO HORÁRIO) ---
-        if (!isStoreOpen()) {
+        const chats = db.get('chats').value() || {};
+        const chatData = chats[jid] || {};
+        const hasActiveOrder = chatData.estado === 'delivery' && chatData.activePedidoId;
+
+        if (!isStoreOpen() && !hasActiveOrder) {
             console.log(`🔌 [Fechado] Mensagem de ${jid} ignorada por estar fora do horário.`);
             const closedMsg = "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻";
             const s = await sendHumanizedMessage(jid, { text: closedMsg });
@@ -406,8 +410,7 @@ async function connectToWhatsApp() {
         }
 
         // --- TRAVA DE ATENDIMENTO HUMANO (SILÊNCIO TOTAL DO ROBÔ) ---
-        const chats = db.get('chats').value() || {};
-        if (chats[jid]?.atendimentoManual) {
+        if (chatData?.atendimentoManual) {
             console.log(`👤 [Humano] Atendimento manual ativo para ${jid}. Robô em silêncio.`);
             return;
         }
@@ -428,7 +431,6 @@ async function connectToWhatsApp() {
             }
         }
 
-        const chatData = chats[jid] || {};
         const estado = chatData.estado || 'normal';
         let reply = "";
 
