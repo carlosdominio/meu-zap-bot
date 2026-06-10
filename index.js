@@ -459,7 +459,7 @@ async function connectToWhatsApp() {
             } else if (rating === 3) {
                 thanks = "Obrigado pelo seu feedback! 👍 Vamos trabalhar para que sua próxima experiência seja nota 5. Se tiver alguma sugestão, pode mandar aqui! 📝";
             } else {
-                thanks = "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar. Se quiser falar mais sobre o ocorrido, digite *5* para falar com um atendente.";
+                thanks = "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar.";
             }
             await sendHumanizedMessage(jid, { text: thanks });
             await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
