@@ -274,7 +274,8 @@ io.on('connection', (socket) => {
         if (db) {
             await db.get('settings').set('caixaFechado', status).write();
             io.emit('status_caixa', status);
-            console.log(`🏪 [Loja] Caixa ${status ? 'FECHADO' : 'ABERTO'} manualmente.`);
+            const statusLabel = typeof status === 'string' ? status.toUpperCase() : (status ? 'FECHADO' : 'ABERTO');
+            console.log(`🏪 [Loja] Status do Caixa alterado para: ${statusLabel}`);
         }
     });
 
@@ -316,19 +317,20 @@ async function saveMessage(jid, msg, name) {
 function isStoreOpen() {
     if (!db) return true;
     const settings = db.get('settings').value() || {};
-    if (settings.caixaFechado) return false;
+    
+    const status = settings.caixaFechado;
 
-    // Obtém data/hora atual em Brasília (GMT-3)
+    // Se estiver em 'aberto', o robô funciona sempre
+    if (status === 'aberto') return true;
+    
+    // Caso contrário (modo 'auto'), segue o horário programado
     const now = new Date();
     const localized = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     
-    const day = localized.getDay(); // 0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sab
+    const day = localized.getDay(); 
     const hour = localized.getHours();
 
-    // Horário: Terça (2) a Domingo (0) das 18h às 02h
-    // Noite (18h-23h)
     const isNightOpen = (hour >= 18 && [2, 3, 4, 5, 6, 0].includes(day));
-    // Madrugada (00h-02h) - pertence ao turno do dia anterior
     const isEarlyMorningOpen = (hour < 2 && [3, 4, 5, 6, 0, 1].includes(day));
 
     return isNightOpen || isEarlyMorningOpen;

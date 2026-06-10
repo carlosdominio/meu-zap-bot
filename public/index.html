@@ -113,8 +113,8 @@
 <div id="sidebar">
     <div id="sidebar-header">
         Conversas
-        <div style="float: right; display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: normal;">
-            <span id="caixa-label">Caixa Aberto</span>
+        <div style="float: right; display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: normal;">
+            <span id="caixa-label">Automático</span>
             <label class="switch">
                 <input type="checkbox" id="caixa-toggle-input" onchange="toggleCaixa(this.checked)">
                 <span class="slider round"></span>
@@ -225,13 +225,17 @@
     });
     socket.on('status_caixa', (status) => {
         const input = document.getElementById('caixa-toggle-input');
-        input.checked = !status; // caixaFechado=true -> checked=false (UI diz Aberto se fehcado for false)
-        document.getElementById('caixa-label').innerText = status ? 'Caixa Fechado' : 'Caixa Aberto';
-        document.getElementById('caixa-label').style.color = status ? '#e74c3c' : '#00a884';
+        const label = document.getElementById('caixa-label');
+        const isAberto = (status === 'aberto');
+        
+        input.checked = isAberto;
+        label.innerText = isAberto ? '🟢 Aberto' : '📅 Automático';
+        label.style.color = isAberto ? '#00a884' : '#3498db';
+        label.style.fontWeight = 'bold';
     });
     function toggleCaixa(checked) {
-        // UI checked (Aberto) -> caixaFechado = false
-        socket.emit('toggle_caixa', !checked);
+        const val = checked ? 'aberto' : 'auto';
+        socket.emit('toggle_caixa', val);
     }
     function updateUnreadTitle() {
         const totalUnread = Object.values(chatData).reduce((sum, chat) => sum + (chat.unreadCount || 0), 0);
