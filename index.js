@@ -28,7 +28,7 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 });
 
 const port = process.env.PORT || 3002;
-const DELIVERY_API_URL = process.env.DELIVERY_API_URL || 'http://localhost:3001/api/pedidos';
+const DELIVERY_API_URL = process.env.DELIVERY_API_URL || 'https://garconnexpress.vercel.app/api/pedidos';
 
 app.get('/qr', (req, res) => {
     if (statusConexao === 'CONECTADO') {
@@ -441,7 +441,10 @@ async function connectToWhatsApp() {
                 const ped = await resp.json();
                 const stMap = { 'recebido': 'Preparando 👨‍🍳', 'preparando': 'Preparando 👨‍🍳', 'pronto': 'Pronto 🥡', 'saiu_entrega': 'A caminho 🛵', 'entregue': 'Entregue 😋' };
                 reply = `📦 *ACOMPANHAMENTO DO PEDIDO #${pId}*\n\nOlá ${pushName}, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *${stMap[ped.status] || ped.status}*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨`;
-            } catch (e) { reply = "Erro ao consultar status. 😕"; }
+            } catch (e) { 
+                console.error(`❌ Erro ao consultar status do pedido #${pId}:`, e.message);
+                reply = "Erro ao consultar status. 😕"; 
+            }
         } else if (estado === 'delivery' && text === '2') {
             reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nEntendido! Já acionei nossa equipe. Um de nossos atendentes falará com você em instantes para tirar suas dúvidas ou resolver qualquer problema. 🚀\n\n⏳ *Tempo médio de espera:* 2 a 5 minutos.\n\n_Por favor, aguarde um momento..._";
             chats[jid].atendimentoManual = true;
