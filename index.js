@@ -139,14 +139,31 @@ app.post('/api/notify-delivery', async (req, res) => {
     let targetJid = jid;
 
     if (pedidoId && db) {
-        // --- PREVENÇÃO DE DUPLICIDADE (MENSAGEM REPETIDA) ---
-        const lastNotif = db.get('lastNotifications').value() || {};
-        if (lastNotif[pedidoId] === status) {
-            console.log(`⚠️ [Bot] Notificação duplicada para Pedido #${pedidoId} (Status: ${status}). Ignorando para não enviar duas vezes.`);
-            return res.json({ success: true, info: 'Notificação já enviada' });
+        // --- NOVA PREVENÇÃO DE DUPLICIDADE POR CATEGORIA ---
+        const lastNotifCategory = db.get('lastNotifications').value() || {};
+        
+        // Define categorias para evitar repetições de mensagens que dizem a mesma coisa
+        const categories = {
+            'recebido': 'RECEBIDO',
+            'preparando': 'PREPARANDO',
+            'pronto': 'PRONTO',
+            'saiu_entrega': 'SAIU_ENTREGA',
+            'entregue': 'ENTREGUE',
+            'servido': 'ENTREGUE',
+            'aguardando_fechamento': 'ENTREGUE',
+            'concluido': 'FINALIZADO',
+            'finalizado': 'FINALIZADO',
+            'cancelado': 'CANCELADO'
+        };
+
+        const currentCategory = categories[status];
+        if (lastNotifCategory[pedidoId] === currentCategory) {
+            console.log(`⚠️ [Bot] Notificação da categoria ${currentCategory} já enviada para Pedido #${pedidoId}. Ignorando duplicata.`);
+            return res.json({ success: true, info: 'Categoria já enviada' });
         }
-        lastNotif[pedidoId] = status;
-        await db.set('lastNotifications', lastNotif).write();
+        
+        lastNotifCategory[pedidoId] = currentCategory;
+        await db.set('lastNotifications', lastNotifCategory).write();
 
         const mapping = db.get('pedidoIdToJid').value() || {};
         if (mapping[pedidoId]) {
@@ -191,9 +208,9 @@ app.post('/api/notify-delivery', async (req, res) => {
     const isFinalizedStatus = ['concluido', 'finalizado'].includes(status);
 
     if (isEntregueStatus) {
-        message = `Olá, ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido foi **ENTREGUE**! 🎉\n\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
     } else if (isFinalizedStatus) {
-        message = `Olá, ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\n✅ **PEDIDO FINALIZADO COM SUCESSO!**\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\n\n*Equipe GuGA Bebidas* 🍻`;
+        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
     }
 
     if (db) {
