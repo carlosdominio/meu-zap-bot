@@ -600,7 +600,15 @@ async function connectToWhatsApp() {
             try {
                 const resp = await fetch(`${DELIVERY_API_URL}/${pId}`);
                 const ped = await resp.json();
-                const stMap = { 'recebido': 'Preparando 👨‍🍳', 'preparando': 'Preparando 👨‍🍳', 'pronto': 'Pronto 🥡', 'saiu_entrega': 'A caminho 🛵', 'entregue': 'Entregue 😋' };
+                const stMap = { 
+                    'recebido': 'Preparando 👨‍🍳', 
+                    'preparando': 'Preparando 👨‍🍳', 
+                    'pronto': 'Pronto 🥡', 
+                    'saiu_entrega': 'A caminho 🛵', 
+                    'servido': 'Saiu para Entrega 🛵', 
+                    'entregue': 'Entregue 😋', 
+                    'aguardando_fechamento': 'Entregue 😋' 
+                };
                 reply = `📦 *ACOMPANHAMENTO DO PEDIDO #${pId}*\n\nOlá ${pushName}, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *${stMap[ped.status] || ped.status}*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨`;
             } catch (e) { 
                 console.error(`❌ Erro ao consultar status do pedido #${pId}:`, e.message);
