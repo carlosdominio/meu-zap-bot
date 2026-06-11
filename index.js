@@ -279,6 +279,14 @@ app.post('/api/notify-delivery', async (req, res) => {
                 try {
                     const s2 = await sendHumanizedMessage(targetJid, { text: surveyMessage });
                     if (s2) {
+                        // Ativa a flag de que há uma pesquisa aguardando resposta
+                        if (db) {
+                            const chatsDB = db.get('chats').value() || {};
+                            if (chatsDB[targetJid]) {
+                                chatsDB[targetJid].surveyPending = true;
+                                await db.set('chats', chatsDB).write();
+                            }
+                        }
                         const rObj2 = { id: s2.key.id, text: surveyMessage, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
                         await saveMessage(targetJid, rObj2, 'Robo');
                         io.emit('new_msg', rObj2);
@@ -499,7 +507,7 @@ async function connectToWhatsApp() {
         }
 
         // --- RESPOSTA À PESQUISA DE SATISFAÇÃO ---
-        const isSurveyResponse = ['1','2','3','4','5'].includes(text) && (Date.now() - (chatData.lastUpdate || 0) < 30 * 60 * 1000); // 30 minutos de validade
+        const isSurveyResponse = ['1','2','3','4','5'].includes(text) && chatData.surveyPending;
         if (isSurveyResponse && chatData.estado !== 'delivery') {
             const rating = parseInt(text);
             let thanks = "";
@@ -510,8 +518,19 @@ async function connectToWhatsApp() {
             } else {
                 thanks = "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar.";
             }
+            
+            // Desativa a flag para não entrar em loop no próximo número digitado
+            chatData.surveyPending = false;
+            await db.set('chats', chats).write();
+
             await sendHumanizedMessage(jid, { text: thanks });
             await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
+            
+            // Seguir fluxo padrão: Enviar menu principal logo após o agradecimento
+            const mainMenu = `Olá ${pushName}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._`;
+            const sMenu = await sendHumanizedMessage(jid, { text: mainMenu });
+            await saveMessage(jid, { id: sMenu.key.id, text: mainMenu, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
+            
             return;
         }
 
