@@ -187,9 +187,13 @@ app.post('/api/notify-delivery', async (req, res) => {
     // MENSAGEM RICA DE ACOMPANHAMENTO
     let message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusMessages[status]}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
 
-    const isFinalized = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento'].includes(status);
-    if (isFinalized) {
-        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ Informamos que seu pedido foi finalizado com sucesso!\n\nAgradecemos pela sua preferência e esperamos que você aproveite muito. 😋🥤\n\nAtenciosamente,\n\nEquipe GuGA Bebidas 🍻`;
+    const isEntregueStatus = ['entregue', 'servido', 'aguardando_fechamento'].includes(status);
+    const isFinalizedStatus = ['concluido', 'finalizado'].includes(status);
+
+    if (isEntregueStatus) {
+        message = `Olá, ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido foi **ENTREGUE**! 🎉\n\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+    } else if (isFinalizedStatus) {
+        message = `Olá, ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\n✅ **PEDIDO FINALIZADO COM SUCESSO!**\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\n\n*Equipe GuGA Bebidas* 🍻`;
     }
 
     if (db) {
@@ -226,8 +230,7 @@ app.post('/api/notify-delivery', async (req, res) => {
         io.emit('new_msg', rObj);
 
         // --- MENSAGEM DE PESQUISA DE SATISFAÇÃO (APENAS UMA VEZ POR PEDIDO) ---
-        const isSurveyStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento'].includes(status);
-        if (isSurveyStatus && pedidoId) {
+        if (isFinalizedStatus && pedidoId) {
             const surveysSent = db.get('surveysSent').value() || {};
             if (!surveysSent[pedidoId]) {
                 surveysSent[pedidoId] = true;
