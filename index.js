@@ -104,7 +104,7 @@ async function checkInactivity() {
                     id: s?.key?.id || ('timeout-' + Date.now()), 
                     text: timeoutMsg, 
                     fromMe: true, 
-                    time: new Date().toLocaleTimeString('pt-BR'), 
+                    time: getFormattedTime(), 
                     sender: sock.user.id, 
                     pushName: 'Robô 🤖' 
                 };
@@ -210,10 +210,10 @@ app.post('/api/notify-delivery', async (req, res) => {
     const clientName = (chatData.name && chatData.name !== targetJid.split('@')[0]) ? chatData.name : 'cliente';
     
     // Lista de status que disparam o template de ENTREGA
-    const isEntregueStatus = ['entregue', 'servido'].includes(status);
+    const isEntregueStatus = ['entregue', 'servido', 'aguardando_fechamento'].includes(status);
     
     // Lista de status que disparam o template de FINALIZAÇÃO (Aqui incluímos todas as variações possíveis)
-    const isFinalizedStatus = ['concluido', 'finalizado', 'concluído', 'concluida', 'concluída', 'finalizada', 'pago', 'encerrado', 'fechado', 'aguardando_fechamento'].includes(status);
+    const isFinalizedStatus = ['concluido', 'finalizado', 'concluído', 'concluida', 'concluída', 'finalizada', 'pago', 'encerrado', 'fechado'].includes(status);
 
     let message = "";
 
@@ -230,14 +230,24 @@ app.post('/api/notify-delivery', async (req, res) => {
     if (db) {
         if (!chats[targetJid]) chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
         chats[targetJid].ultimoPedidoId = pedidoId;
-        if (isFinalizedStatus || isEntregueStatus || status === 'cancelado') {
-            chats[targetJid].estado = 'normal';
-            chats[targetJid].activePedidoId = null;
+        
+        const isTerminalStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento', 'cancelado'].includes(status);
+        if (isTerminalStatus) {
+            console.log(`✅ [Bot] Pedido #${pedidoId} atingiu status terminal (${status}).`);
+            if (isFinalizedStatus || status === 'cancelado') {
+                chats[targetJid].estado = 'normal';
+                chats[targetJid].activePedidoId = null;
+            }
         } else {
             chats[targetJid].estado = 'delivery';
             chats[targetJid].activePedidoId = pedidoId;
         }
         await db.set('chats', chats).write();
+        
+        // Garante que o mapping JID <-> Pedido exista no banco
+        const mapping = db.get('pedidoIdToJid').value() || {};
+        mapping[String(pedidoId)] = targetJid;
+        await db.set('pedidoIdToJid', mapping).write();
     }
 
     if (status === 'recebido') return res.json({ success: true, info: 'Recebimento silenciado' });
@@ -338,7 +348,7 @@ io.on('connection', (socket) => {
         if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
         const buffer = Buffer.from(data.image.split(';base64,').pop(), 'base64');
         const s = await sendHumanizedMessage(jid, { image: buffer });
-        const rObj = { id: s.key.id, text: '🖼️ Imagem', fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖", imageUrl: data.image };
+        const rObj = { id: s.key.id, text: '🖼️ Imagem', fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖", imageUrl: data.image };
         await saveMessage(jid, rObj, "Robo");
         io.emit('new_msg', rObj);
     });
@@ -479,7 +489,7 @@ async function connectToWhatsApp() {
         const pushName = fromMe ? "Voce" : (msg.pushName || jid.split('@')[0]);
         let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
         
-        const msgObj = { id: msg.key.id, from: jid, text, fromMe, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName };
+        const msgObj = { id: msg.key.id, from: jid, text, fromMe, time: getFormattedTime(msg.messageTimestamp ? msg.messageTimestamp * 1000 : undefined), sender: jid, pushName };
         await saveMessage(jid, msgObj, pushName);
         io.emit('new_msg', msgObj);
 
@@ -495,7 +505,7 @@ async function connectToWhatsApp() {
             const closedMsg = "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻";
             const s = await sendHumanizedMessage(jid, { text: closedMsg });
             if (s) {
-                await saveMessage(jid, { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+                await saveMessage(jid, { id: s.key.id, text: closedMsg, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
             }
             return;
         }
@@ -524,8 +534,7 @@ async function connectToWhatsApp() {
             await db.set('chats', chats).write();
 
             await sendHumanizedMessage(jid, { text: thanks });
-            await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
-            
+            await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖" }, "Robo");
             return;
         }
 
@@ -598,7 +607,7 @@ async function connectToWhatsApp() {
 
         if (reply) {
             const s = await sendHumanizedMessage(jid, { text: reply });
-            await saveMessage(jid, { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
+            await saveMessage(jid, { id: s.key.id, text: reply, fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖" }, "Robo");
         }
     });
 }
