@@ -545,6 +545,14 @@ async function connectToWhatsApp() {
 
         // --- RESPOSTA À PESQUISA DE SATISFAÇÃO ---
         const isSurveyResponse = ['1','2','3','4','5'].includes(text) && chatData.surveyPending;
+        
+        // Se há uma pesquisa pendente mas o cliente digitou outra coisa, cancelamos a pesquisa e seguimos para o menu normal
+        if (chatData.surveyPending && !isSurveyResponse) {
+            chatData.surveyPending = false;
+            await db.set('chats', chats).write();
+            console.log(`📝 [Survey] Cliente ${jid} ignorou a pesquisa. Voltando ao fluxo normal.`);
+        }
+
         if (isSurveyResponse && chatData.estado !== 'delivery') {
             const rating = parseInt(text);
             let thanks = "";
