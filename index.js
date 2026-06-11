@@ -182,12 +182,10 @@ app.post('/api/notify-delivery', async (req, res) => {
             'concluido': 'FINALIZADO', 'finalizado': 'FINALIZADO', 'concluído': 'FINALIZADO', 'concluida': 'FINALIZADO', 'concluída': 'FINALIZADO', 'finalizada': 'FINALIZADO', 'pago': 'FINALIZADO', 'cancelado': 'CANCELADO'
         };
         currentCat = categories[status];
-        /* 
         if (currentCat && lastNotifCategory[pedidoId] === currentCat) {
             console.log(`⚠️ [Delivery] Categoria ${currentCat} já enviada para Pedido #${pedidoId}. Ignorando duplicata.`);
             return res.json({ success: true, info: 'Categoria já enviada' });
         }
-        */
     }
 
     const statusMessages = {
@@ -232,7 +230,7 @@ app.post('/api/notify-delivery', async (req, res) => {
     if (db) {
         if (!chats[targetJid]) chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
         chats[targetJid].ultimoPedidoId = pedidoId;
-        if (isFinalizedStatus || status === 'cancelado') {
+        if (isFinalizedStatus || isEntregueStatus || status === 'cancelado') {
             chats[targetJid].estado = 'normal';
             chats[targetJid].activePedidoId = null;
         } else {
@@ -266,6 +264,14 @@ app.post('/api/notify-delivery', async (req, res) => {
         console.log(`✅ [Delivery] Mensagem enviada com sucesso para Pedido #${pedidoId}`);
 
         if (isFinalizedStatus) {
+            const surveysSent = db.get('surveysSent').value() || {};
+            if (surveysSent[pedidoId]) {
+                console.log(`⚠️ [Survey] Pesquisa já enviada anteriormente para Pedido #${pedidoId}.`);
+                return res.json({ success: true, info: 'Pesquisa já enviada' });
+            }
+            surveysSent[pedidoId] = true;
+            await db.set('surveysSent', surveysSent).write();
+
             console.log(`⏳ [Survey] Agendando pesquisa para Pedido #${pedidoId} em 8 segundos...`);
             setTimeout(async () => {
                 if (!sock || statusConexao !== 'CONECTADO') return;
