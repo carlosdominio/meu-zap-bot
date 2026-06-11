@@ -526,11 +526,6 @@ async function connectToWhatsApp() {
             await sendHumanizedMessage(jid, { text: thanks });
             await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
             
-            // Seguir fluxo padrão: Enviar menu principal logo após o agradecimento
-            const mainMenu = `Olá ${pushName}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._`;
-            const sMenu = await sendHumanizedMessage(jid, { text: mainMenu });
-            await saveMessage(jid, { id: sMenu.key.id, text: mainMenu, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
-            
             return;
         }
 

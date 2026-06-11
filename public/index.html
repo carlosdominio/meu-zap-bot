@@ -21,6 +21,8 @@
         .chat-info strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .badge-msg { background: #00a884; color: white; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: bold; margin-left: 5px; }
         .badge-unread { background: #e74c3c;   }
+        .badge-human { background: #f39c12; color: white; margin-left: 5px; animation: pulse-human 2s infinite; }
+        @keyframes pulse-human { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         @keyframes pulse-unread { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         .btn-del-chat { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; padding: 5px; opacity: 0.7; transition: transform 0.2s; }
         .btn-del-chat:hover { transform: scale(1.2); opacity: 1; }
@@ -125,7 +127,10 @@
 </div>
 <div id="main-chat">
     <div id="chat-header">
-        <span id="current-chat-name" style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Selecione uma conversa</span>
+        <div style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+            <span id="current-chat-name" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Selecione uma conversa</span>
+            <span id="header-human-badge" style="display: none; font-size: 10px; background: #f39c12; color: white; padding: 2px 6px; border-radius: 4px; width: fit-content; margin-top: 2px; animation: pulse-human 2s infinite;">SOLICITAÇÃO DE ATENDIMENTO HUMANO</span>
+        </div>
         <div id="human-control-toggle" style="display: none; align-items: center; gap: 8px;">
             <span id="status-label" style="font-size: 12px; color: #666;">Robô Ativo</span>
             <label class="switch">
@@ -219,6 +224,7 @@
                 const input = document.getElementById('human-toggle-input');
                 input.checked = data.atendimentoManual;
                 document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';        
+                document.getElementById('header-human-badge').style.display = data.atendimentoManual ? 'block' : 'none';
             }
             updateChatList();
         }
@@ -271,7 +277,8 @@
             item.className = 'chat-item' + (jid === currentJid ? ' active' : '') + (isUnread ? ' unread' : '');
             item.onclick = () => openChat(jid);
             const statusIcon = chat.atendimentoManual ? '👤' : '🤖';
-            item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa">🗑️</button>';
+            const humanBadge = chat.atendimentoManual ? '<span class="badge-msg badge-human">HUMANO</span>' : '';
+            item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + humanBadge + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa">🗑️</button>';
             listDiv.appendChild(item);
         });
     }
@@ -289,6 +296,7 @@
         const isManual = chatData[jid].atendimentoManual || false;
         document.getElementById('human-toggle-input').checked = isManual;
         document.getElementById('status-label').innerText = isManual ? 'Humano Ativo' : 'Robô Ativo';
+        document.getElementById('header-human-badge').style.display = isManual ? 'block' : 'none';
         const messagesDiv = document.getElementById('messages');
         messagesDiv.innerHTML = '';
         if (chatData[jid].messages) {
