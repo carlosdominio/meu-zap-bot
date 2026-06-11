@@ -172,21 +172,22 @@ app.post('/api/notify-delivery', async (req, res) => {
 
     if (!targetJid || targetJid === 'undefined') return res.status(404).json({ error: 'JID não encontrado' });
 
-    // 3. Categorias e Deduplicação
+    // 3. Categorias e Deduplicação (Apenas Verificação Inicial)
+    let currentCat = null;
     if (db) {
         const lastNotifCategory = db.get('lastNotifications').value() || {};
         const categories = {
             'recebido': 'RECEBIDO', 'preparando': 'PREPARANDO', 'pronto': 'PRONTO', 'saiu_entrega': 'SAIU_ENTREGA',
             'entregue': 'ENTREGUE', 'servido': 'ENTREGUE', 'aguardando_fechamento': 'ENTREGUE',
-            'concluido': 'FINALIZADO', 'finalizado': 'FINALIZADO', 'cancelado': 'CANCELADO'
+            'concluido': 'FINALIZADO', 'finalizado': 'FINALIZADO', 'concluído': 'FINALIZADO', 'concluida': 'FINALIZADO', 'concluída': 'FINALIZADO', 'finalizada': 'FINALIZADO', 'pago': 'FINALIZADO', 'cancelado': 'CANCELADO'
         };
-        const currentCat = categories[status];
-        if (lastNotifCategory[pedidoId] === currentCat) {
-            console.log(`⚠️ [Delivery] Categoria ${currentCat} já enviada para Pedido #${pedidoId}.`);
+        currentCat = categories[status];
+        /* 
+        if (currentCat && lastNotifCategory[pedidoId] === currentCat) {
+            console.log(`⚠️ [Delivery] Categoria ${currentCat} já enviada para Pedido #${pedidoId}. Ignorando duplicata.`);
             return res.json({ success: true, info: 'Categoria já enviada' });
         }
-        lastNotifCategory[pedidoId] = currentCat;
-        await db.set('lastNotifications', lastNotifCategory).write();
+        */
     }
 
     const statusMessages = {
@@ -197,7 +198,12 @@ app.post('/api/notify-delivery', async (req, res) => {
         'entregue': 'foi ENTREGUE! 😋🥤',
         'servido': 'foi ENTREGUE! 😋🥤',
         'concluido': 'foi FINALIZADO com sucesso! 🌟',
+        'concluído': 'foi FINALIZADO com sucesso! 🌟',
         'finalizado': 'foi FINALIZADO com sucesso! 🌟',
+        'finalizada': 'foi FINALIZADO com sucesso! 🌟',
+        'concluida': 'foi FINALIZADO com sucesso! 🌟',
+        'concluída': 'foi FINALIZADO com sucesso! 🌟',
+        'pago': 'foi FINALIZADO com sucesso! 🌟',
         'aguardando_fechamento': 'foi ENTREGUE! 😋🥤',
         'cancelado': 'foi CANCELADO. ❌'
     };
@@ -205,14 +211,22 @@ app.post('/api/notify-delivery', async (req, res) => {
     const chatData = chats[targetJid] || {};
     const clientName = (chatData.name && chatData.name !== targetJid.split('@')[0]) ? chatData.name : 'cliente';
     
-    let message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusMessages[status]}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+    // Lista de status que disparam o template de ENTREGA
+    const isEntregueStatus = ['entregue', 'servido'].includes(status);
+    
+    // Lista de status que disparam o template de FINALIZAÇÃO (Aqui incluímos todas as variações possíveis)
+    const isFinalizedStatus = ['concluido', 'finalizado', 'concluído', 'concluida', 'concluída', 'finalizada', 'pago', 'encerrado', 'fechado', 'aguardando_fechamento'].includes(status);
 
-    const isFinalizedStatus = ['entregue', 'servido', 'aguardando_fechamento', 'concluido', 'finalizado'].includes(status);
+    let message = "";
 
-    if (status === 'recebido') {
-        // Silenciado
+    if (isEntregueStatus) {
+        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
     } else if (isFinalizedStatus) {
-        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\n\nEquipe GuGA Bebidas 🍻`;
+        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
+    } else {
+        // Template Genérico para outros status (Recebido, Preparando, Pronto, Saiu Entrega)
+        const statusText = statusMessages[status] || `está com o status: ${status}`;
+        message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusText}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
     }
 
     if (db) {
@@ -236,8 +250,16 @@ app.post('/api/notify-delivery', async (req, res) => {
     }
 
     try {
-        console.log(`🚀 [Delivery] Enviando mensagem de "${status}" para ${targetJid}...`);
+        console.log(`🚀 [Delivery] Enviando mensagem de "${status}" para ${targetJid} (Pedido #${pedidoId})...`);
         const s = await sendHumanizedMessage(targetJid, { text: message });
+        
+        // --- SÓ SALVA A CATEGORIA NO BANCO SE O ENVIO FUNCIONOU ---
+        if (db && currentCat) {
+            const lastNotifCategory = db.get('lastNotifications').value() || {};
+            lastNotifCategory[pedidoId] = currentCat;
+            await db.set('lastNotifications', lastNotifCategory).write();
+        }
+
         const rObj = { id: s.key.id, text: message, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
         await saveMessage(targetJid, rObj, 'Robo');
         io.emit('new_msg', rObj);
@@ -247,7 +269,7 @@ app.post('/api/notify-delivery', async (req, res) => {
             console.log(`⏳ [Survey] Agendando pesquisa para Pedido #${pedidoId} em 8 segundos...`);
             setTimeout(async () => {
                 if (!sock || statusConexao !== 'CONECTADO') return;
-                const surveyMessage = `Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+                const surveyMessage = `Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
                 try {
                     const s2 = await sendHumanizedMessage(targetJid, { text: surveyMessage });
                     if (s2) {
@@ -261,7 +283,7 @@ app.post('/api/notify-delivery', async (req, res) => {
         }
         res.json({ success: true });
     } catch (e) { 
-        console.error(`❌ [Delivery] Erro ao enviar mensagem:`, e.message);
+        console.error(`❌ [Delivery] Erro ao enviar mensagem para Pedido #${pedidoId}:`, e.message);
         res.status(500).json({ error: e.message }); 
     }
 });
