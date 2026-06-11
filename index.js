@@ -28,6 +28,9 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 });
 
 const port = process.env.PORT || 3002;
+const getFormattedTime = (date = new Date()) => {
+    return (date instanceof Date ? date : new Date(date)).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+};
 const DELIVERY_API_URL = process.env.DELIVERY_API_URL || 'https://garconnexpress.vercel.app/api/pedidos';
 
 app.get('/qr', (req, res) => {
@@ -126,123 +129,141 @@ app.get('/health', (req, res) => res.send('OK'));
 
 // ROTA PARA NOTIFICAÇÕES DE STATUS DE DELIVERY
 app.post('/api/notify-delivery', async (req, res) => {
-    const { number, status, pedidoId } = req.body;
-    console.log(`📦 [Bot] Notificação: Status=${status}, Pedido=#${pedidoId}`);
+    let { number, status, pedidoId } = req.body;
+    
+    // 1. Normalização de dados
+    status = String(status || '').toLowerCase().trim();
+    pedidoId = String(pedidoId || '').trim();
+    
+    console.log(`📦 [Delivery] Nova notificação: Pedido=#${pedidoId}, Status=${status}`);
 
-    let jid = number;
-    if (jid && !jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+    if (!pedidoId) return res.status(400).json({ error: 'pedidoId é obrigatório' });
 
     const chats = db ? db.get('chats').value() || {} : {};
+    let jid = number;
+    if (jid && !jid.includes('@')) {
+        const cleanNumber = jid.replace(/\D/g, '');
+        const existingJid = Object.keys(chats).find(k => k.startsWith(cleanNumber));
+        jid = existingJid || (cleanNumber + '@s.whatsapp.net');
+    }
+
     let targetJid = jid;
 
-    if (pedidoId && db) {
-        // --- PREVENÇÃO DE DUPLICIDADE (MENSAGEM REPETIDA) ---
-        const lastNotif = db.get('lastNotifications').value() || {};
-        if (lastNotif[pedidoId] === status) {
-            console.log(`⚠️ [Bot] Notificação duplicada para Pedido #${pedidoId} (Status: ${status}). Ignorando para não enviar duas vezes.`);
-            return res.json({ success: true, info: 'Notificação já enviada' });
-        }
-        lastNotif[pedidoId] = status;
-        await db.set('lastNotifications', lastNotif).write();
-
+    // 2. Busca robusta pelo JID
+    if (db) {
         const mapping = db.get('pedidoIdToJid').value() || {};
-        if (mapping[pedidoId]) {
+        if (mapping[pedidoId] && mapping[pedidoId] !== 'undefined') {
             targetJid = mapping[pedidoId];
         } else {
             const foundJid = Object.keys(chats).find(k => 
-                String(chats[k].activePedidoId) === String(pedidoId) || 
-                String(chats[k].ultimoPedidoId) === String(pedidoId)
+                String(chats[k].activePedidoId) === pedidoId || 
+                String(chats[k].ultimoPedidoId) === pedidoId
             );
-            if (foundJid) {
-                targetJid = foundJid;
-                await db.get('pedidoIdToJid').set(pedidoId, targetJid).write();
-            }
+            if (foundJid) targetJid = foundJid;
+        }
+        
+        if ((!targetJid || targetJid === 'undefined') && jid) targetJid = jid;
+
+        if (targetJid && targetJid !== 'undefined') {
+            mapping[pedidoId] = targetJid;
+            await db.set('pedidoIdToJid', mapping).write();
         }
     }
 
-    if (!targetJid) targetJid = jid;
-    if (!targetJid) return res.status(400).json({ error: 'JID não encontrado' });
+    if (!targetJid || targetJid === 'undefined') return res.status(404).json({ error: 'JID não encontrado' });
+
+    // 3. Categorias e Deduplicação
+    if (db) {
+        const lastNotifCategory = db.get('lastNotifications').value() || {};
+        const categories = {
+            'recebido': 'RECEBIDO', 'preparando': 'PREPARANDO', 'pronto': 'PRONTO', 'saiu_entrega': 'SAIU_ENTREGA',
+            'entregue': 'ENTREGUE', 'servido': 'ENTREGUE', 'aguardando_fechamento': 'ENTREGUE',
+            'concluido': 'FINALIZADO', 'finalizado': 'FINALIZADO', 'cancelado': 'CANCELADO'
+        };
+        const currentCat = categories[status];
+        if (lastNotifCategory[pedidoId] === currentCat) {
+            console.log(`⚠️ [Delivery] Categoria ${currentCat} já enviada para Pedido #${pedidoId}.`);
+            return res.json({ success: true, info: 'Categoria já enviada' });
+        }
+        lastNotifCategory[pedidoId] = currentCat;
+        await db.set('lastNotifications', lastNotifCategory).write();
+    }
 
     const statusMessages = {
-        'recebido': 'foi recebido com sucesso e já está na nossa fila de produção! 📝',
-        'preparando': 'está sendo preparado com todo carinho pela nossa equipe! 👨‍🍳🔥',
-        'pronto': 'já está PRONTO e aguardando apenas o entregador! 🥡✨',
-        'saiu_entrega': 'acaba de SAIR PARA ENTREGA! Prepara o coração (e o estômago) que já estamos chegando! 🛵💨',
-        'entregue': 'foi ENTREGUE! Esperamos que aproveite muito. Bom apetite! 😋🥤',
-        'servido': 'foi ENTREGUE! Esperamos que aproveite muito. Bom apetite! 😋🥤',
-        'concluido': 'foi FINALIZADO com sucesso. Obrigado pela preferência! 🌟',
-        'finalizado': 'foi FINALIZADO com sucesso. Obrigado pela preferência! 🌟',
-        'aguardando_fechamento': 'foi ENTREGUE! Esperamos que aproveite muito. Bom apetite! 😋🥤',
-        'cancelado': 'foi CANCELADO. Se precisar de mais informações, por favor, chame um de nossos atendentes. ❌'
+        'recebido': 'foi recebido com sucesso! 📝',
+        'preparando': 'está sendo preparado! 👨‍🍳🔥',
+        'pronto': 'já está PRONTO! 🥡✨',
+        'saiu_entrega': 'acaba de SAIR PARA ENTREGA! 🛵💨',
+        'entregue': 'foi ENTREGUE! 😋🥤',
+        'servido': 'foi ENTREGUE! 😋🥤',
+        'concluido': 'foi FINALIZADO com sucesso! 🌟',
+        'finalizado': 'foi FINALIZADO com sucesso! 🌟',
+        'aguardando_fechamento': 'foi ENTREGUE! 😋🥤',
+        'cancelado': 'foi CANCELADO. ❌'
     };
-
-    if (!statusMessages[status]) return res.status(400).json({ error: 'Status inválido' });
 
     const chatData = chats[targetJid] || {};
     const clientName = (chatData.name && chatData.name !== targetJid.split('@')[0]) ? chatData.name : 'cliente';
     
-    // MENSAGEM RICA DE ACOMPANHAMENTO
-    const message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusMessages[status]}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+    let message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusMessages[status]}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+
+    const isFinalizedStatus = ['entregue', 'servido', 'aguardando_fechamento', 'concluido', 'finalizado'].includes(status);
+
+    if (status === 'recebido') {
+        // Silenciado
+    } else if (isFinalizedStatus) {
+        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\n\nEquipe GuGA Bebidas 🍻`;
+    }
 
     if (db) {
-        if (!chats[targetJid]) {
-            chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
-        }
-
-        const isTerminalStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento', 'cancelado'].includes(status);
-        if (isTerminalStatus) {
-            console.log(`✅ [Bot] Pedido #${pedidoId} finalizado. Resetando estado.`);
+        if (!chats[targetJid]) chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
+        chats[targetJid].ultimoPedidoId = pedidoId;
+        if (isFinalizedStatus || status === 'cancelado') {
             chats[targetJid].estado = 'normal';
             chats[targetJid].activePedidoId = null;
         } else {
             chats[targetJid].estado = 'delivery';
             chats[targetJid].activePedidoId = pedidoId;
         }
-
         await db.set('chats', chats).write();
-        await db.get('pedidoIdToJid').set(String(pedidoId), targetJid).write();
     }
 
-    // --- FILTRO: SILENCIAR RECEBIMENTO PARA O CLIENTE ---
-    if (status === 'recebido') {
-        console.log(`ℹ️ [Bot] Pedido #${pedidoId} recebido. Notificação para o cliente pulada (apenas log).`);
-        return res.json({ success: true, info: 'Mensagem de recebimento desativada para o cliente' });
+    if (status === 'recebido') return res.json({ success: true, info: 'Recebimento silenciado' });
+    
+    if (!sock || statusConexao !== 'CONECTADO') {
+        console.error(`❌ [Delivery] Erro: Bot está ${statusConexao}. Não foi possível enviar para o Pedido #${pedidoId}`);
+        return res.status(503).json({ error: 'Bot offline' });
     }
-
-    if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'Bot offline' });
 
     try {
+        console.log(`🚀 [Delivery] Enviando mensagem de "${status}" para ${targetJid}...`);
         const s = await sendHumanizedMessage(targetJid, { text: message });
-        const rObj = { id: s.key.id, text: message, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: sock.user.id, pushName: 'Robô 🤖' };
+        const rObj = { id: s.key.id, text: message, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
         await saveMessage(targetJid, rObj, 'Robo');
         io.emit('new_msg', rObj);
+        console.log(`✅ [Delivery] Mensagem enviada com sucesso para Pedido #${pedidoId}`);
 
-        // --- MENSAGEM DE PESQUISA DE SATISFAÇÃO (APENAS UMA VEZ POR PEDIDO) ---
-        const isSurveyStatus = ['entregue', 'servido', 'aguardando_fechamento'].includes(status);
-        if (isSurveyStatus && pedidoId) {
-            const surveysSent = db.get('surveysSent').value() || {};
-            if (!surveysSent[pedidoId]) {
-                surveysSent[pedidoId] = true;
-                await db.set('surveysSent', surveysSent).write();
-
+        if (isFinalizedStatus) {
+            console.log(`⏳ [Survey] Agendando pesquisa para Pedido #${pedidoId} em 8 segundos...`);
+            setTimeout(async () => {
+                if (!sock || statusConexao !== 'CONECTADO') return;
                 const surveyMessage = `Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
-                
-                setTimeout(async () => {
-                    if (!sock || statusConexao !== 'CONECTADO') return;
-                    try {
-                        const s2 = await sendHumanizedMessage(targetJid, { text: surveyMessage });
-                        if (s2) {
-                            const rObj2 = { id: s2.key.id, text: surveyMessage, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: sock.user.id, pushName: 'Robô 🤖' };
-                            await saveMessage(targetJid, rObj2, 'Robo');
-                            io.emit('new_msg', rObj2);
-                        }
-                    } catch (e) { console.error('❌ [Bot] Erro ao enviar pesquisa:', e.message); }
-                }, 8000); // 8 segundos após a notificação
-            }
+                try {
+                    const s2 = await sendHumanizedMessage(targetJid, { text: surveyMessage });
+                    if (s2) {
+                        const rObj2 = { id: s2.key.id, text: surveyMessage, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
+                        await saveMessage(targetJid, rObj2, 'Robo');
+                        io.emit('new_msg', rObj2);
+                        console.log(`✅ [Survey] Pesquisa enviada para Pedido #${pedidoId}`);
+                    }
+                } catch (e) { console.error('❌ [Survey] Erro:', e.message); }
+            }, 8000);
         }
-
         res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    } catch (e) { 
+        console.error(`❌ [Delivery] Erro ao enviar mensagem:`, e.message);
+        res.status(500).json({ error: e.message }); 
+    }
 });
 
 let statusConexao = "DESCONECTADO";
