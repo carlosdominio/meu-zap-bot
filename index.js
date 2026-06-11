@@ -28,6 +28,9 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 });
 
 const port = process.env.PORT || 3002;
+const getFormattedTime = (date = new Date()) => {
+    return (date instanceof Date ? date : new Date(date)).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+};
 const DELIVERY_API_URL = process.env.DELIVERY_API_URL || 'https://garconnexpress.vercel.app/api/pedidos';
 
 app.get('/qr', (req, res) => {
@@ -101,7 +104,7 @@ async function checkInactivity() {
                     id: s?.key?.id || ('timeout-' + Date.now()), 
                     text: timeoutMsg, 
                     fromMe: true, 
-                    time: new Date().toLocaleTimeString('pt-BR'), 
+                    time: getFormattedTime(), 
                     sender: sock.user.id, 
                     pushName: 'Robô 🤖' 
                 };
@@ -213,7 +216,7 @@ app.post('/api/notify-delivery', async (req, res) => {
 
     try {
         const s = await sendHumanizedMessage(targetJid, { text: message });
-        const rObj = { id: s.key.id, text: message, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: sock.user.id, pushName: 'Robô 🤖' };
+        const rObj = { id: s.key.id, text: message, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
         await saveMessage(targetJid, rObj, 'Robo');
         io.emit('new_msg', rObj);
 
@@ -232,7 +235,7 @@ app.post('/api/notify-delivery', async (req, res) => {
                     try {
                         const s2 = await sendHumanizedMessage(targetJid, { text: surveyMessage });
                         if (s2) {
-                            const rObj2 = { id: s2.key.id, text: surveyMessage, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: sock.user.id, pushName: 'Robô 🤖' };
+                            const rObj2 = { id: s2.key.id, text: surveyMessage, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
                             await saveMessage(targetJid, rObj2, 'Robo');
                             io.emit('new_msg', rObj2);
                         }
@@ -281,7 +284,7 @@ io.on('connection', (socket) => {
         if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
         const buffer = Buffer.from(data.image.split(';base64,').pop(), 'base64');
         const s = await sendHumanizedMessage(jid, { image: buffer });
-        const rObj = { id: s.key.id, text: '🖼️ Imagem', fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖", imageUrl: data.image };
+        const rObj = { id: s.key.id, text: '🖼️ Imagem', fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖", imageUrl: data.image };
         await saveMessage(jid, rObj, "Robo");
         io.emit('new_msg', rObj);
     });
@@ -422,7 +425,7 @@ async function connectToWhatsApp() {
         const pushName = fromMe ? "Voce" : (msg.pushName || jid.split('@')[0]);
         let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
         
-        const msgObj = { id: msg.key.id, from: jid, text, fromMe, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName };
+        const msgObj = { id: msg.key.id, from: jid, text, fromMe, time: getFormattedTime(msg.messageTimestamp ? msg.messageTimestamp * 1000 : undefined), sender: jid, pushName };
         await saveMessage(jid, msgObj, pushName);
         io.emit('new_msg', msgObj);
 
@@ -438,7 +441,7 @@ async function connectToWhatsApp() {
             const closedMsg = "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻";
             const s = await sendHumanizedMessage(jid, { text: closedMsg });
             if (s) {
-                await saveMessage(jid, { id: s.key.id, text: closedMsg, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+                await saveMessage(jid, { id: s.key.id, text: closedMsg, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
             }
             return;
         }
@@ -462,7 +465,7 @@ async function connectToWhatsApp() {
                 thanks = "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar.";
             }
             await sendHumanizedMessage(jid, { text: thanks });
-            await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
+            await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖" }, "Robo");
             return;
         }
 
@@ -532,7 +535,7 @@ async function connectToWhatsApp() {
 
         if (reply) {
             const s = await sendHumanizedMessage(jid, { text: reply });
-            await saveMessage(jid, { id: s.key.id, text: reply, fromMe: true, time: new Date().toLocaleTimeString('pt-BR'), sender: jid, pushName: "Robô 🤖" }, "Robo");
+            await saveMessage(jid, { id: s.key.id, text: reply, fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖" }, "Robo");
         }
     });
 }
