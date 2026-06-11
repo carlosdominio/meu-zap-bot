@@ -185,7 +185,12 @@ app.post('/api/notify-delivery', async (req, res) => {
     const clientName = (chatData.name && chatData.name !== targetJid.split('@')[0]) ? chatData.name : 'cliente';
     
     // MENSAGEM RICA DE ACOMPANHAMENTO
-    const message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusMessages[status]}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+    let message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusMessages[status]}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+
+    const isFinalized = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento'].includes(status);
+    if (isFinalized) {
+        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ Informamos que seu pedido foi finalizado com sucesso!\n\nAgradecemos pela sua preferência e esperamos que você aproveite muito. 😋🥤\n\nAtenciosamente,\n\nEquipe GuGA Bebidas 🍻`;
+    }
 
     if (db) {
         if (!chats[targetJid]) {
@@ -221,7 +226,7 @@ app.post('/api/notify-delivery', async (req, res) => {
         io.emit('new_msg', rObj);
 
         // --- MENSAGEM DE PESQUISA DE SATISFAÇÃO (APENAS UMA VEZ POR PEDIDO) ---
-        const isSurveyStatus = ['entregue', 'servido', 'aguardando_fechamento'].includes(status);
+        const isSurveyStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento'].includes(status);
         if (isSurveyStatus && pedidoId) {
             const surveysSent = db.get('surveysSent').value() || {};
             if (!surveysSent[pedidoId]) {
