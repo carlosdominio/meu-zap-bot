@@ -210,7 +210,7 @@ app.post('/api/notify-delivery', async (req, res) => {
     if (isEntregueStatus) {
         message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
     } else if (isFinalizedStatus) {
-        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
+        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ Seu pedido foi finalizado com sucesso!\n\nEm breve, você receberá uma breve pesquisa de satisfação. Contamos com sua participação para continuarmos oferecendo a melhor experiência possível. 😊\n\nAgradecemos pela confiança e esperamos que você aproveite muito. 😋🥤\n\nAtenciosamente,\n\nEquipe GuGA Bebidas 🍻`;
     }
 
     if (db) {
@@ -218,18 +218,26 @@ app.post('/api/notify-delivery', async (req, res) => {
             chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
         }
 
+        // --- AJUSTE: MANTÉM O MAPPING ATÉ O FIM REAL ---
         const isTerminalStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento', 'cancelado'].includes(status);
         if (isTerminalStatus) {
-            console.log(`✅ [Bot] Pedido #${pedidoId} finalizado. Resetando estado.`);
-            chats[targetJid].estado = 'normal';
-            chats[targetJid].activePedidoId = null;
+            console.log(`✅ [Bot] Pedido #${pedidoId} atingiu status terminal (${status}).`);
+            chats[targetJid].ultimoPedidoId = pedidoId; // Salva como último para referência
+            
+            if (isFinalizedStatus || status === 'cancelado') {
+                chats[targetJid].estado = 'normal';
+                chats[targetJid].activePedidoId = null;
+            }
         } else {
             chats[targetJid].estado = 'delivery';
             chats[targetJid].activePedidoId = pedidoId;
         }
 
         await db.set('chats', chats).write();
-        await db.get('pedidoIdToJid').set(String(pedidoId), targetJid).write();
+        // Garante que o mapping JID <-> Pedido exista no banco
+        const mapping = db.get('pedidoIdToJid').value() || {};
+        mapping[String(pedidoId)] = targetJid;
+        await db.set('pedidoIdToJid', mapping).write();
     }
 
     // --- FILTRO: SILENCIAR RECEBIMENTO PARA O CLIENTE ---
