@@ -177,14 +177,24 @@ app.post('/api/notify-delivery', async (req, res) => {
     if (db) {
         const lastNotifCategory = db.get('lastNotifications').value() || {};
         const categories = {
-            'recebido': 'RECEBIDO', 'preparando': 'PREPARANDO', 'pronto': 'PRONTO', 'saiu_entrega': 'SAIU_ENTREGA',
-            'entregue': 'ENTREGUE', 'servido': 'ENTREGUE', 'aguardando_fechamento': 'ENTREGUE',
-            'concluido': 'FINALIZADO', 'finalizado': 'FINALIZADO', 'concluído': 'FINALIZADO', 'concluida': 'FINALIZADO', 'concluída': 'FINALIZADO', 'finalizada': 'FINALIZADO', 'pago': 'FINALIZADO', 'cancelado': 'CANCELADO'
+            'recebido': 'RECEBIDO', 'preparando': 'PREPARANDO', 'pronto': 'PRONTO', 
+            'saiu_entrega': 'SAIU_ENTREGA', 'entregue': 'ENTREGUE', 'servido': 'ENTREGUE',
+            'concluido': 'FINALIZADO', 'finalizado': 'FINALIZADO', 'concluído': 'FINALIZADO', 'concluida': 'FINALIZADO', 'concluída': 'FINALIZADO', 'finalizada': 'FINALIZADO', 'pago': 'FINALIZADO', 'encerrado': 'FINALIZADO', 'fechado': 'FINALIZADO', 'aguardando_fechamento': 'FINALIZADO', 'cancelado': 'CANCELADO'
         };
         currentCat = categories[status];
-        if (currentCat && lastNotifCategory[pedidoId] === currentCat) {
+        
+        const sentCat = lastNotifCategory[pedidoId];
+
+        // 1. Se já enviamos ESTA mesma categoria, ignoramos duplicata
+        if (currentCat && sentCat === currentCat) {
             console.log(`⚠️ [Delivery] Categoria ${currentCat} já enviada para Pedido #${pedidoId}. Ignorando duplicata.`);
             return res.json({ success: true, info: 'Categoria já enviada' });
+        }
+
+        // 2. Se já finalizamos o pedido, ignoramos qualquer notificação de entrega que chegar depois
+        if (currentCat === 'ENTREGUE' && sentCat === 'FINALIZADO') {
+            console.log(`⚠️ [Delivery] Pedido #${pedidoId} ya está FINALIZADO. Ignorando notificação de ENTREGA tardia.`);
+            return res.json({ success: true, info: 'Pedido já finalizado' });
         }
     }
 
@@ -202,7 +212,9 @@ app.post('/api/notify-delivery', async (req, res) => {
         'concluida': 'foi FINALIZADO com sucesso! 🌟',
         'concluída': 'foi FINALIZADO com sucesso! 🌟',
         'pago': 'foi FINALIZADO com sucesso! 🌟',
-        'aguardando_fechamento': 'foi ENTREGUE! 😋🥤',
+        'encerrado': 'foi FINALIZADO com sucesso! 🌟',
+        'fechado': 'foi FINALIZADO com sucesso! 🌟',
+        'aguardando_fechamento': 'foi FINALIZADO com sucesso! 🌟',
         'cancelado': 'foi CANCELADO. ❌'
     };
 
@@ -210,57 +222,50 @@ app.post('/api/notify-delivery', async (req, res) => {
     const clientName = (chatData.name && chatData.name !== targetJid.split('@')[0]) ? chatData.name : 'cliente';
     
     // Lista de status que disparam o template de ENTREGA
-    const isEntregueStatus = ['entregue', 'servido', 'aguardando_fechamento'].includes(status);
+    const isEntregueStatus = ['entregue', 'servido'].includes(status);
     
-    // Lista de status que disparam o template de FINALIZAÇÃO (Aqui incluímos todas as variações possíveis)
-    const isFinalizedStatus = ['concluido', 'finalizado', 'concluído', 'concluida', 'concluída', 'finalizada', 'pago', 'encerrado', 'fechado'].includes(status);
-
-    let message = "";
-
-    if (isEntregueStatus) {
-        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
-    } else if (isFinalizedStatus) {
-        message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
-    } else {
-        // Template Genérico para outros status (Recebido, Preparando, Pronto, Saiu Entrega)
-        const statusText = statusMessages[status] || `está com o status: ${status}`;
-        message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusText}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
-    }
-
-    if (db) {
-        if (!chats[targetJid]) chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
-        chats[targetJid].ultimoPedidoId = pedidoId;
-        
-        const isTerminalStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'aguardando_fechamento', 'cancelado'].includes(status);
-        if (isTerminalStatus) {
-            console.log(`✅ [Bot] Pedido #${pedidoId} atingiu status terminal (${status}).`);
-            if (isFinalizedStatus || status === 'cancelado') {
-                chats[targetJid].estado = 'normal';
-                chats[targetJid].activePedidoId = null;
-            }
-        } else {
-            chats[targetJid].estado = 'delivery';
-            chats[targetJid].activePedidoId = pedidoId;
-        }
-        await db.set('chats', chats).write();
-        
-        // Garante que o mapping JID <-> Pedido exista no banco
-        const mapping = db.get('pedidoIdToJid').value() || {};
-        mapping[String(pedidoId)] = targetJid;
-        await db.set('pedidoIdToJid', mapping).write();
-    }
+    // Lista de status que disparam o template de FINALIZAÇÃO
+    const isFinalizedStatus = ['concluido', 'finalizado', 'concluído', 'concluida', 'concluída', 'finalizada', 'pago', 'encerrado', 'fechado', 'aguardando_fechamento'].includes(status);
 
     if (status === 'recebido') return res.json({ success: true, info: 'Recebimento silenciado' });
-    
+
     if (!sock || statusConexao !== 'CONECTADO') {
         console.error(`❌ [Delivery] Erro: Bot está ${statusConexao}. Não foi possível enviar para o Pedido #${pedidoId}`);
         return res.status(503).json({ error: 'Bot offline' });
     }
 
     try {
+        // --- SEQUENCE PROTECTOR: Se for FINALIZAR mas não enviamos o ENTREGUE, envia agora primeiro ---
+        if (db && isFinalizedStatus) {
+            const lastNotifCategory = db.get('lastNotifications').value() || {};
+            if (lastNotifCategory[pedidoId] !== 'ENTREGUE' && lastNotifCategory[pedidoId] !== 'FINALIZADO') {
+                console.log(`⚡ [Sequence] Forçando mensagem de ENTREGA antes da FINALIZAÇÃO para Pedido #${pedidoId}`);
+                const forceDeliveryMsg = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
+                await sendHumanizedMessage(targetJid, { text: forceDeliveryMsg });
+
+                const dObj = { id: 'f-' + Date.now(), text: forceDeliveryMsg, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
+                await saveMessage(targetJid, dObj, 'Robo');
+                io.emit('new_msg', dObj);
+
+                lastNotifCategory[pedidoId] = 'ENTREGUE';
+                await db.set('lastNotifications', lastNotifCategory).write();
+                await new Promise(r => setTimeout(r, 2500)); // Pausa para garantir ordem no Zap
+            }
+        }
+
+        let message = "";
+        if (isEntregueStatus) {
+            message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
+        } else if (isFinalizedStatus) {
+            message = `Olá, ${clientName}! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #${pedidoId}\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻`;
+        } else {
+            const statusText = statusMessages[status] || `está com o status: ${status}`;
+            message = `Olá ${clientName}! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #${pedidoId}*\n\nInformamos que seu pedido ${statusText}\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻`;
+        }
+
         console.log(`🚀 [Delivery] Enviando mensagem de "${status}" para ${targetJid} (Pedido #${pedidoId})...`);
         const s = await sendHumanizedMessage(targetJid, { text: message });
-        
+
         // --- SÓ SALVA A CATEGORIA NO BANCO SE O ENVIO FUNCIONOU ---
         if (db && currentCat) {
             const lastNotifCategory = db.get('lastNotifications').value() || {};
@@ -273,6 +278,28 @@ app.post('/api/notify-delivery', async (req, res) => {
         io.emit('new_msg', rObj);
         console.log(`✅ [Delivery] Mensagem enviada com sucesso para Pedido #${pedidoId}`);
 
+        if (db) {
+            if (!chats[targetJid]) chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
+            chats[targetJid].ultimoPedidoId = pedidoId;
+
+            // Um pedido só é considerado TERMINAL quando é FINALIZADO ou CANCELADO
+            const isTerminalStatus = isFinalizedStatus || status === 'cancelado';
+
+            if (isTerminalStatus) {
+                console.log(`✅ [Bot] Pedido #${pedidoId} atingiu status terminal (${status}).`);
+                chats[targetJid].estado = 'normal';
+                chats[targetJid].activePedidoId = null;
+            } else {
+                // Status intermediários (Recebido, Preparando, Pronto, A caminho, Entregue) mantêm o modo delivery
+                chats[targetJid].estado = 'delivery';
+                chats[targetJid].activePedidoId = pedidoId;
+            }
+            await db.set('chats', chats).write();
+
+            const mapping = db.get('pedidoIdToJid').value() || {};
+            mapping[String(pedidoId)] = targetJid;
+            await db.set('pedidoIdToJid', mapping).write();
+        }
         if (isFinalizedStatus) {
             const surveysSent = db.get('surveysSent').value() || {};
             if (surveysSent[pedidoId]) {
