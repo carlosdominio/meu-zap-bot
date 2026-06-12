@@ -339,6 +339,31 @@ app.post('/api/notify-delivery', async (req, res) => {
     }
 });
 
+// ROTA PARA SINCRONIZAR STATUS DO CAIXA COM O PAINEL ADM
+app.post('/api/sync-caixa', async (req, res) => {
+    let input = req.body.status !== undefined ? req.body.status : req.body.caixaFechado;
+    if (input === undefined) return res.status(400).json({ error: 'Status ou caixaFechado é obrigatório' });
+    
+    let normalized = "auto";
+    const val = String(input).toLowerCase().trim();
+
+    if (val === 'fechado' || val === 'true' || val === '1') {
+        normalized = 'fechado';
+    } else if (val === 'aberto' || val === 'false' || val === '0') {
+        normalized = 'aberto';
+    } else {
+        normalized = 'auto';
+    }
+    
+    if (db) {
+        await db.get('settings').set('caixaFechado', normalized).write();
+        io.emit('status_caixa', normalized);
+        console.log(`🏪 [Sincronização] Status do Caixa atualizado via API para: ${normalized.toUpperCase()}`);
+        return res.json({ success: true, status: normalized });
+    }
+    res.status(500).json({ error: 'DB não pronto' });
+});
+
 let statusConexao = "DESCONECTADO";
 let sock = null;
 let lastQr = null;
@@ -445,13 +470,17 @@ async function saveMessage(jid, msg, name) {
 function isStoreOpen() {
     if (!db) return true;
     const settings = db.get('settings').value() || {};
-    
     const status = settings.caixaFechado;
 
-    // Se estiver em 'aberto', o robô funciona sempre
-    if (status === 'aberto') return true;
-    
-    // Caso contrário (modo 'auto'), segue o horário programado
+    console.log(`🔍 [Status Check] caixaFechado:`, status);
+
+    // Se "fechado", "true" ou true (booleano) -> Fechado (false)
+    if (status === 'fechado' || status === 'true' || status === true) return false;
+
+    // Se "aberto", "false" ou false (booleano) -> Aberto (true)
+    if (status === 'aberto' || status === 'false' || status === false) return true;
+
+    // Caso contrário (modo 'auto' ou qualquer outra coisa), segue o horário programado
     const now = new Date();
     const localized = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     

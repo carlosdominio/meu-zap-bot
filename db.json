@@ -18,13 +18,71 @@
           "time": "16:17",
           "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB09DD76FA3DFFC58A375",
+          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1569*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "fromMe": true,
+          "time": "18:44",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB01263874DEFBB2C9256",
+          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1572*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "fromMe": true,
+          "time": "18:56",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "f-1781215035345",
+          "text": "Olá, cliente! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1572\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "18:57",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB034C685406CF0771FF1",
+          "from": "82993225452@s.whatsapp.net",
+          "text": "Olá, cliente! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1572\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "18:57",
+          "sender": "82993225452@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB09596767E7DF8596A1D",
+          "text": "Olá, cliente! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1572\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "18:57",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0A7E5ABB1D8EC7C9AC5",
+          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1572*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "fromMe": true,
+          "time": "18:57",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0913F48F24B99589A08",
+          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "18:57",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
         }
       ],
       "unreadCount": 0,
-      "lastUpdate": 1781205450184,
-      "estado": "delivery",
-      "activePedidoId": "1557",
-      "ultimoPedidoId": "1557"
+      "lastUpdate": 1781215061740,
+      "estado": "normal",
+      "activePedidoId": null,
+      "ultimoPedidoId": "1572",
+      "surveyPending": true
     },
     "558293157048@s.whatsapp.net": {
       "name": "Pedidos Zap 📦",
@@ -496,864 +554,1080 @@
           "time": "18:04",
           "sender": "558293157048@s.whatsapp.net",
           "pushName": "Voce"
+        },
+        {
+          "id": "3EB02D1ACD4AF50885F8E9",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1569\n🗑️ O pedido foi removido do sistema.",
+          "fromMe": true,
+          "time": "18:44",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB04ACB5A8E5C76A731E5",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1570*\n📍 Mesa: DELIVERY #1570\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
+          "fromMe": true,
+          "time": "18:44",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB04B46AB29C71B90A997",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1570\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "18:47",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB02D871E3EB23D70AA96",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1570\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "18:48",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0A32D5CEAB79A427974",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1571*\n📍 Mesa: DELIVERY #1571\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
+          "fromMe": true,
+          "time": "18:50",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0D81352E58B4BD6DE2B",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1571\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "18:53",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0B2645F20A0C3F94F1B",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1571\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "18:54",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0A4D285EDF6F156C240",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1572*\n📍 Mesa: DELIVERY #1572\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
+          "fromMe": true,
+          "time": "18:55",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB068136D7DA846837B8C",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1572\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "18:57",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB08322A4C1955A8CE7E7",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1572\n🗑️ O pedido foi removido do sistema.",
+          "fromMe": true,
+          "time": "18:57",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB07DE0B1932EFB11DE72",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1573*\n📍 Mesa: DELIVERY #1573\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
+          "fromMe": true,
+          "time": "18:57",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB007EAB96FDE6A4E4A44",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1573\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "19:04",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB038B33392C7FEDAEF0B",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1573\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "19:09",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0014CEB83B1F97C1DF7",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1574*\n📍 Mesa: DELIVERY #1574\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
+          "fromMe": true,
+          "time": "19:10",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0227E0D8249101BD190",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1574\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "19:16",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0BC50FE4D41FE70E357",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1574\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "19:20",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0C1621D24FD4F09EFCE",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🚀 *NOVO PEDIDO #1575*\n📍 Mesa: DELIVERY #1575\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
+          "fromMe": true,
+          "time": "19:37",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB08F4D3A943031523933",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1575\n💰 O cliente solicitou a conta.",
+          "fromMe": true,
+          "time": "19:42",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0EB714B1D5F01B29596",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "19:44",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB00C05688A439641F512",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "19:44",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB01190B1EE9FCF1DFA31",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: Mesa 1\n🗑️ O pedido foi removido do sistema.",
+          "fromMe": true,
+          "time": "21:43",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Voce"
+        },
+        {
+          "id": "ACDB8A23EA1FE2B13F99691108D1292E",
+          "from": "558293157048@s.whatsapp.net",
+          "text": "",
+          "fromMe": false,
+          "time": "21:59",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "558293157048"
+        },
+        {
+          "id": "3EB09E3C53DD83B0A902B6",
+          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:59",
+          "sender": "558293157048@s.whatsapp.net",
+          "pushName": "Robô 🤖"
         }
       ],
-      "unreadCount": 15,
-      "lastUpdate": 1781211862919,
+      "unreadCount": 0,
+      "lastUpdate": 1781225967734,
       "estado": "normal"
     },
     "115328914817201@lid": {
       "name": "Carlos Leonidio",
       "messages": [
         {
-          "id": "ACFF4C4C42022549170859A2CFC179DA",
+          "id": "AC49D14B9FE198F766B135DBFB0E88B8",
           "from": "115328914817201@lid",
-          "text": "1",
+          "text": "0",
           "fromMe": false,
-          "time": "16:39",
+          "time": "18:48",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0C57D4ECC4B550ACC1F",
+          "id": "3EB051BC23EAFEE12C92AA",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "18:48",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC2C6178FA1AE9DF686FA56094AAE163",
+          "from": "115328914817201@lid",
+          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1571\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 115\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "fromMe": false,
+          "time": "18:50",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB026344A4130AF6CD303",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1571* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "fromMe": true,
+          "time": "18:50",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC42090B6B0A0D3D85FF3FAEFBB3C0D1",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "fromMe": false,
+          "time": "18:50",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB05D7EE3F8CE10A74C7C",
+          "text": "📦 *ACOMPANHAMENTO DO PEDIDO #1571*\n\nOlá Carlos Leonidio, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *undefined*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨",
+          "fromMe": true,
+          "time": "18:50",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "ACE689CFDC90AA965DCB560DF518BF44",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "fromMe": false,
+          "time": "18:51",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB028F105682C94DC311F",
+          "text": "📦 *ACOMPANHAMENTO DO PEDIDO #1571*\n\nOlá Carlos Leonidio, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *Em processamento... ⏳*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨",
+          "fromMe": true,
+          "time": "18:51",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB091471C8D750E180F3B",
+          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1571*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "fromMe": true,
+          "time": "18:51",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC9B4BCA8E598A4C875D65531ACF14AC",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "fromMe": false,
+          "time": "18:51",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0757BC709FEE34BB873",
+          "text": "📦 *ACOMPANHAMENTO DO PEDIDO #1571*\n\nOlá Carlos Leonidio, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *Em processamento... ⏳*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨",
+          "fromMe": true,
+          "time": "18:51",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "f-1781214807514",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1571\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "18:53",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0C888B65421052E0FAD",
+          "from": "115328914817201@lid",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1571\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "18:53",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB08FAD5DDA397B90B935",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1571\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "18:53",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0CE2B067556B89EAF47",
+          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "18:53",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC6D169B09D750E1CDACE7E98BA73C59",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "fromMe": false,
+          "time": "18:54",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "survey-thanks-1781214857431",
+          "text": "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar.",
+          "fromMe": true,
+          "time": "18:54",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB08C635D74BDBD3C9AA1",
+          "from": "115328914817201@lid",
+          "text": "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar.",
+          "fromMe": true,
+          "time": "18:54",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "ACFD502DF64606693E15275E27D3A966",
+          "from": "115328914817201@lid",
+          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1573\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 11\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Água Mineral (R$ 4.00)\n\n💵 *Subtotal:* R$ 4.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 7.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "fromMe": false,
+          "time": "18:57",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB03CBDF1E51024F80808",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1573* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "fromMe": true,
+          "time": "18:57",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0BA5D39E8C1199BD7BB",
+          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1573*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "fromMe": true,
+          "time": "18:58",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC740D774E48579EAED95026FC7AB588",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "fromMe": false,
+          "time": "18:58",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0FD33C65B6CEB0FE88E",
+          "text": "📦 *ACOMPANHAMENTO DO PEDIDO #1573*\n\nOlá Carlos Leonidio, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *undefined*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨",
+          "fromMe": true,
+          "time": "18:58",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "f-1781215473192",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1573\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "19:04",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB079F49D991B08E6B6D5",
+          "from": "115328914817201@lid",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1573\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "19:04",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB034085A8EC5000383B2",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1573\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "19:04",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB050717BCB877E447211",
+          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "19:04",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "ACF700B082EEE3E1A35161E5F0886F3C",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "fromMe": false,
+          "time": "19:05",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "survey-thanks-1781215537662",
+          "text": "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar.",
+          "fromMe": true,
+          "time": "19:05",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0231ACCE4D411515307",
+          "from": "115328914817201@lid",
+          "text": "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar.",
+          "fromMe": true,
+          "time": "19:05",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC9659CCB9CB7194FB1D768F1D9DC54A",
+          "from": "115328914817201@lid",
+          "text": "Cardápio",
+          "fromMe": false,
+          "time": "19:05",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB04F709AD8F0C3500434",
           "text": "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉",
           "fromMe": true,
-          "time": "16:39",
+          "time": "19:05",
           "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB0756AF83D231C7E76EB",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1554\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "16:39",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACC5C637688DCE184954DAF2E300FFE3",
+          "id": "AC2A55BD7DC116C96A46AE25361002EA",
           "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1555\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* Rua Demócrito Gracindo, 117\n📍 *Bairro/Ref:* Ponta Grossa\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1574\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 116\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Água Mineral (R$ 4.00)\n\n💵 *Subtotal:* R$ 4.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 7.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
           "fromMe": false,
-          "time": "16:43",
+          "time": "19:10",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB03CCD0C9D4B35F89E99",
+          "id": "3EB031902985F32329953D",
           "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1555* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1574* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
           "fromMe": true,
-          "time": "16:43",
+          "time": "19:10",
           "sender": "115328914817201@lid",
           "pushName": "Voce"
         },
         {
-          "id": "3EB00E6689F2EC5001C157",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1555\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "id": "3EB0929988C865D0D27464",
+          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1574*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
           "fromMe": true,
-          "time": "16:44",
+          "time": "19:10",
           "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "ACB4D2457E1C824C88C2C865418D9940",
+          "id": "ACD47D98F11D747CAE3181343DCFCC8A",
+          "from": "115328914817201@lid",
+          "text": "#1574",
+          "fromMe": false,
+          "time": "19:11",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0920D286907A0C97987",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "19:11",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "ACE98FD96FA05FC2B18A4D779A158A3A",
+          "from": "115328914817201@lid",
+          "text": "Status 1574",
+          "fromMe": false,
+          "time": "19:11",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB02B35B1FED5718428F3",
+          "text": "📦 *ACOMPANHAMENTO DO PEDIDO #1574*\n\nOlá Carlos Leonidio, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *undefined*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨",
+          "fromMe": true,
+          "time": "19:12",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC82B85956C9F8D2213250DFF98A9250",
+          "from": "115328914817201@lid",
+          "text": "#1574",
+          "fromMe": false,
+          "time": "19:15",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0BED5CA73449B28D27D",
+          "text": "Olá Carlos Leonidio! 👋\n\nIdentificamos que você tem um pedido ativo conosco! 🛍️\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "fromMe": true,
+          "time": "19:16",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC8407150D814DF6C1EE744D36C1F6BB",
           "from": "115328914817201@lid",
           "text": "1",
           "fromMe": false,
-          "time": "16:45",
+          "time": "19:16",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0262E54F36107C4E063",
-          "text": "📦 *ACOMPANHAMENTO DO PEDIDO #1555*\n\nOlá Carlos Leonidio, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *undefined*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨",
+          "id": "3EB082B6C3AFC77D2AF8BB",
+          "text": "📦 *ACOMPANHAMENTO DO PEDIDO #1574*\n\nOlá Carlos Leonidio, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *undefined*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨",
           "fromMe": true,
-          "time": "16:45",
+          "time": "19:16",
           "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB089DDBA47052041FBB9",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1555*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "id": "f-1781216200028",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1574\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
           "fromMe": true,
-          "time": "16:46",
+          "time": "19:16",
           "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "AC30068A11162D9A67A7AF08378E7DE1",
+          "id": "3EB05345100296386301CE",
           "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1556\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Cerveja Skol 600ml (R$ 12.00)\n\n💵 *Subtotal:* R$ 12.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 15.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
-          "fromMe": false,
-          "time": "16:47",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB0E24213B503B6001F4D",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1556* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1574\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
           "fromMe": true,
-          "time": "16:47",
+          "time": "19:16",
           "sender": "115328914817201@lid",
           "pushName": "Voce"
         },
         {
-          "id": "3EB07F34FBECD7902FBFFA",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1556*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "id": "3EB01600CAEF131CA69E30",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1574\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
           "fromMe": true,
-          "time": "16:47",
+          "time": "19:16",
           "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB04EC6BA42AFC43FC7A5",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1556\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "16:47",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACF6EC6106478A936538F16048FD0185",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1557\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
-          "fromMe": false,
-          "time": "16:51",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB0BED9998E404BA95544",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1557* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
-          "fromMe": true,
-          "time": "16:51",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB06D8265621430BE0146",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1557*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "16:51",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB00D592B4C854E150976",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1557\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "16:52",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0EC6BE9D57BF3FD2FDD",
+          "id": "3EB0483E29E9A1AB33C345",
           "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
           "fromMe": true,
-          "time": "16:52",
+          "time": "19:17",
           "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB03558CCF2E983081F94",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1557\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "16:53",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "AC4AE67023CC4239548D604320F4884A",
+          "id": "ACB90C001E3718D6CE54F808CD43721A",
           "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1558\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "text": "5",
           "fromMe": false,
-          "time": "16:58",
+          "time": "19:17",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB011103D550D005CB789",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1558* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "id": "survey-thanks-1781216237200",
+          "text": "Ficamos muito felizes que você gostou! 😍 Obrigado pela nota máxima! Sua satisfação é o que nos move. Até a próxima! 🍻",
           "fromMe": true,
-          "time": "16:58",
+          "time": "19:17",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB00494E8C2988F0DD827",
+          "from": "115328914817201@lid",
+          "text": "Ficamos muito felizes que você gostou! 😍 Obrigado pela nota máxima! Sua satisfação é o que nos move. Até a próxima! 🍻",
+          "fromMe": true,
+          "time": "19:17",
           "sender": "115328914817201@lid",
           "pushName": "Voce"
         },
         {
-          "id": "3EB0CE6CC042D496802AF9",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1558*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "16:58",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB06C1B36283FD0AB4549",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1558\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "16:59",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACB6E0DE9E0508748072D054DD06859B",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1559\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
-          "fromMe": false,
-          "time": "17:02",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB0724B5E0E7088A30AB8",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1559* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
-          "fromMe": true,
-          "time": "17:02",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB03A6838ACE72FED236D",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1559*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:02",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "force-delivery-1781208157656",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1559\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:02",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0409AAD3CFD187ECC88",
-          "from": "115328914817201@lid",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1559\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:02",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0B45CBF49C9463613A2",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1559\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:02",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB03C61578C95A173FF4C",
-          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:03",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "AC9FD0336FBCA2D252D004FE79AEF876",
-          "from": "115328914817201@lid",
-          "text": "1",
-          "fromMe": false,
-          "time": "17:03",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "survey-thanks-1781208211203",
-          "text": "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar.",
-          "fromMe": true,
-          "time": "17:03",
-          "sender": "115328914817201@lid",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB05701591DDD29562808",
-          "from": "115328914817201@lid",
-          "text": "Sentimos muito que sua experiência não foi como esperava. 😔 Agradecemos a nota e vamos usar seu feedback para melhorar.",
-          "fromMe": true,
-          "time": "17:03",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "ACFC54196B68A8861EB8518201CC6A5E",
+          "id": "AC53950836AB9D371C190366BA701623",
           "from": "115328914817201@lid",
           "text": "Ok",
           "fromMe": false,
-          "time": "17:03",
+          "time": "19:17",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0BFF95C4CD6B30AEBEE",
+          "id": "3EB0914A1925C4329A19B5",
           "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
           "fromMe": true,
-          "time": "17:03",
+          "time": "19:17",
           "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "AC96F869A5BACF3A41B68BF94A28F734",
+          "id": "ACB87CE2D438ABEC23019C5A869E6086",
           "from": "115328914817201@lid",
           "text": "1",
           "fromMe": false,
-          "time": "17:03",
+          "time": "19:17",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB07B3A2397E75A6CFB95",
+          "id": "3EB0A9387D4116299AD9D3",
           "text": "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉",
           "fromMe": true,
-          "time": "17:03",
+          "time": "19:17",
           "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB0DF6E7A38ADCA0B07C4",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1559*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:09",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACEE22A22478640575A25268088A7A8D",
+          "id": "ACB9FD1A360E8F7CECA01792F2A9E412",
           "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1560\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "text": "Cardápio",
           "fromMe": false,
-          "time": "17:10",
+          "time": "19:17",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB03E05DDCCB8CB2BABF7",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1560* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "id": "3EB0D4F459223A6E9AE00D",
+          "text": "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉",
           "fromMe": true,
-          "time": "17:10",
+          "time": "19:17",
           "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB049C81B817D3425C900",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1560*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:10",
-          "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB042DAD3BBAF679391B5",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1560\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:11",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0E52491F619468F941B",
-          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:11",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0B9A9F445CF13F1CE5C",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1560\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:17",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACD29072ABAAFA01F58525F0A6018867",
+          "id": "ACEA53C16F4D94012A4F0C840AC0DDAE",
           "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1561\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "text": "Menu",
           "fromMe": false,
-          "time": "17:18",
+          "time": "19:17",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0DC44DCA05ABA0D0E52",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1561* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "id": "3EB09847EA8FE8DE1DB956",
+          "text": "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉",
           "fromMe": true,
-          "time": "17:18",
+          "time": "19:18",
           "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0CBB1276B770DC813B6",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1561*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:18",
-          "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB02C1F8847978D46A5C8",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1561\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:18",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0F43EE041DAF65918F7",
-          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:18",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0EACF6EF3C534B9A77A",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1561\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:19",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACF86B0CB1A4FAEADEF248C2DB364037",
+          "id": "AC6BD5670106A133AF27478BBCBDE6A1",
           "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1562\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Cerveja Skol 600ml (R$ 12.00)\n\n💵 *Subtotal:* R$ 12.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 15.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "text": "Endereço",
           "fromMe": false,
-          "time": "17:24",
+          "time": "19:18",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0FEFE335D26B8DFBFA0",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1562* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "id": "3EB095A9F548AA4F9F5964",
+          "text": "📍 *ONDE ESTAMOS E QUANDO ABRIMOS*\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n_Venha nos visitar ou peça no conforto do seu sofá!_ 🏠🍻",
           "fromMe": true,
-          "time": "17:24",
+          "time": "19:18",
           "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0ABC763DACC07735FEA",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1562*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:24",
-          "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "f-1781209494131",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1562\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:24",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB05A745289B79094CAA7",
+          "id": "AC2FBD06E00D22F0A2AADF288F28849A",
           "from": "115328914817201@lid",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1562\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:24",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB03B599560398817E6AE",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1562\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:25",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0B6481FA8EA995DAB96",
-          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:25",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB00396188FFE3A90D7A9",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1562*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:28",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACDEBF84A5194378B167B3B663A5851B",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1563\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Cerveja Skol 600ml (R$ 12.00)\n\n💵 *Subtotal:* R$ 12.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 15.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "text": "#1574",
           "fromMe": false,
-          "time": "17:28",
+          "time": "19:18",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0C8FC0CF518CD4ABC66",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1563* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
+          "id": "3EB09352A6043EA9027B96",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
           "fromMe": true,
-          "time": "17:29",
+          "time": "19:18",
           "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB052CEA7947F83AAD5B3",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1563*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:29",
-          "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "f-1781209767947",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1563\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:29",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB052E19813E194A61D2F",
+          "id": "ACEBA6D32612A51E7C5631AF5C3752EB",
           "from": "115328914817201@lid",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1563\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:29",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0B5C49287BBA898E0E5",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1563\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:29",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB07B2657B1EBBF8D706B",
-          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:29",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB09AFB497BF3F713882A",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1563*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:32",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "AC393A976ABE331A6CA24F141B2E22D5",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1564\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, Q17\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Cerveja Skol 600ml (R$ 12.00)\n\n💵 *Subtotal:* R$ 12.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 15.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
+          "text": "Promoções",
           "fromMe": false,
-          "time": "17:32",
+          "time": "19:19",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB02884981991CBD51664",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1564* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
-          "fromMe": true,
-          "time": "17:33",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0D4FA9702F337B9A94C",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1564*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:33",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0071F956B6BDA5C10EF",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1564\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:33",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "AC82029C0082FE9811973F7DA3D8B78E",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1565\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 117\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Cerveja Skol 600ml (R$ 12.00)\n\n💵 *Subtotal:* R$ 12.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 15.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
-          "fromMe": false,
-          "time": "17:38",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB03DEC131EF01D2FC79B",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1565* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
-          "fromMe": true,
-          "time": "17:38",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0690A2D80570868511F",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1565*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:39",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB032C9B5C3E12FA6000F",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1565\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:39",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACD9ED5A0A827DB9EEDE6614878D9065",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1566\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 11\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
-          "fromMe": false,
-          "time": "17:43",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB0C785D10A9904DEB5B3",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1566* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
-          "fromMe": true,
-          "time": "17:43",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB04F993DBA96DC0021FC",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1566*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:43",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "f-1781210624924",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1566\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:43",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0CE917E63A2B622ACDA",
-          "from": "115328914817201@lid",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1566\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:43",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB00BA4B280B049A6B53C",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1566\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:43",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0F0F8DE0BDF8B610318",
-          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:44",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB011F222C2092B1B340D",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1566\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:51",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACD78B5B3363029CDBAD82E390A65D93",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1567\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 11\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Cerveja Skol 600ml (R$ 12.00)\n\n💵 *Subtotal:* R$ 12.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 15.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
-          "fromMe": false,
-          "time": "17:52",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB057FABE2FE8294EDE89",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1567* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
-          "fromMe": true,
-          "time": "17:52",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB06716BA03CCE6FB021E",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1567*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:52",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB085F8FFE8200EE06B4D",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1567*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:54",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "AC12C0F7413FC3001931EDE805CBC43B",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1568\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 118\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Água Mineral (R$ 4.00)\n- 3x Cerveja Skol 600ml (R$ 36.00)\n\n💵 *Subtotal:* R$ 40.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 43.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
-          "fromMe": false,
-          "time": "17:55",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB0F6ACA7EF7CF28802AD",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1568* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
-          "fromMe": true,
-          "time": "17:55",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0EE5003820E316B6047",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1568*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "17:56",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "f-1781211378012",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1568\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:56",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0EA02F9471B9F269F04",
-          "from": "115328914817201@lid",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1568\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:56",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0C72CEE6EA235798CC1",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1568\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:56",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0052B52BC5D004B3654",
-          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "17:56",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "AC9F6E044F728D5CFB81DFF7AA0F5E98",
-          "from": "115328914817201@lid",
-          "text": "32",
-          "fromMe": false,
-          "time": "17:59",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB077E2132B7CFB43BCE5",
+          "id": "3EB0A23CB915EAA467601A",
           "text": "🔥 *PROMOÇÕES IMPERDÍVEIS DE HOJE*\n\n✨ *Heineken *\n💰 Por apenas: *R$ 7.00*\n\n✨ *Stella Artois *\n💰 Por apenas: *R$ 8.50*\n\n✨ *Amstel *\n💰 Por apenas: *R$ 7.00*\n\n✨ *Guenga*\n💰 Por apenas: *R$ 12.00*\n\n✨ *Feijão *\n💰 Por apenas: *R$ 7.00*\n\n✨ *Batata Frita - Grande*\n💰 Por apenas: *R$ 20.00*\n\n_Aproveite antes que acabe!_ 🏃💨",
           "fromMe": true,
-          "time": "17:59",
+          "time": "19:19",
           "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "AC169B87D0877513788B80EEBF846DE9",
+          "id": "ACCEC7B252A88455DE0386BEFFCF7E67",
           "from": "115328914817201@lid",
-          "text": "3",
+          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1575\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 115\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Água Mineral (R$ 4.00)\n\n💵 *Subtotal:* R$ 4.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 7.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
           "fromMe": false,
-          "time": "17:59",
+          "time": "19:37",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "survey-thanks-1781211568891",
-          "text": "Obrigado pelo seu feedback! 👍 Vamos trabalhar para que sua próxima experiência seja nota 5. Se tiver alguma sugestão, pode mandar aqui! 📝",
-          "fromMe": true,
-          "time": "17:59",
-          "sender": "115328914817201@lid",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB08477D1AA29B20A83BB",
+          "id": "3EB097480197F704768A2A",
           "from": "115328914817201@lid",
-          "text": "Obrigado pelo seu feedback! 👍 Vamos trabalhar para que sua próxima experiência seja nota 5. Se tiver alguma sugestão, pode mandar aqui! 📝",
+          "text": "Olá Carlos Leonidio! 👋\\n\\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\\n\\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1575* já caiu em nosso sistema e está na fila de preparo! 🚀\\n\\n💡 *O que acontece agora?*\\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\\n\\n👇 *Opções:* \\n1️⃣ - Ver Status Atual 🛵\\n2️⃣ - Falar com Atendente 👨‍💻",
           "fromMe": true,
-          "time": "17:59",
+          "time": "19:37",
           "sender": "115328914817201@lid",
           "pushName": "Voce"
         },
         {
-          "id": "AC4ACC28A9F334A42B0B70688CDB35C0",
+          "id": "3EB0B94C5F69CCB4601200",
+          "text": "Olá Carlos Leonidio! 👋\\n\\n🔔 *ATUALIZAÇÃO DO PEDIDO #1575*\\n\\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\\n\\nAtenciosamente,\\n*Equipe GuGA Bebidas* 🍻",
+          "fromMe": true,
+          "time": "19:38",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC413E6321293F3AEDFA0D51766F2011",
           "from": "115328914817201@lid",
-          "text": "Ok",
+          "text": "1",
           "fromMe": false,
-          "time": "17:59",
+          "time": "19:42",
           "sender": "115328914817201@lid",
           "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0DEE622A418C804BFA2",
+          "id": "3EB01D586084A76C7DEDA7",
+          "text": "📦 *ACOMPANHAMENTO DO PEDIDO #1575*\n\nOlá Carlos Leonidio, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *undefined*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨",
+          "fromMe": true,
+          "time": "19:42",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "f-1781217779484",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1575\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "19:42",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0557A76CDA4D69BD6AC",
+          "from": "115328914817201@lid",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1575\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "19:42",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0449D8F92C22BABBC44",
+          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1575\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "19:43",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0B738AEE62DBC0E44AC",
+          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "19:43",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "ACBB96A818C3EB8C2F727C28F1B998A1",
+          "from": "115328914817201@lid",
+          "text": "Oka",
+          "fromMe": false,
+          "time": "21:44",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB04850385F6F47BEFD3D",
+          "from": "115328914817201@lid",
           "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
           "fromMe": true,
-          "time": "17:59",
+          "time": "21:44",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0FE014DC4A82A11F8B1",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:44",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC9ECD2142D02749636B80E45BE89EBD",
+          "from": "115328914817201@lid",
+          "text": "Ola",
+          "fromMe": false,
+          "time": "21:44",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB000628F6F2C27056E81",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:45",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0A957EBFACDA3D725A0",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:45",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC9F21C20D0971FB67306CEBD05CE9F3",
+          "from": "115328914817201@lid",
+          "text": "Oi",
+          "fromMe": false,
+          "time": "21:49",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0545D811C8749112986",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:49",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0FE63D9536CD0586333",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:49",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC464C59501CF0F88799C6C04346F8D4",
+          "from": "115328914817201@lid",
+          "text": "A",
+          "fromMe": false,
+          "time": "21:50",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB078FBD5131F9313D39C",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:50",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0C96E6288F8F3AF1017",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:50",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC57E72FDAF30FF7F4E8C21E0CCD56E2",
+          "from": "115328914817201@lid",
+          "text": "Aa",
+          "fromMe": false,
+          "time": "21:52",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0D1769D8F7DC5854801",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:52",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB01517717CCFF7C480B7",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:52",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC6428F6B1CF65CA3BC7FE99732F40D4",
+          "from": "115328914817201@lid",
+          "text": "W",
+          "fromMe": false,
+          "time": "21:56",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0011EF564E99B6512EB",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:56",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB034B95FCDB8A261B77B",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "21:56",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC2A67EE932B9AB66135F5861576AB56",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "fromMe": false,
+          "time": "21:58",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB01033AE60B036F26FC1",
+          "text": "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉",
+          "fromMe": true,
+          "time": "21:58",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB03A56EA17578DDCA1E0",
+          "from": "115328914817201@lid",
+          "text": "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉",
+          "fromMe": true,
+          "time": "21:58",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC5ACED2C34A6B2A7687EB60A279603F",
+          "from": "115328914817201@lid",
+          "text": "1",
+          "fromMe": false,
+          "time": "21:59",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB09DFFB7CC41D38D8839",
+          "text": "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉",
+          "fromMe": true,
+          "time": "21:59",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC3D1DD0588A254DDEA6969DAD3D9449",
+          "from": "115328914817201@lid",
+          "text": "U",
+          "fromMe": false,
+          "time": "22:02",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0D26AE07E306CB528B0",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "22:02",
+          "sender": "115328914817201@lid",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC71F9D195B3E0E8864CE82065DB395C",
+          "from": "115328914817201@lid",
+          "text": "S",
+          "fromMe": false,
+          "time": "22:03",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB05D935B3493C38B0F7A",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "22:03",
           "sender": "115328914817201@lid",
           "pushName": "Robô 🤖"
         }
       ],
-      "unreadCount": 6,
-      "lastUpdate": 1781211582871,
+      "unreadCount": 0,
+      "lastUpdate": 1781226189143,
       "estado": "normal",
       "activePedidoId": null,
-      "ultimoPedidoId": "1568",
+      "ultimoPedidoId": "1575",
       "surveyPending": false
     }
   },
@@ -1424,6 +1698,13 @@
     "1566": "115328914817201@lid",
     "1567": "115328914817201@lid",
     "1568": "115328914817201@lid",
+    "1569": "82993225452@s.whatsapp.net",
+    "1570": "115328914817201@lid",
+    "1571": "115328914817201@lid",
+    "1572": "82993225452@s.whatsapp.net",
+    "1573": "115328914817201@lid",
+    "1574": "115328914817201@lid",
+    "1575": "115328914817201@lid",
     "7777": "558293157048@lid",
     "8888": "558293157048@lid",
     "9999": "5582993225452@s.whatsapp.net",
@@ -1431,7 +1712,7 @@
     "12346": "558294247688@s.whatsapp.net"
   },
   "settings": {
-    "caixaFechado": "aberto"
+    "caixaFechado": "auto"
   },
   "lastNotifications": {
     "1518": "entregue",
@@ -1458,7 +1739,14 @@
     "1565": "ENTREGUE",
     "1566": "ENTREGUE",
     "1567": "CANCELADO",
-    "1568": "FINALIZADO"
+    "1568": "FINALIZADO",
+    "1569": "CANCELADO",
+    "1570": "FINALIZADO",
+    "1571": "FINALIZADO",
+    "1572": "CANCELADO",
+    "1573": "FINALIZADO",
+    "1574": "FINALIZADO",
+    "1575": "FINALIZADO"
   },
   "surveysSent": {
     "1518": true,
@@ -1471,6 +1759,12 @@
     "1562": true,
     "1563": true,
     "1566": true,
-    "1568": true
+    "1568": true,
+    "1570": true,
+    "1571": true,
+    "1572": true,
+    "1573": true,
+    "1574": true,
+    "1575": true
   }
 }
