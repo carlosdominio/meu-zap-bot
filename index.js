@@ -425,10 +425,10 @@ io.on('connection', (socket) => {
 
     socket.on('toggle_caixa', async (status) => {
         if (db) {
-            await db.get('settings').set('caixaFechado', status).write();
-            io.emit('status_caixa', status);
-            const statusLabel = typeof status === 'string' ? status.toUpperCase() : (status ? 'FECHADO' : 'ABERTO');
-            console.log(`🏪 [Loja] Status do Caixa alterado para: ${statusLabel}`);
+            const normalized = String(status).toLowerCase().trim();
+            await db.get('settings').set('caixaFechado', normalized).write();
+            io.emit('status_caixa', normalized);
+            console.log(`🏪 [Painel] Status do Caixa alterado manualmente para: ${normalized.toUpperCase()}`);
         }
     });
 
@@ -470,27 +470,33 @@ async function saveMessage(jid, msg, name) {
 function isStoreOpen() {
     if (!db) return true;
     const settings = db.get('settings').value() || {};
-    const status = settings.caixaFechado;
+    const status = String(settings.caixaFechado || 'auto').toLowerCase().trim();
 
-    console.log(`🔍 [Status Check] caixaFechado:`, status);
+    console.log(`🏪 [Caixa] Verificando status atual: "${status.toUpperCase()}"`);
 
-    // Se "fechado", "true" ou true (booleano) -> Fechado (false)
-    if (status === 'fechado' || status === 'true' || status === true) return false;
+    // Prioridade 1: Manual Fechado
+    if (status === 'fechado' || status === 'true' || status === '1') {
+        console.log("🚫 [Caixa] BLOQUEADO: Comando manual de FECHADO ativo.");
+        return false;
+    }
+    
+    // Prioridade 2: Manual Aberto
+    if (status === 'aberto' || status === 'false' || status === '0') {
+        console.log("✅ [Caixa] LIBERADO: Comando manual de ABERTO ativo.");
+        return true;
+    }
 
-    // Se "aberto", "false" ou false (booleano) -> Aberto (true)
-    if (status === 'aberto' || status === 'false' || status === false) return true;
-
-    // Caso contrário (modo 'auto' ou qualquer outra coisa), segue o horário programado
+    // Prioridade 3: Automático (Horário)
     const now = new Date();
     const localized = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-    
     const day = localized.getDay(); 
     const hour = localized.getHours();
-
     const isNightOpen = (hour >= 18 && [2, 3, 4, 5, 6, 0].includes(day));
     const isEarlyMorningOpen = (hour < 2 && [3, 4, 5, 6, 0, 1].includes(day));
 
-    return isNightOpen || isEarlyMorningOpen;
+    const open = isNightOpen || isEarlyMorningOpen;
+    console.log(`📅 [Caixa] Modo AUTO: Loja está ${open ? 'ABERTA' : 'FECHADA'} pelo horário.`);
+    return open;
 }
 
 async function connectToWhatsApp() {
@@ -551,13 +557,16 @@ async function connectToWhatsApp() {
 
         if (fromMe) return;
 
-        // --- TRAVA DE CAIXA FECHADO (FORA DO HORÁRIO) ---
+        // --- VERIFICAÇÃO DE STATUS DA LOJA (LOG EM TEMPO REAL) ---
+        const storeOpen = isStoreOpen();
         const chats = db.get('chats').value() || {};
         const chatData = chats[jid] || {};
         const hasActiveOrder = chatData.estado === 'delivery' && chatData.activePedidoId;
 
-        if (!isStoreOpen() && !hasActiveOrder) {
-            console.log(`🔌 [Fechado] Mensagem de ${jid} ignorada por estar fora do horário.`);
+        console.log(`📩 [Mensagem] De: ${jid} | Loja Aberta: ${storeOpen} | Pedido Ativo: ${!!hasActiveOrder}`);
+
+        if (!storeOpen && !hasActiveOrder) {
+            console.log(`🚫 [Bloqueio] Caixa FECHADO. Enviando mensagem de fechamento para ${jid}`);
             const closedMsg = "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻";
             const s = await sendHumanizedMessage(jid, { text: closedMsg });
             if (s) {

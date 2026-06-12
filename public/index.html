@@ -115,12 +115,12 @@
 <div id="sidebar">
     <div id="sidebar-header">
         Conversas
-        <div style="float: right; display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: normal;">
-            <span id="caixa-label">Automático</span>
-            <label class="switch">
-                <input type="checkbox" id="caixa-toggle-input" onchange="toggleCaixa(this.checked)">
-                <span class="slider round"></span>
-            </label>
+        <div style="float: right; display: flex; align-items: center; gap: 5px;">
+            <select id="caixa-select" onchange="toggleCaixa(this.value)" style="padding: 2px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 11px; background: #f0f2f5; font-weight: bold; cursor: pointer;">
+                <option value="auto">📅 AUTO</option>
+                <option value="aberto">🟢 ABERTO</option>
+                <option value="fechado">🔴 FECHADO</option>
+            </select>
         </div>
     </div>
     <div id="chat-list"></div>
@@ -230,17 +230,24 @@
         }
     });
     socket.on('status_caixa', (status) => {
-        const input = document.getElementById('caixa-toggle-input');
-        const label = document.getElementById('caixa-label');
-        const isAberto = (status === 'aberto');
+        const select = document.getElementById('caixa-select');
+        const normalized = String(status).toLowerCase().trim();
         
-        input.checked = isAberto;
-        label.innerText = isAberto ? '🟢 Aberto' : '📅 Automático';
-        label.style.color = isAberto ? '#00a884' : '#3498db';
-        label.style.fontWeight = 'bold';
+        select.value = normalized;
+        
+        // Estilização dinâmica baseada no status
+        if (normalized === 'aberto') {
+            select.style.background = '#dcfce7'; // Verde claro
+            select.style.color = '#166534';
+        } else if (normalized === 'fechado') {
+            select.style.background = '#fee2e2'; // Vermelho claro
+            select.style.color = '#991b1b';
+        } else {
+            select.style.background = '#f0f2f5'; // Padrão/Auto
+            select.style.color = '#333';
+        }
     });
-    function toggleCaixa(checked) {
-        const val = checked ? 'aberto' : 'auto';
+    function toggleCaixa(val) {
         socket.emit('toggle_caixa', val);
     }
     function updateUnreadTitle() {
