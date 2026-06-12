@@ -113,11 +113,11 @@
     <img id="qr-img" src="" alt="QR Code" style="width: 250px; margin: 20px; display: none;">
 </div>
 <div id="sidebar">
-    <div id="sidebar-header">
-        Conversas
-        <div style="float: right; display: flex; align-items: center; gap: 5px;">
-            <select id="caixa-select" onchange="toggleCaixa(this.value)" style="padding: 2px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 11px; background: #f0f2f5; font-weight: bold; cursor: pointer;">
-                <option value="auto">📅 AUTO</option>
+    <div id="sidebar-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
+        <span style="font-size: 16px;">Conversas</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div id="status-badge" style="width: 10px; height: 10px; border-radius: 50%; background: #ccc; display: none; box-shadow: 0 0 5px rgba(0,0,0,0.2);"></div>
+            <select id="caixa-select" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 12px; background: #f0f2f5; font-weight: bold; cursor: pointer; outline: none; transition: all 0.2s;">
                 <option value="aberto">🟢 ABERTO</option>
                 <option value="fechado">🔴 FECHADO</option>
             </select>
@@ -148,9 +148,45 @@
         <button class="btn-action" onclick="enviar()">></button>
     </footer>
 </div>
+<script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-        const blockedNumbers = ['5582993225452', '82993225452']; // Nmeros ocultos no chat UI
+    // --- SINCRONIZAÇÃO PUSHER (OPCIONAL) ---
+    try {
+        const pusher = new Pusher('5b2b284e309dea9d90fb', { cluster: 'sa1' });
+        const channel = pusher.subscribe('garconnexpress');
+        
+        channel.bind_global((eventName, data) => {
+            console.log('📡 [Pusher] Evento:', eventName, data);
+            
+            // Tenta identificar mudança de status no payload
+            let newStatus = null;
+            if (data) {
+                if (data.status) newStatus = data.status;
+                else if (data.caixaFechado !== undefined) newStatus = data.caixaFechado;
+                else if (data.caixa !== undefined) newStatus = data.caixa;
+            }
+
+            if (newStatus) {
+                console.log('⚡ [Pusher] Mudança de status detectada:', newStatus);
+                const val = String(newStatus).toLowerCase().trim();
+                let normalized = "auto";
+                if (val === 'fechado' || val === 'true' || val === '1') normalized = 'fechado';
+                else if (val === 'aberto' || val === 'false' || val === '0') normalized = 'aberto';
+                
+                // Só emite se for um valor válido e diferente do que já temos
+                const select = document.getElementById('caixa-select');
+                if (select && select.value !== normalized) {
+                    console.log('🔄 [Pusher] Sincronizando interface via Pusher...');
+                    socket.emit('toggle_caixa', normalized);
+                }
+            }
+        });
+    } catch (e) {
+        console.error('❌ [Pusher] Erro ao carregar:', e.message);
+    }
+
+    const blockedNumbers = ['5582993225452', '82993225452']; // Nmeros ocultos no chat UI
         const socket = io();
     let currentJid = null;
     let chatData = {};
@@ -230,24 +266,72 @@
         }
     });
     socket.on('status_caixa', (status) => {
+        console.log('📢 [UI] Recebido status do caixa do servidor:', status);
         const select = document.getElementById('caixa-select');
+        const badge = document.getElementById('status-badge');
+        if (!select) return;
+
         const normalized = String(status).toLowerCase().trim();
         
-        select.value = normalized;
-        
-        // Estilização dinâmica baseada no status
+        // Só atualiza se for diferente do valor atual para evitar loops
+        if (select.value !== normalized) {
+            select.value = normalized;
+        }
+
+        // Estilização dinâmica baseada no status selecionado
         if (normalized === 'aberto') {
             select.style.background = '#dcfce7'; // Verde claro
             select.style.color = '#166534';
+            select.style.borderColor = '#166534';
+            if (badge) { badge.style.display = 'block'; badge.style.background = '#22c55e'; }
         } else if (normalized === 'fechado') {
             select.style.background = '#fee2e2'; // Vermelho claro
             select.style.color = '#991b1b';
+            select.style.borderColor = '#991b1b';
+            if (badge) { badge.style.display = 'block'; badge.style.background = '#ef4444'; }
         } else {
             select.style.background = '#f0f2f5'; // Padrão/Auto
             select.style.color = '#333';
+            select.style.borderColor = '#ccc';
+            if (badge) { badge.style.display = 'none'; }
+        }
+
+        console.log('✅ [UI] Select sincronizado com servidor para:', normalized);
+    });
+
+    // Inicializa listeners quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', () => {
+        const selectCaixa = document.getElementById('caixa-select');
+        if (selectCaixa) {
+            console.log('🎯 [UI] Listener do Caixa Select inicializado.');
+            selectCaixa.addEventListener('change', (e) => {
+                const val = e.target.value;
+                console.log('👆 [UI] Clique detectado no select, novo valor:', val);
+                
+                // Feedback visual instantâneo
+                if (val === 'aberto') {
+                    selectCaixa.style.background = '#dcfce7';
+                    selectCaixa.style.color = '#166534';
+                } else if (val === 'fechado') {
+                    selectCaixa.style.background = '#fee2e2';
+                    selectCaixa.style.color = '#991b1b';
+                } else {
+                    selectCaixa.style.background = '#f0f2f5';
+                    selectCaixa.style.color = '#333';
+                }
+
+                socket.emit('toggle_caixa', val);
+                
+                // Notifica o painel pai (Admin)
+                window.parent.postMessage({ type: 'caixa_status_change', status: val }, '*');
+            });
         }
     });
+
     function toggleCaixa(val) {
+        // Mantido apenas para compatibilidade legada se houver algum outro lugar chamando, 
+        // mas o listener acima é o principal agora.
+        console.log('👆 [UI] Função toggleCaixa legada chamada para:', val);
         socket.emit('toggle_caixa', val);
     }
     function updateUnreadTitle() {

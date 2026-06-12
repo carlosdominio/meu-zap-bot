@@ -16,11 +16,18 @@ let db;
 
 async function initDB() {
     db = await low(adapter);
-    await db.defaults({ chats: {}, pedidoIdToJid: {}, settings: { caixaFechado: false }, lastNotifications: {}, surveysSent: {} }).write();
+    await db.defaults({ chats: {}, pedidoIdToJid: {}, settings: { caixaFechado: 'aberto' }, lastNotifications: {}, surveysSent: {} }).write();
     console.log('✅ Banco de dados pronto');
 }
 
 const app = express();
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    if (req.method === 'OPTIONS') return res.sendStatus(200);
+    next();
+});
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -56,6 +63,7 @@ app.get('/qr', (req, res) => {
         res.send('<html><body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#e5ddd5;"> <div style="background:white;padding:40px;border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);text-align:center;"> <h2 style="color:#075e54;">⏳ Gerando QR Code...</h2> <p style="color:#666;">Aguarde alguns segundos e a página irá carregar o código.</p> </div> <script>setTimeout(() => { location.reload(); }, 3000);</script> </body></html>');
     }
 });
+
 const INACTIVITY_THRESHOLD = 15 * 60 * 1000; // 15 minutos
 const CHAT_EXPIRY_THRESHOLD = 24 * 60 * 60 * 1000; // 24 horas
 
@@ -345,15 +353,11 @@ app.post('/api/sync-caixa', async (req, res) => {
     let input = req.body.status !== undefined ? req.body.status : req.body.caixaFechado;
     if (input === undefined) return res.status(400).json({ error: 'Status ou caixaFechado é obrigatório' });
     
-    let normalized = "auto";
+    let normalized = "aberto";
     const val = String(input).toLowerCase().trim();
 
     if (val === 'fechado' || val === 'true' || val === '1') {
         normalized = 'fechado';
-    } else if (val === 'aberto' || val === 'false' || val === '0') {
-        normalized = 'aberto';
-    } else {
-        normalized = 'auto';
     }
     
     if (db) {
@@ -382,85 +386,6 @@ async function sendHumanizedMessage(jid, content, options = {}) {
     } catch (e) { throw e; }
 }
 
-io.on('connection', (socket) => {
-    socket.emit('status', { status: statusConexao });
-    if (lastQr) socket.emit('qr', lastQr);
-    if (db) {
-        socket.emit('history', db.get('chats').value());
-        
-        // Normaliza o status para o Painel Visual (Aberto, Fechado ou Auto)
-        const rawStatus = db.get('settings').value()?.caixaFechado;
-        const currentStatus = String(rawStatus || 'auto').toLowerCase().trim();
-        let normalized = "auto";
-        if (currentStatus === 'fechado' || currentStatus === 'true' || currentStatus === '1') normalized = 'fechado';
-        else if (currentStatus === 'aberto' || currentStatus === 'false' || currentStatus === '0') normalized = 'aberto';
-        
-        socket.emit('status_caixa', normalized);
-        socket.emit('status_caixa', normalized); // Envia duas vezes para garantir captura pelo socket
-    }
-
-    socket.on('send_msg', async (data) => {
-        let jid = data.number;
-        if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
-        await sendHumanizedMessage(jid, { text: data.text });
-    });
-
-    socket.on('send_image', async (data) => {
-        let jid = data.number;
-        if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
-        const buffer = Buffer.from(data.image.split(';base64,').pop(), 'base64');
-        const s = await sendHumanizedMessage(jid, { image: buffer });
-        const rObj = { id: s.key.id, text: '🖼️ Imagem', fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖", imageUrl: data.image };
-        await saveMessage(jid, rObj, "Robo");
-        io.emit('new_msg', rObj);
-    });
-
-    socket.on('mark_seen', async (jid) => {
-        if (db) {
-            const chats = db.get('chats').value() || {};
-            if (chats[jid]) { chats[jid].unreadCount = 0; await db.set('chats', chats).write(); }
-        }
-    });
-
-    socket.on('toggle_atendimento', async (data) => {
-        const { jid, status } = data;
-        if (db) {
-            const chats = db.get('chats').value() || {};
-            if (!chats[jid]) chats[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0 };
-            chats[jid].atendimentoManual = status;
-            await db.set('chats', chats).write();
-            io.emit('status_atendimento', { jid, atendimentoManual: status });
-        }
-    });
-
-    socket.on('toggle_caixa', async (status) => {
-        if (db) {
-            let normalized = "auto";
-            const val = String(status).toLowerCase().trim();
-
-            if (val === 'fechado' || val === 'true' || val === '1') {
-                normalized = 'fechado';
-            } else if (val === 'aberto' || val === 'false' || val === '0') {
-                normalized = 'aberto';
-            } else {
-                normalized = 'auto';
-            }
-
-            await db.get('settings').set('caixaFechado', normalized).write();
-            io.emit('status_caixa', normalized);
-            console.log(`🏪 [Painel] Status do Caixa alterado manualmente para: ${normalized.toUpperCase()}`);
-        }
-    });
-
-    socket.on('delete_chat', async (jid) => {
-        if (db) {
-            const chats = db.get('chats').value() || {};
-            delete chats[jid];
-            await db.set('chats', { ...chats }).write();
-            io.emit('chat_deleted', jid);
-        }
-    });
-});
 async function saveMessage(jid, msg, name) {
     if (!jid || jid.includes('@newsletter')) return;
     const chats = db.get('chats').value() || {};
@@ -487,44 +412,103 @@ async function saveMessage(jid, msg, name) {
     if (chats[jid].messages.length > 100) chats[jid].messages.shift();
     await db.set('chats', chats).write();
 }
+
 function isStoreOpen() {
     if (!db) return true;
     const settings = db.get('settings').value() || {};
     const rawValue = settings.caixaFechado;
-    const status = String(rawValue || 'auto').toLowerCase().trim();
 
-    console.log(`🏪 [Caixa] Status no DB: "${rawValue}" (Normalizado: "${status.toUpperCase()}")`);
-
-    // Prioridade 1: Manual Fechado
-    if (status === 'fechado' || status === 'true' || status === '1') {
-        console.log("🚫 [Caixa] Decisao: FECHADO (Comando manual ativo)");
-        return false;
-    }
-    
-    // Prioridade 2: Manual Aberto
-    if (status === 'aberto' || status === 'false' || status === '0') {
-        console.log("✅ [Caixa] Decisao: ABERTO (Comando manual ativo)");
-        return true;
+    // Normalização robusta: Assume 'aberto' como padrão
+    let status = "aberto";
+    if (rawValue === 'fechado' || rawValue === true || rawValue === 'true' || rawValue === '1') {
+        status = "fechado";
     }
 
-    // Prioridade 3: Automático (Horário)
-    const now = new Date();
-    const localized = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-    const day = localized.getDay(); 
-    const hour = localized.getHours();
+    const isOpen = status === 'aberto';
+    console.log(`🏪 [Caixa] Status no DB: "${rawValue}" | Loja Aberta: ${isOpen ? 'SIM' : 'NÃO'}`);
     
-    // Horário: 18h às 02h
-    // isNightOpen: 18h às 23:59h do dia atual (Terça a Domingo)
-    // isEarlyMorningOpen: 00h às 01:59h do dia seguinte (Quarta a Segunda)
-    // Dias getDay(): 0-Dom, 1-Seg, 2-Ter, 3-Qua, 4-Qui, 5-Sex, 6-Sab
-    
-    const isNightOpen = (hour >= 18 && [2, 3, 4, 5, 6, 0].includes(day));
-    const isEarlyMorningOpen = (hour < 2 && [3, 4, 5, 6, 0, 1].includes(day));
-
-    const open = isNightOpen || isEarlyMorningOpen;
-    console.log(`📅 [Caixa] Decisao MODO AUTO: Loja ${open ? 'ABERTA' : 'FECHADA'} pelo horario (${hour}h, dia ${day})`);
-    return open;
+    return isOpen;
 }
+
+io.on('connection', (socket) => {
+    socket.emit('status', { status: statusConexao });
+    if (lastQr) socket.emit('qr', lastQr);
+    if (db) {
+        socket.emit('history', db.get('chats').value());
+        
+        // Normaliza o status para o Painel Visual (Aberto ou Fechado)
+        const rawStatus = db.get('settings').value()?.caixaFechado;
+        const currentStatus = String(rawStatus || 'aberto').toLowerCase().trim();
+        let normalized = "aberto";
+        if (currentStatus === 'fechado' || currentStatus === 'true' || currentStatus === '1') normalized = 'fechado';
+        
+        socket.emit('status_caixa', normalized);
+    }
+
+    socket.on('send_msg', async (data) => {
+        let jid = data.number;
+        if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+        await sendHumanizedMessage(jid, { text: data.text });
+    });
+
+    socket.on('send_image', async (data) => {
+        let jid = data.number;
+        if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+        const buffer = Buffer.from(data.image.split(';base64,').pop(), 'base64');
+        const s = await sendHumanizedMessage(jid, { image: buffer });
+        const rObj = { id: s.key.id, text: '🖼️ Imagem', fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖", imageUrl: data.image };
+        await saveMessage(jid, rObj, "Robo");
+        io.emit('new_msg', rObj);
+    });
+
+    socket.on('mark_seen', async (jid) => {
+        if (db) {
+            const chats = db.get('chats').value() || {};
+            if (chats[jid]) { chats[jid].unreadCount = 0; await db.set('chats', chats).write(); }
+        }
+    });
+
+    socket.on('toggle_atendimento', async (data) => {
+        const { jid, status } = data;
+        if (db) {
+            const chats = db.get('chats').value() || {};
+            if (!chats[jid]) chats[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0 };
+            chats[jid].atendimentoManual = status;
+            await db.set('chats', chats).write();
+            io.emit('status_atendimento', { jid, atendimentoManual: status });
+        }
+    });
+
+    socket.on('toggle_caixa', async (status) => {
+        if (db) {
+            let normalized = "aberto";
+            const val = String(status).toLowerCase().trim();
+
+            if (val === 'fechado' || val === 'true' || val === '1') {
+                normalized = 'fechado';
+            }
+
+            console.log(`👆 [Painel] Solicitada alteração do Caixa para: ${normalized.toUpperCase()}`);
+            await db.get('settings').set('caixaFechado', normalized).write();
+
+            // Emite o status normalizado para todos
+            io.emit('status_caixa', normalized);
+
+            // Também emite um log para o console do servidor
+            const effectivelyOpen = isStoreOpen();
+            console.log(`🏪 [Caixa] Novo status: ${normalized.toUpperCase()} | Funcionando agora: ${effectivelyOpen ? 'SIM' : 'NÃO'}`);
+        }
+    });
+
+    socket.on('delete_chat', async (jid) => {
+        if (db) {
+            const chats = db.get('chats').value() || {};
+            delete chats[jid];
+            await db.set('chats', { ...chats }).write();
+            io.emit('chat_deleted', jid);
+        }
+    });
+});
 
 async function connectToWhatsApp() {
     const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
@@ -634,7 +618,7 @@ async function connectToWhatsApp() {
             await db.set('chats', chats).write();
 
             await sendHumanizedMessage(jid, { text: thanks });
-            await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖" }, "Robo");
+            await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
             return;
         }
 
@@ -683,7 +667,7 @@ async function connectToWhatsApp() {
                     await db.set('chats', chats).write();
 
                     await sendHumanizedMessage(jid, { text: statusReply });
-                    await saveMessage(jid, { id: 'search-' + Date.now(), text: statusReply, fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖" }, "Robo");
+                    await saveMessage(jid, { id: 'search-' + Date.now(), text: statusReply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
                     return; // Interrompe para não mostrar o menu logo abaixo
                 }
             } catch (e) {
@@ -772,7 +756,7 @@ async function connectToWhatsApp() {
 
         if (reply) {
             const s = await sendHumanizedMessage(jid, { text: reply });
-            await saveMessage(jid, { id: s.key.id, text: reply, fromMe: true, time: getFormattedTime(), sender: jid, pushName: "Robô 🤖" }, "Robo");
+            await saveMessage(jid, { id: s.key.id, text: reply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
         }
     });
 }
