@@ -341,6 +341,7 @@ app.post('/api/notify-delivery', async (req, res) => {
 
 // ROTA PARA SINCRONIZAR STATUS DO CAIXA COM O PAINEL ADM
 app.post('/api/sync-caixa', async (req, res) => {
+    console.log('📩 [API] Requisicao em /api/sync-caixa:', req.body);
     let input = req.body.status !== undefined ? req.body.status : req.body.caixaFechado;
     if (input === undefined) return res.status(400).json({ error: 'Status ou caixaFechado é obrigatório' });
     
@@ -386,7 +387,16 @@ io.on('connection', (socket) => {
     if (lastQr) socket.emit('qr', lastQr);
     if (db) {
         socket.emit('history', db.get('chats').value());
-        socket.emit('status_caixa', db.get('settings').value()?.caixaFechado || false);
+        
+        // Normaliza o status para o Painel Visual (Aberto, Fechado ou Auto)
+        const rawStatus = db.get('settings').value()?.caixaFechado;
+        const currentStatus = String(rawStatus || 'auto').toLowerCase().trim();
+        let normalized = "auto";
+        if (currentStatus === 'fechado' || currentStatus === 'true' || currentStatus === '1') normalized = 'fechado';
+        else if (currentStatus === 'aberto' || currentStatus === 'false' || currentStatus === '0') normalized = 'aberto';
+        
+        socket.emit('status_caixa', normalized);
+        socket.emit('status_caixa', normalized); // Envia duas vezes para garantir captura pelo socket
     }
 
     socket.on('send_msg', async (data) => {
@@ -425,7 +435,17 @@ io.on('connection', (socket) => {
 
     socket.on('toggle_caixa', async (status) => {
         if (db) {
-            const normalized = String(status).toLowerCase().trim();
+            let normalized = "auto";
+            const val = String(status).toLowerCase().trim();
+
+            if (val === 'fechado' || val === 'true' || val === '1') {
+                normalized = 'fechado';
+            } else if (val === 'aberto' || val === 'false' || val === '0') {
+                normalized = 'aberto';
+            } else {
+                normalized = 'auto';
+            }
+
             await db.get('settings').set('caixaFechado', normalized).write();
             io.emit('status_caixa', normalized);
             console.log(`🏪 [Painel] Status do Caixa alterado manualmente para: ${normalized.toUpperCase()}`);
@@ -470,19 +490,20 @@ async function saveMessage(jid, msg, name) {
 function isStoreOpen() {
     if (!db) return true;
     const settings = db.get('settings').value() || {};
-    const status = String(settings.caixaFechado || 'auto').toLowerCase().trim();
+    const rawValue = settings.caixaFechado;
+    const status = String(rawValue || 'auto').toLowerCase().trim();
 
-    console.log(`🏪 [Caixa] Verificando status atual: "${status.toUpperCase()}"`);
+    console.log(`🏪 [Caixa] Status no DB: "${rawValue}" (Normalizado: "${status.toUpperCase()}")`);
 
     // Prioridade 1: Manual Fechado
     if (status === 'fechado' || status === 'true' || status === '1') {
-        console.log("🚫 [Caixa] BLOQUEADO: Comando manual de FECHADO ativo.");
+        console.log("🚫 [Caixa] Decisao: FECHADO (Comando manual ativo)");
         return false;
     }
     
     // Prioridade 2: Manual Aberto
     if (status === 'aberto' || status === 'false' || status === '0') {
-        console.log("✅ [Caixa] LIBERADO: Comando manual de ABERTO ativo.");
+        console.log("✅ [Caixa] Decisao: ABERTO (Comando manual ativo)");
         return true;
     }
 
@@ -491,11 +512,17 @@ function isStoreOpen() {
     const localized = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     const day = localized.getDay(); 
     const hour = localized.getHours();
+    
+    // Horário: 18h às 02h
+    // isNightOpen: 18h às 23:59h do dia atual (Terça a Domingo)
+    // isEarlyMorningOpen: 00h às 01:59h do dia seguinte (Quarta a Segunda)
+    // Dias getDay(): 0-Dom, 1-Seg, 2-Ter, 3-Qua, 4-Qui, 5-Sex, 6-Sab
+    
     const isNightOpen = (hour >= 18 && [2, 3, 4, 5, 6, 0].includes(day));
     const isEarlyMorningOpen = (hour < 2 && [3, 4, 5, 6, 0, 1].includes(day));
 
     const open = isNightOpen || isEarlyMorningOpen;
-    console.log(`📅 [Caixa] Modo AUTO: Loja está ${open ? 'ABERTA' : 'FECHADA'} pelo horário.`);
+    console.log(`📅 [Caixa] Decisao MODO AUTO: Loja ${open ? 'ABERTA' : 'FECHADA'} pelo horario (${hour}h, dia ${day})`);
     return open;
 }
 
