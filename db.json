@@ -1,1008 +1,394 @@
 {
   "chats": {
-    "82993225452@s.whatsapp.net": {
-      "name": "82993225452",
+    "115328914817201@lid": {
+      "name": "Carlos Leonidio",
       "messages": [
         {
-          "id": "3EB08E3FFE43892EEE58EC",
-          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1520*\n\nInformamos que seu pedido foi CANCELADO. Se precisar de mais informações, por favor, chame um de nossos atendentes. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "id": "AC8307A0543E2FBA39EC779E5B1FF91D",
+          "from": "115328914817201@lid",
+          "text": "4",
+          "fromMe": false,
+          "time": "11:09",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0FE39B66D2E1D0F1673",
+          "text": "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻",
           "fromMe": true,
-          "time": "19:30:40",
+          "time": "09:35",
           "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB09A3537854659DB6BDE",
-          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1549*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "id": "ACEB6AEEE6A59AEB5233B1A5274056F6",
+          "from": "115328914817201@lid",
+          "text": "Ola",
+          "fromMe": false,
+          "time": "10:52",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB09F90FBED5BC97997CB",
+          "text": "Olá ! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
           "fromMe": true,
-          "time": "16:17",
+          "time": "10:52",
           "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB09DD76FA3DFFC58A375",
-          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1569*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "id": "3EB0AC2872573D1E24F590",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
           "fromMe": true,
-          "time": "18:44",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB01263874DEFBB2C9256",
-          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1572*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "18:56",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "f-1781215035345",
-          "text": "Olá, cliente! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1572\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "18:57",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB034C685406CF0771FF1",
-          "from": "82993225452@s.whatsapp.net",
-          "text": "Olá, cliente! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1572\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "18:57",
-          "sender": "82993225452@s.whatsapp.net",
+          "time": "10:52",
+          "sender": "115328914817201@lid",
           "pushName": "Voce"
         },
         {
-          "id": "3EB09596767E7DF8596A1D",
-          "text": "Olá, cliente! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1572\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "id": "AC30866B5C4BCECE84C2D87EE07377E7",
+          "from": "115328914817201@lid",
+          "text": "Ola",
+          "fromMe": false,
+          "time": "10:52",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB06AFA323D064DD6E820",
+          "text": "Olá ! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! . 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
           "fromMe": true,
-          "time": "18:57",
+          "time": "10:52",
           "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
         },
         {
-          "id": "3EB0A7E5ABB1D8EC7C9AC5",
-          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1572*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "id": "3EB02CC72AF1EE28BF9E16",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
           "fromMe": true,
-          "time": "18:57",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
+          "time": "10:52",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
         },
         {
-          "id": "3EB0913F48F24B99589A08",
-          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "18:57",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
+          "id": "AC4BD253D4981F1278E0E5AE05B002D1",
+          "from": "115328914817201@lid",
+          "text": "Yeatando",
+          "fromMe": false,
+          "time": "10:53",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
         },
         {
-          "id": "3EB0D7621D3F9316602A7D",
-          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1578*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "id": "3EB090BD82B73F556C3FF6",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
           "fromMe": true,
-          "time": "10:51",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
+          "time": "10:53",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
         },
         {
-          "id": "3EB04803EF15D66757A96A",
-          "text": "Olá cliente! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1578*\n\nInformamos que seu pedido foi CANCELADO. ❌\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
+          "id": "3EB0D703F8DD536B189E12",
+          "text": "Olá ! 👋 Seja muito bem-vindo ao *GuGA Bebidas*!🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._ !!!!!!!!",
           "fromMe": true,
           "time": "10:53",
           "sender": "558293157048:4@s.whatsapp.net",
           "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC270E7425451F923BA8EBE7214E3D56",
+          "from": "115328914817201@lid",
+          "text": "Ola",
+          "fromMe": false,
+          "time": "10:56",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0F6A62290C140993A75",
+          "text": "Olá {nome}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*!🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._ !!!!!!!!",
+          "fromMe": true,
+          "time": "10:56",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB033DEE38A6D580945F5",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "10:56",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC1C464EBDB36BCB891EBB769C9FABA1",
+          "from": "115328914817201@lid",
+          "text": "Ola",
+          "fromMe": false,
+          "time": "11:00",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB044D3724A0C34ADA2F8",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "11:00",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0787923E19B52778429",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*!🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._ !!!!!!!!",
+          "fromMe": true,
+          "time": "11:00",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC83D48B021A3D9A9F91CE7B19E2DFE1",
+          "from": "115328914817201@lid",
+          "text": "Ola",
+          "fromMe": false,
+          "time": "11:01",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0000649DB6CE5655C7D",
+          "from": "115328914817201@lid",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+          "fromMe": true,
+          "time": "11:01",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0DF3F38E1AAE6C72B83",
+          "text": "Olá Carlos Leonidio! 👋 Seja muito bem-vindo ao *GuGA Bebidas*!🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada. 👍_",
+          "fromMe": true,
+          "time": "11:01",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC8F34B134EE88B6062D722283741212",
+          "from": "115328914817201@lid",
+          "text": "Cardápio",
+          "fromMe": false,
+          "time": "11:03",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB045CDF1D1D0369FB63D",
+          "text": "📋 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😋",
+          "fromMe": true,
+          "time": "11:03",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0898DE05DAFABC2E0B2",
+          "from": "115328914817201@lid",
+          "text": "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉",
+          "fromMe": true,
+          "time": "11:03",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "ACA8C6B416DB323429B1CC5FBCF26E1E",
+          "from": "115328914817201@lid",
+          "text": "Ola",
+          "fromMe": false,
+          "time": "11:18",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB06521BD61394994BBF6",
+          "text": "Olá Carlos Leonidio! No momento estamos *FECHADOS* 🌙\\n\\n⏰ *Horário de Funcionamento:*\\nTerça a Domingo: das 18h às 02h\\n\\n🏠 *Endereço:* Rua Demócrito Gracindo, 139 - Ponta Grossa\\n\\n_Aguardamos seu pedido em breve!_ 🛵",
+          "fromMe": true,
+          "time": "11:18",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB05B85F80FBFA25D020F",
+          "from": "115328914817201@lid",
+          "text": "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻",
+          "fromMe": true,
+          "time": "11:18",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC1DCC31166A175B5575100191F7675D",
+          "from": "115328914817201@lid",
+          "text": "Ola",
+          "fromMe": false,
+          "time": "11:19",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB04ED96D4C5BD742F5CD",
+          "from": "115328914817201@lid",
+          "text": "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻",
+          "fromMe": true,
+          "time": "11:19",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "3EB0C75B65E6BEAAA30885",
+          "text": "Olá Carlos Leonidio! No momento estamos *FECHADOS* 🌙\n⏰ *Horário de Funcionamento:* \nTerça a Domingo: das 18h às 02h\n🏠 *Endereço:* Rua Demócrito Gracindo, 139 \n- Ponta Grossa\nAguardamos seu pedido em breve!_ 🛵",
+          "fromMe": true,
+          "time": "11:19",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "AC2732734F1390AFFED15B92C2FB6848",
+          "from": "115328914817201@lid",
+          "text": "Ok",
+          "fromMe": false,
+          "time": "11:20",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB04371E6318D6969E728",
+          "text": "Olá Carlos Leonidio! No momento estamos *FECHADOS* 🌙\n\n⏰ *Horário de Funcionamento:* \nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 139 - Ponta Grossa\n\nAguardamos seu pedido em breve!_ 🛵",
+          "fromMe": true,
+          "time": "11:20",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0462C211031D358BC26",
+          "from": "115328914817201@lid",
+          "text": "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻",
+          "fromMe": true,
+          "time": "11:20",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
+        },
+        {
+          "id": "AC356CAB66E189FBCE5F7F6555167F49",
+          "from": "115328914817201@lid",
+          "text": "Ola",
+          "fromMe": false,
+          "time": "11:21",
+          "sender": "115328914817201@lid",
+          "pushName": "Carlos Leonidio"
+        },
+        {
+          "id": "3EB0D4E96A309CE8BC3D14",
+          "text": "Olá Carlos Leonidio! No momento estamos *FECHADOS* 🌙\n\n⏰ *Horário de Funcionamento:* \nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 139 - Ponta Grossa\n\nAguardamos seu pedido em breve!_ 🍺🍻",
+          "fromMe": true,
+          "time": "11:21",
+          "sender": "558293157048:4@s.whatsapp.net",
+          "pushName": "Robô 🤖"
+        },
+        {
+          "id": "3EB0D9A21E9B29F8793AFC",
+          "from": "115328914817201@lid",
+          "text": "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻",
+          "fromMe": true,
+          "time": "11:21",
+          "sender": "115328914817201@lid",
+          "pushName": "Voce"
         }
       ],
       "unreadCount": 0,
-      "lastUpdate": 1781272425454,
-      "estado": "normal",
-      "activePedidoId": null,
-      "ultimoPedidoId": "1578",
-      "surveyPending": true
+      "lastUpdate": 1782051704432,
+      "estado": "normal"
+    },
+    "82993225452@s.whatsapp.net": {
+      "name": "82993225452",
+      "messages": [
+        {
+          "id": "3EB0A113D08F8EA23F8F5D",
+          "from": "82993225452@s.whatsapp.net",
+          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
+          "fromMe": true,
+          "time": "14:17",
+          "sender": "82993225452@s.whatsapp.net",
+          "pushName": "Voce"
+        }
+      ],
+      "unreadCount": 0,
+      "lastUpdate": 1782047851069,
+      "estado": "normal"
     },
     "558293157048@s.whatsapp.net": {
       "name": "Pedidos Zap 📦",
       "messages": [
         {
-          "id": "3EB0BD6C87EA94BAE53074",
+          "id": "3EB01F820B029767D40EB8",
           "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1552\n🗑️ O pedido foi removido do sistema.",
+          "text": "🚀 *NOVO PEDIDO #559*\n📍 Mesa: DELIVERY #559\n📝 Itens:\n1x Heineken\n💰 Total: R$ 17.00",
           "fromMe": true,
-          "time": "16:33",
+          "time": "16:41",
           "sender": "558293157048@s.whatsapp.net",
           "pushName": "Voce"
         },
         {
-          "id": "3EB0B4559EBB122CCDA95B",
+          "id": "3EB0B9669FBB5A16F1B1AA",
           "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1553*\n📍 Mesa: DELIVERY #1553\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 15.00",
-          "fromMe": true,
-          "time": "16:33",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB062471B9A0AA33663C8",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1553\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:33",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0B53608239FFBA0230B",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1553\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:34",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB090E8A5BDA7F740BE41",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1554*\n📍 Mesa: DELIVERY #1554\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 15.00",
-          "fromMe": true,
-          "time": "16:37",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0B64E777A7B95BF0F3A",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1554\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:38",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB057F5118666F1BEAEA4",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1554\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:39",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB017036E66BAFF121A6D",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1555*\n📍 Mesa: DELIVERY #1555\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
-          "fromMe": true,
-          "time": "16:43",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0A9EBE8AEEA0A127511",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1555\n🗑️ O pedido foi removido do sistema.",
-          "fromMe": true,
-          "time": "16:46",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0A7212C5C5454A45FCC",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1556*\n📍 Mesa: DELIVERY #1556\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 15.00",
-          "fromMe": true,
-          "time": "16:47",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB01CFECC137FC3C06848",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1556\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:47",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0B62FBF50EB40E96C48",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1556\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:48",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB092F20D2E6CE7E5D9C9",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1557*\n📍 Mesa: DELIVERY #1557\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
-          "fromMe": true,
-          "time": "16:51",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB01C38BAD6D3A63779CF",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1557\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:51",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB052411D7D2A7A4D7099",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1557\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:53",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0624BFF3BDAE91C100A",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1558*\n📍 Mesa: DELIVERY #1558\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
-          "fromMe": true,
-          "time": "16:58",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB08566D4205377232992",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1558\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:59",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB084A71FDAD974FC7B89",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1558\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "16:59",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0193A0A8F5651CCC497",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1559*\n📍 Mesa: DELIVERY #1559\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
-          "fromMe": true,
-          "time": "17:02",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB015CBA4E1BBD14C15E5",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1559\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:02",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB03BADD599FCDF599B10",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1559\n🗑️ O pedido foi removido do sistema.",
-          "fromMe": true,
-          "time": "17:09",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0CECEF8433A9DADBEAF",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1560*\n📍 Mesa: DELIVERY #1560\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
-          "fromMe": true,
-          "time": "17:10",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0825B57BAF91546CA02",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1560\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:10",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB01205D6CB2C72CE745C",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1560\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:17",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB059585E47647BA30C60",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1561*\n📍 Mesa: DELIVERY #1561\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
+          "text": "🚀 *NOVO PEDIDO #615*\n📍 Mesa: DELIVERY #615\n📝 Itens:\n1x Itaipava\n💰 Total: R$ 12.00",
           "fromMe": true,
           "time": "17:18",
           "sender": "558293157048@s.whatsapp.net",
           "pushName": "Voce"
         },
         {
-          "id": "3EB07B4FA062F292C56311",
+          "id": "3EB01924706317DCD655BC",
           "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1561\n💰 O cliente solicitou a conta.",
+          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #649\n🗑️ O pedido foi removido do sistema.",
           "fromMe": true,
-          "time": "17:18",
+          "time": "11:42",
           "sender": "558293157048@s.whatsapp.net",
           "pushName": "Voce"
         },
         {
-          "id": "3EB0298774D7761F8D57A8",
+          "id": "3EB046872573FDAE2BB24E",
           "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1561\n💰 O cliente solicitou a conta.",
+          "text": "💰 *CAIXA FECHADO*\n🕒 Horário: 10:51:11\n\n📊 *RESUMO DO DIA:*\n💵 Dinheiro: R$ 0.00\n💳 Cartão: R$ 0.00\n📱 Pix: R$ 0.00\n📈 Total Vendas: R$ 0.00\n🏁 Valor Final: R$ 100.00",
           "fromMe": true,
-          "time": "17:19",
+          "time": "10:51",
           "sender": "558293157048@s.whatsapp.net",
           "pushName": "Voce"
         },
         {
-          "id": "3EB0C750AFCC7BB8FCDA4D",
+          "id": "3EB0DE001A8DB190AA8B5B",
           "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1562*\n📍 Mesa: DELIVERY #1562\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 15.00",
+          "text": "💰 *CAIXA ABERTO*\n🕒 Horário: 10:51:18\n💵 Valor Inicial: R$ 100.00",
           "fromMe": true,
-          "time": "17:24",
+          "time": "10:51",
           "sender": "558293157048@s.whatsapp.net",
           "pushName": "Voce"
         },
         {
-          "id": "3EB07B9ED7CCCC1ED85A0C",
+          "id": "3EB0DE830340DB0947C48A",
           "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1562\n💰 O cliente solicitou a conta.",
+          "text": "💰 *CAIXA FECHADO*\n🕒 Horário: 11:17:47\n\n📊 *RESUMO DO DIA:*\n💵 Dinheiro: R$ 0.00\n💳 Cartão: R$ 0.00\n📱 Pix: R$ 0.00\n📈 Total Vendas: R$ 0.00\n🏁 Valor Final: R$ 100.00",
           "fromMe": true,
-          "time": "17:24",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0FDB4D1742F9D6F13CD",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1562\n🗑️ O pedido foi removido do sistema.",
-          "fromMe": true,
-          "time": "17:28",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0EE02BF49169EC6B9C2",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1563*\n📍 Mesa: DELIVERY #1563\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 15.00",
-          "fromMe": true,
-          "time": "17:28",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0991AFEECD98C244941",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1563\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:29",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0D1818CF000F4EAB084",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1563\n🗑️ O pedido foi removido do sistema.",
-          "fromMe": true,
-          "time": "17:32",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB06F982C0EE043170650",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1564*\n📍 Mesa: DELIVERY #1564\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 15.00",
-          "fromMe": true,
-          "time": "17:32",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB01CB29BE51065EB2263",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1564\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:33",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB02482D529074E815C6A",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1564\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:33",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0296D19366B4A798B45",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1565*\n📍 Mesa: DELIVERY #1565\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 15.00",
-          "fromMe": true,
-          "time": "17:38",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0224CF7D8584F6ECBB6",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1565\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:39",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0C718F789A1C3BF1252",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1565\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:39",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB06D964E07C779755CC1",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1566*\n📍 Mesa: DELIVERY #1566\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
-          "fromMe": true,
-          "time": "17:43",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB03C8F6F7C98E2EE27DB",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1566\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:43",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0965A02D510EB606B26",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1566\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:51",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0DC7CACFAF6F8F52F97",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1567*\n📍 Mesa: DELIVERY #1567\n📝 Itens:\n1x Cerveja Skol 600ml\n💰 Total: R$ 15.00",
-          "fromMe": true,
-          "time": "17:52",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0CB3785D50EEE466112",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1567\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:52",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0D8460B813EB9A92A64",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1567\n🗑️ O pedido foi removido do sistema.",
-          "fromMe": true,
-          "time": "17:54",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB001AE2829F64D14AE6C",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1568*\n📍 Mesa: DELIVERY #1568\n📝 Itens:\n1x Água Mineral\n3x Cerveja Skol 600ml\n💰 Total: R$ 43.00",
-          "fromMe": true,
-          "time": "17:55",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0325E292B18A8AAEEBF",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1568\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:56",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB03B36B2677896A389B2",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1568\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "17:56",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0B2CE018CE92DD15272",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
-          "fromMe": true,
-          "time": "18:04",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB007E45CBB6B24E0ADE8",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
-          "fromMe": true,
-          "time": "18:04",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0B7CA405F049E393149",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
-          "fromMe": true,
-          "time": "18:04",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB07BCF0E3B4A10D19C59",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
-          "fromMe": true,
-          "time": "18:04",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB02D1ACD4AF50885F8E9",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1569\n🗑️ O pedido foi removido do sistema.",
-          "fromMe": true,
-          "time": "18:44",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB04ACB5A8E5C76A731E5",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1570*\n📍 Mesa: DELIVERY #1570\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
-          "fromMe": true,
-          "time": "18:44",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB04B46AB29C71B90A997",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1570\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "18:47",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB02D871E3EB23D70AA96",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1570\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "18:48",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0A32D5CEAB79A427974",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1571*\n📍 Mesa: DELIVERY #1571\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
-          "fromMe": true,
-          "time": "18:50",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0D81352E58B4BD6DE2B",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1571\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "18:53",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0B2645F20A0C3F94F1B",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1571\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "18:54",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0A4D285EDF6F156C240",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1572*\n📍 Mesa: DELIVERY #1572\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
-          "fromMe": true,
-          "time": "18:55",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB068136D7DA846837B8C",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1572\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "18:57",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB08322A4C1955A8CE7E7",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1572\n🗑️ O pedido foi removido do sistema.",
-          "fromMe": true,
-          "time": "18:57",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB07DE0B1932EFB11DE72",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1573*\n📍 Mesa: DELIVERY #1573\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
-          "fromMe": true,
-          "time": "18:57",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB007EAB96FDE6A4E4A44",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1573\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "19:04",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB038B33392C7FEDAEF0B",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1573\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "19:09",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0014CEB83B1F97C1DF7",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1574*\n📍 Mesa: DELIVERY #1574\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
-          "fromMe": true,
-          "time": "19:10",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0227E0D8249101BD190",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1574\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "19:16",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0BC50FE4D41FE70E357",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1574\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "19:20",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0C1621D24FD4F09EFCE",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1575*\n📍 Mesa: DELIVERY #1575\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
-          "fromMe": true,
-          "time": "19:37",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB08F4D3A943031523933",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1575\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "19:42",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0EB714B1D5F01B29596",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
-          "fromMe": true,
-          "time": "19:44",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB00C05688A439641F512",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
-          "fromMe": true,
-          "time": "19:44",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB01190B1EE9FCF1DFA31",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: Mesa 1\n🗑️ O pedido foi removido do sistema.",
-          "fromMe": true,
-          "time": "21:43",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "ACDB8A23EA1FE2B13F99691108D1292E",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "",
-          "fromMe": false,
-          "time": "21:59",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "558293157048"
-        },
-        {
-          "id": "3EB09E3C53DD83B0A902B6",
-          "text": "Olá 558293157048! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
-          "fromMe": true,
-          "time": "21:59",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB0E97B90EE767FD60A16",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA ABERTO*\n🕒 Horário: 10:29:57\n💵 Valor Inicial: R$ 100.00",
-          "fromMe": true,
-          "time": "10:30",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0977377D0FC59873C8A",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA FECHADO*\n🕒 Horário: 10:30:02\n\n📊 *RESUMO DO DIA:*\n💵 Dinheiro: R$ 0.00\n💳 Cartão: R$ 0.00\n📱 Pix: R$ 0.00\n📈 Total Vendas: R$ 0.00\n🏁 Valor Final: R$ 100.00",
-          "fromMe": true,
-          "time": "10:30",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0CD28D97DD3B867844F",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA ABERTO*\n🕒 Horário: 10:35:02\n💵 Valor Inicial: R$ 100.00",
-          "fromMe": true,
-          "time": "10:35",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB09B5ED710D4EC8C6857",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA FECHADO*\n🕒 Horário: 10:35:14\n\n📊 *RESUMO DO DIA:*\n💵 Dinheiro: R$ 0.00\n💳 Cartão: R$ 0.00\n📱 Pix: R$ 0.00\n📈 Total Vendas: R$ 0.00\n🏁 Valor Final: R$ 100.00",
-          "fromMe": true,
-          "time": "10:35",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0E32136BEAAB7039449",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA ABERTO*\n🕒 Horário: 10:36:21\n💵 Valor Inicial: R$ 100.00",
-          "fromMe": true,
-          "time": "10:36",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB04F10CE7C41F566D0CA",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1578*\n📍 Mesa: DELIVERY #1578\n📝 Itens:\n1x Refrigerante Lata\n💰 Total: R$ 9.00",
-          "fromMe": true,
-          "time": "10:44",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB056BE261EEAFF54C2E0",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "❌ *PEDIDO CANCELADO*\n📍 Local: DELIVERY #1578\n🗑️ O pedido foi removido do sistema.",
-          "fromMe": true,
-          "time": "10:53",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB08D14AC42AA517AD2DE",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA FECHADO*\n🕒 Horário: 10:56:22\n\n📊 *RESUMO DO DIA:*\n💵 Dinheiro: R$ 0.00\n💳 Cartão: R$ 0.00\n📱 Pix: R$ 0.00\n📈 Total Vendas: R$ 0.00\n🏁 Valor Final: R$ 100.00",
-          "fromMe": true,
-          "time": "10:56",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB05A2732992E60B78636",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA ABERTO*\n🕒 Horário: 10:56:44\n💵 Valor Inicial: R$ 10.00",
-          "fromMe": true,
-          "time": "10:56",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB07309E70A3592AAB8E2",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA FECHADO*\n🕒 Horário: 10:56:50\n\n📊 *RESUMO DO DIA:*\n💵 Dinheiro: R$ 0.00\n💳 Cartão: R$ 0.00\n📱 Pix: R$ 0.00\n📈 Total Vendas: R$ 0.00\n🏁 Valor Final: R$ 10.00",
-          "fromMe": true,
-          "time": "10:56",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB07B32B144384D0C5771",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA ABERTO*\n🕒 Horário: 10:57:00\n💵 Valor Inicial: R$ 100.00",
-          "fromMe": true,
-          "time": "10:57",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB07D291B9D44D5AAEAFD",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🚀 *NOVO PEDIDO #1579*\n📍 Mesa: DELIVERY #1579\n📝 Itens:\n1x Água Mineral\n💰 Total: R$ 7.00",
-          "fromMe": true,
-          "time": "10:58",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0EFEC1FB94FFD78DD1A",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1579\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "11:01",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB00E0FCE4384B4FFFA3B",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "🛎️ *SOLICITAÇÃO DE FECHAMENTO*\n📍 Local: DELIVERY #1579\n💰 O cliente solicitou a conta.",
-          "fromMe": true,
-          "time": "11:02",
-          "sender": "558293157048@s.whatsapp.net",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0767088A349199C7E50",
-          "from": "558293157048@s.whatsapp.net",
-          "text": "💰 *CAIXA FECHADO*\n🕒 Horário: 11:02:46\n\n📊 *RESUMO DO DIA:*\n💵 Dinheiro: R$ 0.00\n💳 Cartão: R$ 0.00\n📱 Pix: R$ 4.40\n📈 Total Vendas: R$ 4.40\n🏁 Valor Final: R$ 104.40",
-          "fromMe": true,
-          "time": "11:02",
+          "time": "11:17",
           "sender": "558293157048@s.whatsapp.net",
           "pushName": "Voce"
         }
       ],
       "unreadCount": 0,
-      "lastUpdate": 1781272974141,
+      "lastUpdate": 1782051475184,
       "estado": "normal"
-    },
-    "115328914817201@lid": {
-      "name": "Carlos Leonidio",
-      "messages": [
-        {
-          "id": "ACE571D3E1253D81BAC0EC915C4AE14B",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1578\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 11\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Refrigerante Lata (R$ 6.00)\n\n💵 *Subtotal:* R$ 6.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 9.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
-          "fromMe": false,
-          "time": "10:44",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB0AF3CC77CBDF5BB69A3",
-          "text": "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻",
-          "fromMe": true,
-          "time": "10:45",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "ACB1FA67E94074614CA3DC367F527E7F",
-          "from": "115328914817201@lid",
-          "text": "🛍️ *NOVO PEDIDO - DELIVERY*\n🔖 *ID:* #1579\n------------------------------\n👤 *Cliente:* Carlos\n📞 *Tel:* 82993225452\n🏠 *Endereço:* DEMOCRITO GRACINDO, 117, 115\n📍 *Bairro/Ref:* PONTA GROSSA\n🛒 *ITENS:*\n- 1x Água Mineral (R$ 4.00)\n\n💵 *Subtotal:* R$ 4.00\n🛵 *Taxa de Entrega:* R$ 3.00\n💰 *TOTAL: R$ 7.00*\n💳 *Pagamento:* Pix\n------------------------------\n_Enviado via Cardápio Digital_",
-          "fromMe": false,
-          "time": "10:58",
-          "sender": "115328914817201@lid",
-          "pushName": "Carlos Leonidio"
-        },
-        {
-          "id": "3EB0E046FEA24661418D14",
-          "from": "115328914817201@lid",
-          "text": "Olá Carlos Leonidio! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#1579* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻",
-          "fromMe": true,
-          "time": "10:58",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB00FD0CDA945E09246EC",
-          "text": "Olá Carlos Leonidio! 👋\n\n🔔 *ATUALIZAÇÃO DO PEDIDO #1579*\n\nInformamos que seu pedido acaba de SAIR PARA ENTREGA! 🛵💨\n\nAtenciosamente,\n*Equipe GuGA Bebidas* 🍻",
-          "fromMe": true,
-          "time": "10:58",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "f-1781272896334",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1579\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "11:01",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB01829B8538B1018256C",
-          "from": "115328914817201@lid",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1579\n\nInformamos que seu pedido foi ENTREGUE! 🎉\nEsperamos que aproveite muito. Bom apetite! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "11:01",
-          "sender": "115328914817201@lid",
-          "pushName": "Voce"
-        },
-        {
-          "id": "3EB0340859796CA90FC96C",
-          "text": "Olá, Carlos Leonidio! 👋\n\n🔔 ATUALIZAÇÃO DO PEDIDO #1579\n\n✅ PEDIDO FINALIZADO COM SUCESSO!\n\nAgradecemos imensamente pela sua preferência. Esperamos que sua experiência tenha sido excelente e que você aproveite cada detalhe! 😋🥤\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "11:01",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        },
-        {
-          "id": "3EB054FFBB413BCF7932F0",
-          "text": "Sua opinião é muito importante para nós! ⭐\n\nComo foi sua experiência com nosso atendimento e entrega?\n\nResponda com uma nota de *1 a 5*:\n\n1️⃣ - Muito Insatisfeito\n2️⃣ - Insatisfeito\n3️⃣ - Regular\n4️⃣ - Satisfeito\n5️⃣ - Muito Satisfeito\n\nAtenciosamente,\nEquipe GuGA Bebidas 🍻",
-          "fromMe": true,
-          "time": "11:02",
-          "sender": "558293157048:4@s.whatsapp.net",
-          "pushName": "Robô 🤖"
-        }
-      ],
-      "unreadCount": 0,
-      "lastUpdate": 1781272922177,
-      "estado": "normal",
-      "activePedidoId": null,
-      "ultimoPedidoId": "1579",
-      "surveyPending": true
     }
   },
   "pedidoIdToJid": {

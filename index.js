@@ -754,6 +754,15 @@ async function connectToWhatsApp() {
                 chats[jid].atendimentoManual = true;
                 await db.set('chats', chats).write();
                 io.emit('status_atendimento', { jid, atendimentoManual: true });
+            } else {
+                // Checar menus dinâmicos de delivery
+                const btexts = await getBotTexts();
+                if (btexts.customMenusDelivery && btexts.customMenusDelivery.length > 0) {
+                    const match = btexts.customMenusDelivery.find(m => text === m.option);
+                    if (match) {
+                        reply = match.response;
+                    }
+                }
             }
         } 
         
@@ -789,12 +798,40 @@ async function connectToWhatsApp() {
                 await db.set('chats', chats).write();
                 io.emit('status_atendimento', { jid, atendimentoManual: true });
             } else if (!/^[1-5]/.test(text)) {
-                // FALLBACK INTELIGENTE: Se não entendeu e está em delivery, mostra o menu de delivery
-                if (estado === 'delivery') {
-                    reply = btexts.delivery.split('{nome}').join(pushName || '');
+                // Checar menus dinâmicos principais
+                let match = null;
+                if (btexts.customMenusMain && btexts.customMenusMain.length > 0) {
+                    match = btexts.customMenusMain.find(m => text === m.option);
+                }
+                
+                if (match) {
+                    reply = match.response;
                 } else {
-                    // Se não está em delivery, mostra o menu normal de boas-vindas
-                    reply = btexts.welcome.split('{nome}').join(pushName || '');
+                    // FALLBACK INTELIGENTE: Se não entendeu e está em delivery, mostra o menu de delivery
+                    if (estado === 'delivery') {
+                        reply = btexts.delivery.split('{nome}').join(pushName || '');
+                        if (btexts.customMenusDelivery && btexts.customMenusDelivery.length > 0) {
+                            btexts.customMenusDelivery.forEach(m => {
+                                reply += `\n${m.option}️⃣ - ${m.title} 📌`;
+                            });
+                        }
+                    } else {
+                        // Se não está em delivery, mostra o menu normal de boas-vindas
+                        reply = btexts.welcome.split('{nome}').join(pushName || '');
+                        if (btexts.customMenusMain && btexts.customMenusMain.length > 0) {
+                            // Antes de colocar as opções dinâmicas, ver se tem "_Basta digitar_" no final para colocar antes
+                            const splitParts = reply.split('_Basta digitar');
+                            let customMenuText = '';
+                            btexts.customMenusMain.forEach(m => {
+                                customMenuText += `${m.option}️⃣ - ${m.title} 📌\n`;
+                            });
+                            if (splitParts.length > 1) {
+                                reply = splitParts[0] + customMenuText + '\n_Basta digitar' + splitParts[1];
+                            } else {
+                                reply += `\n\n${customMenuText}`;
+                            }
+                        }
+                    }
                 }
             }
         }
