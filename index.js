@@ -386,6 +386,28 @@ async function sendHumanizedMessage(jid, content, options = {}) {
     } catch (e) { throw e; }
 }
 
+async function getBotTexts() {
+    try {
+        const res = await fetch('http://localhost:3001/api/bot-responses');
+        if (res.ok) {
+            const data = await res.json();
+            if (Object.keys(data).length > 0) return data;
+        }
+    } catch(e) {}
+    return {
+        welcome: "Olá `${pushName}`! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+        delivery: "Olá `${pushName}`! 👋\n\nIdentificamos que você tem um pedido ativo conosco! 🛵🍔\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻",
+        menu1: "📋 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😋",
+        menu2: "🛵 *FAZER UM PEDIDO AGORA*\n\nJá escolheu? Então não perca tempo! Peça agora pelo nosso sistema de Delivery:\n🔗 https://garconnexpress.vercel.app/delivery\n\n💡 *Dica:* Seus dados ficam salvos para o próximo pedido ser ainda mais rápido!",
+        menu3: "No momento não temos promoções ativas, mas nossos preços continuam os melhores da região! 😉\n\nConfira tudo aqui: https://garconnexpress.vercel.app/delivery",
+        menu4: "📍 *ONDE ESTAMOS E QUANDO ABRIMOS*\n\n🏢 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n🕒 *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n_Venha nos visitar ou peça no conforto do seu sofá!_ 🛵🍻",
+        menu5: "👨‍💻 *ATENDIMENTO HUMANO*\n\nEntendi! Já avisei a nossa equipe. Um de nossos atendentes falará com você em instantes.\n\n_Por favor, aguarde um momento..._",
+        delivery_opt1: "🚚 *ACOMPANHAMENTO DO PEDIDO #{pId}*\n\nOlá ${pushName}, identificamos o seu pedido em nosso sistema! 🔍\n\n📌 *Status Atual:* *{status}*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨",
+        delivery_opt2: "👨‍💻 *ATENDIMENTO HUMANO*\n\nEntendido! Já acionei nossa equipe. Um de nossos atendentes falará com você em instantes para tirar suas dúvidas ou resolver qualquer problema. 💬\n\n⏳ *Tempo médio de espera:* 2 a 5 minutos.\n\n_Por favor, aguarde um momento..._",
+        store_closed: "Olá {nome}! No momento estamos *FECHADOS* 🌙\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🛵"
+    };
+}
+
 async function saveMessage(jid, msg, name) {
     if (!jid || jid.includes('@newsletter')) return;
     const chats = db.get('chats').value() || {};
@@ -578,7 +600,8 @@ async function connectToWhatsApp() {
 
         if (!storeOpen && !hasActiveOrder) {
             console.log(`🚫 [Bloqueio] Caixa FECHADO. Enviando mensagem de fechamento para ${jid}`);
-            const closedMsg = "Olá! No momento estamos *FECHADOS* 😴\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n_Aguardamos seu pedido em breve!_ 🍻";
+            const btexts = await getBotTexts();
+            const closedMsg = (btexts.store_closed || "Olá! Estamos fechados.").split('{nome}').join(pushName || '');
             const s = await sendHumanizedMessage(jid, { text: closedMsg });
             if (s) {
                 await saveMessage(jid, { id: s.key.id, text: closedMsg, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
@@ -700,13 +723,15 @@ async function connectToWhatsApp() {
                         'entregue': 'Entregue 😋', 
                         'aguardando_fechamento': 'Entregue 😋' 
                     };
-                    reply = `📦 *ACOMPANHAMENTO DO PEDIDO #${pId}*\n\nOlá ${pushName}, identificamos o seu pedido em nosso sistema! ✨\n\n📊 *Status Atual:* *${stMap[ped.status] || ped.status}*\n\n💡 *Dica:* Fique tranquilo(a), te avisaremos assim que ele sair para entrega! 🛵💨`;
+                    const btexts = await getBotTexts();
+                    reply = btexts.delivery_opt1.replace('{pId}', pId).split('{nome}').join(pushName || '').replace('{status}', stMap[ped.status] || ped.status);
                 } catch (e) { 
                     console.error(`❌ Erro ao consultar status do pedido #${pId}:`, e.message);
                     reply = "Erro ao consultar status. 😕"; 
                 }
             } else if (isCallHuman) {
-                reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nEntendido! Já acionei nossa equipe. Um de nossos atendentes falará com você em instantes para tirar suas dúvidas ou resolver qualquer problema. 🚀\n\n⏳ *Tempo médio de espera:* 2 a 5 minutos.\n\n_Por favor, aguarde um momento..._";
+                const btexts = await getBotTexts();
+                reply = btexts.delivery_opt2;
                 chats[jid].atendimentoManual = true;
                 await db.set('chats', chats).write();
                 io.emit('status_atendimento', { jid, atendimentoManual: true });
@@ -715,6 +740,7 @@ async function connectToWhatsApp() {
         
         // --- LÓGICA DE RESPOSTAS (ESTADO: NORMAL OU SE NÃO ENTROU NO DELIVERY ACIMA) ---
         if (!reply) {
+            const btexts = await getBotTexts();
             const isMenu1 = text === '1' || normalizedText.includes('cardapio') || normalizedText.includes('menu') || normalizedText.includes('lista');
             const isMenu2 = text === '2' || normalizedText.includes('fazer pedido') || normalizedText.includes('pedir') || normalizedText.includes('comprar');
             const isMenu3 = text === '3' || normalizedText.includes('promo') || normalizedText.includes('oferta');
@@ -722,9 +748,9 @@ async function connectToWhatsApp() {
             const isMenu5 = text === '5' || normalizedText.includes('atendente') || normalizedText.includes('falar') || normalizedText.includes('ajuda') || normalizedText.includes('humano');
 
             if (isMenu1) {
-                reply = "📖 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😉";
+                reply = btexts.menu1;
             } else if (isMenu2) {
-                reply = "🛒 *FAZER UM PEDIDO AGORA*\n\nJá escolheu? Então não perca tempo! Peça agora pelo nosso sistema de Delivery:\n🔗 https://garconnexpress.vercel.app/delivery\n\n🚀 *Dica:* Seus dados ficam salvos para o próximo pedido ser ainda mais rápido!";
+                reply = btexts.menu2;
             } else if (isMenu3) {
                 try {
                     const response = await fetch('https://garconnexpress.vercel.app/api/menu');
@@ -733,23 +759,23 @@ async function connectToWhatsApp() {
                     if (promos.length > 0) {
                         reply = "🔥 *PROMOÇÕES IMPERDÍVEIS DE HOJE*\n\n" + promos.map(p => `✨ *${p.nome}*\n💰 Por apenas: *R$ ${parseFloat(p.preco).toFixed(2)}*\n`).join('\n') + "\n_Aproveite antes que acabe!_ 🏃💨";
                     } else {
-                        reply = "No momento não temos promoções ativas, mas nossos preços continuam os melhores da região! 😉\n\nConfira tudo aqui: https://garconnexpress.vercel.app/delivery";
+                        reply = btexts.menu3;
                     }
                 } catch (e) { reply = "Ops! Tive um problema ao buscar as promoções. Mas você pode ver tudo no nosso cardápio: https://garconnexpress.vercel.app/delivery"; }
             } else if (isMenu4) {
-                reply = "📍 *ONDE ESTAMOS E QUANDO ABRIMOS*\n\n🏠 *Endereço:* Rua Demócrito Gracindo, 132 - Ponta Grossa\n\n⏰ *Horário de Funcionamento:*\nTerça a Domingo: das 18h às 02h\n\n_Venha nos visitar ou peça no conforto do seu sofá!_ 🏠🍻";
+                reply = btexts.menu4;
             } else if (isMenu5) {
-                reply = "👨‍💻 *ATENDIMENTO HUMANO*\n\nEntendi! Já avisei a nossa equipe. Um de nossos atendentes falará com você em instantes.\n\n_Por favor, aguarde um momento..._";
+                reply = btexts.menu5;
                 chats[jid].atendimentoManual = true;
                 await db.set('chats', chats).write();
                 io.emit('status_atendimento', { jid, atendimentoManual: true });
             } else if (!/^[1-5]/.test(text)) {
                 // FALLBACK INTELIGENTE: Se não entendeu e está em delivery, mostra o menu de delivery
                 if (estado === 'delivery') {
-                    reply = `Olá ${pushName}! 👋\n\nIdentificamos que você tem um pedido ativo conosco! 🛍️\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻`;
+                    reply = btexts.delivery.split('{nome}').join(pushName || '');
                 } else {
                     // Se não está em delivery, mostra o menu normal de boas-vindas
-                    reply = `Olá ${pushName}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📖\n2️⃣ - Fazer um Pedido agora 🛒\n3️⃣ - Ver Promoções do Dia 🔥\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._`;
+                    reply = btexts.welcome.split('{nome}').join(pushName || '');
                 }
             }
         }
