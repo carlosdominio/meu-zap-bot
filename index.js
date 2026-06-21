@@ -134,6 +134,7 @@ async function checkInactivity() {
 
 app.use(express.static('public'));
 app.get('/health', (req, res) => res.send('OK'));
+app.get('/status', (req, res) => res.json({ status: statusConexao }));
 
 // ROTA PARA NOTIFICAÇÕES DE STATUS DE DELIVERY
 app.post('/api/notify-delivery', async (req, res) => {
