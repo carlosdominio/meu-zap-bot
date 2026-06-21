@@ -388,15 +388,16 @@ async function sendHumanizedMessage(jid, content, options = {}) {
 
 async function getBotTexts() {
     try {
-        const res = await fetch('http://localhost:3001/api/bot-responses');
+        const baseUrl = DELIVERY_API_URL.replace('/pedidos', '');
+        const res = await fetch(`${baseUrl}/bot-responses`);
         if (res.ok) {
             const data = await res.json();
             if (Object.keys(data).length > 0) return data;
         }
     } catch(e) {}
     return {
-        welcome: "Olá `${pushName}`! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
-        delivery: "Olá `${pushName}`! 👋\n\nIdentificamos que você tem um pedido ativo conosco! 🛵🍔\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻",
+        welcome: "Olá {nome}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+        delivery: "Olá {nome}! 👋\n\nIdentificamos que você tem um pedido ativo conosco! 🛵🍔\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻",
         menu1: "📋 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😋",
         menu2: "🛵 *FAZER UM PEDIDO AGORA*\n\nJá escolheu? Então não perca tempo! Peça agora pelo nosso sistema de Delivery:\n🔗 https://garconnexpress.vercel.app/delivery\n\n💡 *Dica:* Seus dados ficam salvos para o próximo pedido ser ainda mais rápido!",
         menu3: "No momento não temos promoções ativas, mas nossos preços continuam os melhores da região! 😉\n\nConfira tudo aqui: https://garconnexpress.vercel.app/delivery",
