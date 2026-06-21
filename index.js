@@ -423,6 +423,8 @@ async function saveMessage(jid, msg, name) {
 
     if (isSelf) {
         chats[jid].name = "Pedidos Zap 📦";
+    } else if (chats[jid].isSystemNotification) {
+        // Trava o nome se for o número de notificações
     } else if (name && name !== "Voce" && name !== "Robo") {
         chats[jid].name = name;
     }
@@ -520,6 +522,21 @@ io.on('connection', (socket) => {
             // Também emite um log para o console do servidor
             const effectivelyOpen = isStoreOpen();
             console.log(`🏪 [Caixa] Novo status: ${normalized.toUpperCase()} | Funcionando agora: ${effectivelyOpen ? 'SIM' : 'NÃO'}`);
+        }
+    });
+
+    socket.on('rename_chat', async (data) => {
+        const { jid, name } = data;
+        if (db && jid && name) {
+            const chats = db.get('chats').value() || {};
+            if (!chats[jid]) {
+                chats[jid] = { name: name, messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'normal' };
+            } else {
+                chats[jid].name = name;
+            }
+            chats[jid].isSystemNotification = true;
+            await db.set('chats', chats).write();
+            io.emit('chat_renamed', { jid, name });
         }
     });
 
