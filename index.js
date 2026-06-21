@@ -819,14 +819,19 @@ async function connectToWhatsApp() {
                         // Se não está em delivery, mostra o menu normal de boas-vindas
                         reply = btexts.welcome.split('{nome}').join(pushName || '');
                         if (btexts.customMenusMain && btexts.customMenusMain.length > 0) {
-                            // Antes de colocar as opções dinâmicas, ver se tem "_Basta digitar_" no final para colocar antes
-                            const splitParts = reply.split('_Basta digitar');
+                            // Procura variações de "Basta digitar", "Digite", "Escolha" para inserir o menu extra antes dessa frase final
+                            const regexFim = /(_|\*)*(basta digitar|digite o n|escolha uma|para escolher|digite a op)/i;
+                            const matchFim = reply.match(regexFim);
+                            
                             let customMenuText = '';
                             btexts.customMenusMain.forEach(m => {
                                 customMenuText += `${m.option}️⃣ - ${m.title} 📌\n`;
                             });
-                            if (splitParts.length > 1) {
-                                reply = splitParts[0] + customMenuText + '\n_Basta digitar' + splitParts[1];
+                            
+                            if (matchFim && matchFim.index > 0) {
+                                const antes = reply.substring(0, matchFim.index);
+                                const depois = reply.substring(matchFim.index);
+                                reply = antes + customMenuText + '\n' + depois;
                             } else {
                                 reply += `\n\n${customMenuText}`;
                             }
