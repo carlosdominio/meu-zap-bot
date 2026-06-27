@@ -599,6 +599,12 @@ async function connectToWhatsApp() {
         const msg = m.messages[0];
         if (!msg.message) return;
         const jid = msg.key.remoteJid;
+        
+        // IGNORA GRUPOS, LISTAS DE TRANSMISSÃO E STATUS
+        if (jid === 'status@broadcast' || jid.includes('@g.us') || jid.includes('@broadcast') || jid.startsWith('-')) {
+            return;
+        }
+
         const fromMe = msg.key.fromMe;
         const pushName = fromMe ? "Voce" : (msg.pushName || jid.split('@')[0]);
         let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
