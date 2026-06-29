@@ -28,7 +28,9 @@
         .btn-del-chat:hover { transform: scale(1.2); opacity: 1; }
         #main-chat { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #efeae2; position: relative; }      
         #chat-header { background: #f0f2f5; padding: 10px 20px; border-bottom: 1px solid #ddd; height: 60px; display: flex; align-items: center; font-weight: bold; }
-        #messages { flex: 1; min-height: 0; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        #messages { flex: 1; min-height: 0; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scrollbar-width: thin; scrollbar-color: #00a884 transparent; }
+        #messages::-webkit-scrollbar { width: 6px; }
+        #messages::-webkit-scrollbar-thumb { background: #00a884; border-radius: 10px; }
         .msg { max-width: 70%; padding: 10px 15px; border-radius: 8px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; } 
         .msg-recebida { align-self: flex-start; background: white; }
         .msg-enviada { align-self: flex-end; background: #d9fdd3; }
@@ -378,7 +380,7 @@
         sortedJids.forEach(jid => {
             const chat = chatData[jid];
             const cleanJid = jid.split('@')[0].split(':')[0];
-            const isPedidosZap = chat.name === 'Pedidos Zap 📦';
+            const isPedidosZap = chat.name === 'Pedidos Zap 📦' || chat.name === 'Pedidos Zap 📦 🤖' || chat.name === 'Notificações Meu zap 🔔';
             
             // REGRA DE OURO: Se for o admin mas não for o chat de Pedidos Zap, esconde.
             if (cleanJid.includes('558293157048') && !isPedidosZap) return;
