@@ -423,7 +423,7 @@ async function saveMessage(jid, msg, name) {
     }
 
     if (isSelf) {
-        chats[jid].name = "Pedidos Zap 📦";
+        chats[jid].name = "Notificações Meu zap 🔔";
     } else if (chats[jid].isSystemNotification) {
         // Trava o nome se for o número de notificações
     } else if (name && name !== "Voce" && name !== "Robo") {
