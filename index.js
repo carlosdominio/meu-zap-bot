@@ -637,6 +637,16 @@ async function connectToWhatsApp() {
 
         if (fromMe) return;
 
+        // BLOQUEIO: O robô JAMAIS deve tentar atender ou mandar mensagem de boas-vindas para si mesmo ou para o dono
+        const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0];
+        const isSelf = myJid && jid.includes(myJid);
+        const isAdmin = jid.includes('558293157048');
+
+        if (isSelf || isAdmin) {
+            console.log(`🛡️ [Bloqueio] Ignorando fluxo de robô para Admin/Si mesmo: ${jid}`);
+            return;
+        }
+
         // --- VERIFICAÇÃO DE STATUS DA LOJA (LOG EM TEMPO REAL) ---
         const storeOpen = isStoreOpen();
         const chats = db.get('chats').value() || {};
