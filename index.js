@@ -541,6 +541,28 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('pin_chat', async (data) => {
+        try {
+            if (sock && data.jid) {
+                const pinState = data.unpin ? false : true;
+                await sock.chatModify({ pin: pinState }, data.jid);
+                console.log(pinState ? `📌 Conversa fixada: ${data.jid}` : `📍 Conversa desfixada: ${data.jid}`);
+                
+                // Salvar o estado no banco e notificar a UI
+                if (db) {
+                    const chats = db.get('chats').value() || {};
+                    if (chats[data.jid]) {
+                        chats[data.jid].isPinned = pinState;
+                        await db.set('chats', chats).write();
+                        io.emit('chat_renamed', { jid: data.jid, name: chats[data.jid].name, isPinned: pinState });
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('❌ Erro ao modificar fixação da conversa:', error.message);
+        }
+    });
+
     socket.on('delete_chat', async (jid) => {
         if (db) {
             const chats = db.get('chats').value() || {};

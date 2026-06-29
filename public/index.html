@@ -108,6 +108,17 @@
     </div>
 </div>
 
+<div id="modal-confirm-pin" class="modal-overlay" style="z-index: 3000; display:none;">
+    <div class="modal-content">
+        <div class="modal-title" id="pin-modal-title">Fixar Conversa?</div>
+        <div class="modal-text" id="pin-modal-text">Deseja fixar essa conversa no topo do WhatsApp?</div>
+        <div class="modal-buttons">
+            <button class="btn-modal btn-cancel" onclick="closePinModal()">Cancelar</button>
+            <button class="btn-modal" id="btn-modal-confirm-pin" style="background:#00a884; color:white;">Confirmar</button>
+        </div>
+    </div>
+</div>
+
 <div id="qr-overlay" style="display: flex;">
     <h2 id="status-text">Iniciando...</h2>
     <img id="qr-img" src="" alt="QR Code" style="width: 250px; margin: 20px; display: none;">
@@ -253,6 +264,17 @@
         }
         updateChatList();
     });
+
+    socket.on('chat_renamed', (data) => {
+        if (chatData[data.jid]) {
+            chatData[data.jid].name = data.name;
+            if (data.isPinned !== undefined) {
+                chatData[data.jid].isPinned = data.isPinned;
+            }
+            updateChatList();
+        }
+    });
+
     socket.on('status_atendimento', (data) => {
         if (chatData[data.jid]) {
             chatData[data.jid].atendimentoManual = data.atendimentoManual;
@@ -347,29 +369,41 @@
     function updateChatList() {
         const listDiv = document.getElementById('chat-list');
         listDiv.innerHTML = '';
-        const sortedJids = Object.keys(chatData).sort((a, b) => (chatData[b].lastUpdate || 0) - (chatData[a].lastUpdate || 0));     
+        const sortedJids = Object.keys(chatData).sort((a, b) => {
+            const pinA = chatData[a].isPinned ? 1 : 0;
+            const pinB = chatData[b].isPinned ? 1 : 0;
+            if (pinA !== pinB) return pinB - pinA;
+            return (chatData[b].lastUpdate || 0) - (chatData[a].lastUpdate || 0);
+        });     
         sortedJids.forEach(jid => {
             const chat = chatData[jid];
             const cleanJid = jid.split('@')[0].split(':')[0];
             const isPedidosZap = chat.name === 'Pedidos Zap 📦';
             
             // REGRA DE OURO: Se for o admin mas não for o chat de Pedidos Zap, esconde.
-            if (cleanJid.includes('558293157048') && !isPedidosZap) {
-                return;
-            }
+            if (cleanJid.includes('558293157048') && !isPedidosZap) return;
             
             // Se for um número bloqueado mas NÃO for o Pedidos Zap, esconde.
-            if (blockedNumbers.some(num => cleanJid.includes(num)) && !isPedidosZap) {
-                console.log('🙈 [UI] Ocultando chat de sistema/admin:', jid);
-                return;
-            }
+            if (blockedNumbers.some(num => cleanJid.includes(num)) && !isPedidosZap) return;
+
             const item = document.createElement('div');
             const isUnread = chat.unreadCount > 0;
             item.className = 'chat-item' + (jid === currentJid ? ' active' : '') + (isUnread ? ' unread' : '');
+            
+            // Highlight background se estiver fixado
+            if (chat.isPinned && jid !== currentJid && !isUnread) {
+                item.style.background = '#fcf8e3'; // Amarelo bem suave
+            }
+
             item.onclick = () => openChat(jid);
             const statusIcon = chat.atendimentoManual ? '👤' : '🤖';
             const humanBadge = chat.atendimentoManual ? '<span class="badge-msg badge-human">HUMANO</span>' : '';
-            item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + humanBadge + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa">🗑️</button>';
+            
+            const pinIcon = '📌'; 
+            const pinTitle = chat.isPinned ? 'Desfixar do Zap' : 'Fixar no topo do Zap';
+            const pinStyle = chat.isPinned ? 'background:#ffeb3b; border-radius:50%; box-shadow:0 0 8px #ffeb3b; opacity:1;' : 'opacity:0.7;';
+
+            item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + humanBadge + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><div style="display: flex;"><button onclick="fixarConversa(event, \'' + jid + '\', ' + (chat.isPinned ? 'true' : 'false') + ')" title="' + pinTitle + '" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; transition: 0.2s; ' + pinStyle + '">' + pinIcon + '</button><button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa" style="padding:3px;">🗑️</button></div>';
             listDiv.appendChild(item);
         });
     }
@@ -463,6 +497,24 @@
         document.getElementById('btn-modal-confirm').onclick = () => { if (jidToDelete) { socket.emit('delete_chat', jidToDelete); closeModal(); } };
     }
     function closeModal() { document.getElementById('modal-confirm').style.display = 'none'; jidToDelete = null; }
+    let jidToPin = null;
+    let isUnpinAction = false;
+    function fixarConversa(e, jid, unpin) { 
+        e.stopPropagation(); 
+        jidToPin = jid;
+        isUnpinAction = unpin;
+        document.getElementById('pin-modal-title').innerText = unpin ? 'Desfixar Conversa?' : 'Fixar Conversa?';
+        document.getElementById('pin-modal-text').innerText = unpin ? 'Deseja remover esta conversa do topo do WhatsApp?' : 'Deseja fixar essa conversa no topo do WhatsApp?';
+        document.getElementById('modal-confirm-pin').style.display = 'flex';
+        document.getElementById('btn-modal-confirm-pin').onclick = () => {
+            if (jidToPin) socket.emit('pin_chat', { jid: jidToPin, unpin: isUnpinAction });
+            closePinModal();
+        };
+    }
+    function closePinModal() {
+        document.getElementById('modal-confirm-pin').style.display = 'none';
+        jidToPin = null;
+    }
     function apagarConversa(e, jid) { e.stopPropagation(); openConfirmModal(jid); }
     function enviar() {
         const input = document.getElementById('msg-input');
