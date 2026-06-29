@@ -631,6 +631,19 @@ async function connectToWhatsApp() {
         const pushName = fromMe ? "Voce" : (msg.pushName || jid.split('@')[0]);
         let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").trim();
         
+        // Identifica e dá nome para mídias
+        if (msg.message.imageMessage) text = "📷 Imagem recebida";
+        else if (msg.message.audioMessage) text = "🎵 Áudio recebido";
+        else if (msg.message.videoMessage) text = "🎥 Vídeo recebido";
+        else if (msg.message.stickerMessage) text = "🏷️ Figurinha recebida";
+        else if (msg.message.reactionMessage) return; // Ignora reações invisíveis
+        
+        // Se após tudo isso ainda for vazio (como um evento de sistema ou protocolo), ignora!
+        if (!text) {
+            console.log(`[Sistema] Mensagem de protocolo ou vazia ignorada de ${jid}`);
+            return;
+        }
+        
         const msgObj = { id: msg.key.id, from: jid, text, fromMe, time: getFormattedTime(msg.messageTimestamp ? msg.messageTimestamp * 1000 : undefined), sender: jid, pushName };
         await saveMessage(jid, msgObj, pushName);
         io.emit('new_msg', msgObj);
