@@ -8,6 +8,98 @@ const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
 
+// ─── PostgreSQL para sessão do WhatsApp ───────────────────────────────────────
+const { Pool } = require('pg');
+const pgPool = process.env.DATABASE_URL ? new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+}) : null;
+
+async function usePostgresAuthState() {
+    const { initAuthCreds, BufferJSON, proto } = await import('@whiskeysockets/baileys');
+
+    // Fallback para arquivo local se DATABASE_URL não estiver configurada
+    if (!pgPool) {
+        const { useMultiFileAuthState } = await import('@whiskeysockets/baileys');
+        console.log('⚠️ [Auth] DATABASE_URL não configurada. Usando auth_info_baileys local.');
+        return useMultiFileAuthState('auth_info_baileys');
+    }
+
+    // Cria tabela se não existir
+    await pgPool.query(`
+        CREATE TABLE IF NOT EXISTS zap_session (
+            id TEXT PRIMARY KEY,
+            value TEXT NOT NULL,
+            updated_at TIMESTAMP DEFAULT NOW()
+        )
+    `);
+
+    const readData = async (id) => {
+        try {
+            const res = await pgPool.query('SELECT value FROM zap_session WHERE id = $1', [id]);
+            if (res.rows.length === 0) return null;
+            return JSON.parse(res.rows[0].value, BufferJSON.reviver);
+        } catch (e) { return null; }
+    };
+
+    const writeData = async (id, data) => {
+        try {
+            const value = JSON.stringify(data, BufferJSON.replacer);
+            await pgPool.query(
+                'INSERT INTO zap_session (id, value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET value = $2, updated_at = NOW()',
+                [id, value]
+            );
+        } catch (e) { console.error(`❌ [PostgreSQL] Erro ao salvar ${id}:`, e.message); }
+    };
+
+    const removeData = async (id) => {
+        try {
+            await pgPool.query('DELETE FROM zap_session WHERE id = $1', [id]);
+        } catch (e) { console.error(`❌ [PostgreSQL] Erro ao remover ${id}:`, e.message); }
+    };
+
+    const credsData = await readData('creds') || initAuthCreds();
+
+    const state = {
+        creds: credsData,
+        keys: {
+            get: async (type, ids) => {
+                const data = {};
+                await Promise.all(ids.map(async (id) => {
+                    let value = await readData(`${type}-${id}`);
+                    if (type === 'app-state-sync-key' && value) {
+                        value = proto.Message.AppStateSyncKeyData.fromObject(value);
+                    }
+                    data[id] = value;
+                }));
+                return data;
+            },
+            set: async (data) => {
+                const tasks = [];
+                for (const category in data) {
+                    for (const id in data[category]) {
+                        const value = data[category][id];
+                        tasks.push(value ? writeData(`${category}-${id}`, value) : removeData(`${category}-${id}`));
+                    }
+                }
+                await Promise.all(tasks);
+            }
+        }
+    };
+
+    const saveCreds = () => writeData('creds', state.creds);
+    console.log('✅ [PostgreSQL] Sessão do WhatsApp carregada do banco!');
+    return { state, saveCreds };
+}
+
+async function clearPostgresSession() {
+    if (!pgPool) return;
+    try {
+        await pgPool.query('DELETE FROM zap_session');
+        console.log('🗑️ [PostgreSQL] Sessão apagada do banco.');
+    } catch (e) { console.error('❌ Erro ao apagar sessão:', e.message); }
+}
+
 // Banco de dados local
 const low = require('lowdb');
 const FileAsync = require('lowdb/adapters/FileAsync');
@@ -574,9 +666,9 @@ io.on('connection', (socket) => {
 });
 
 async function connectToWhatsApp() {
-    const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
+    const { default: makeWASocket, DisconnectReason, Browsers, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
     const { version } = await fetchLatestBaileysVersion();
-    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+    const { state, saveCreds } = await usePostgresAuthState();
     
     sock = makeWASocket({ 
         version,
@@ -587,7 +679,7 @@ async function connectToWhatsApp() {
 
     sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', (update) => {
+    sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect, qr } = update;
         if (qr) {
             console.log('📸 [WhatsApp] Novo QR Code gerado!');
@@ -609,8 +701,10 @@ async function connectToWhatsApp() {
             if (shouldReconnect) {
                 setTimeout(connectToWhatsApp, 5000);
             } else {
-                if (fs.existsSync('auth_info_baileys')) fs.rmSync('auth_info_baileys', { recursive: true, force: true });
-                setTimeout(connectToWhatsApp, 2000);
+                clearPostgresSession().finally(() => {
+                    if (fs.existsSync('auth_info_baileys')) fs.rmSync('auth_info_baileys', { recursive: true, force: true });
+                    setTimeout(connectToWhatsApp, 2000);
+                });
             }
             statusConexao = "DESCONECTADO";
             io.emit('status', { status: statusConexao });
