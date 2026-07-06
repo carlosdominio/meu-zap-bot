@@ -166,6 +166,11 @@ async function cleanupOldChats() {
     let changed = false;
 
     for (const jid in chats) {
+        // Exceção: Não apaga notificações de sistema ou chats fixados
+        if (chats[jid].isSystemNotification || chats[jid].isPinned) {
+            continue;
+        }
+
         if (chats[jid].lastUpdate && (now - chats[jid].lastUpdate) >= CHAT_EXPIRY_THRESHOLD) {
             console.log(`🧹 [Cleanup] Removendo chat inativo há mais de 24h: ${jid}`);
             delete chats[jid];
