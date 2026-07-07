@@ -494,7 +494,7 @@ async function getBotTexts() {
         }
     } catch(e) {}
     return {
-        welcome: "Olá {nome}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n\n_Basta digitar o número da opção desejada._",
+        welcome: "Olá {nome}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n6️⃣ - Acompanhar Pedido Delivery 🛵\n\n_Basta digitar o número da opção desejada._",
         delivery: "Olá {nome}! 👋\n\nIdentificamos que você tem um pedido ativo conosco! 🛵🍔\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻",
         menu1: "📋 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😋",
         menu2: "🛵 *FAZER UM PEDIDO AGORA*\n\nJá escolheu? Então não perca tempo! Peça agora pelo nosso sistema de Delivery:\n🔗 https://garconnexpress.vercel.app/delivery\n\n💡 *Dica:* Seus dados ficam salvos para o próximo pedido ser ainda mais rápido!",
@@ -873,6 +873,47 @@ async function connectToWhatsApp() {
         // Se for uma resposta de pesquisa, já lidamos com o menu acima e demos 'return'
         if (isSurveyResponse) return;
 
+        // --- LÓGICA DE RESPOSTAS (ESTADO: AGUARDANDO ID DO PEDIDO) ---
+        if (estado === 'aguardando_id_pedido') {
+            const possibleId = (text.match(/\d+/) || [])[0];
+            if (possibleId) {
+                try {
+                    const resp = await fetch(`${DELIVERY_API_URL}/${possibleId}`);
+                    if (resp.ok) {
+                        const ped = await resp.json();
+                        const stMap = { 
+                            'recebido': 'Preparando 👨‍🍳', 
+                            'preparando': 'Preparando 👨‍🍳', 
+                            'pronto': 'Pronto 🥡', 
+                            'saiu_entrega': 'A caminho 🛵', 
+                            'servido': 'Saiu para Entrega 🛵', 
+                            'entregue': 'Entregue 😋', 
+                            'aguardando_fechamento': 'Entregue 😋' 
+                        };
+                        const statusDesc = stMap[ped.status] || ped.status || 'Em processamento... ⏳';
+                        reply = `📦 *STATUS DO PEDIDO #${possibleId}*\n\nOlá ${pushName}, localizamos o seu pedido! ✨\n\n📊 *Status Atual:* *${statusDesc}*\n\n💡 *Dica:* Te avisaremos aqui assim que houver uma nova atualização! 🛵💨`;
+                        
+                        chats[jid].activePedidoId = possibleId;
+                        chats[jid].estado = 'delivery';
+                    } else {
+                        reply = `Ops! Não conseguimos localizar o pedido #${possibleId}. Por favor, verifique se o número está correto ou digite '5' para falar com um atendente.`;
+                        chats[jid].estado = 'normal';
+                    }
+                } catch (e) {
+                    console.error(`❌ Erro ao consultar pedido #${possibleId}:`, e.message);
+                    reply = "Erro ao consultar o status do pedido. Tente novamente mais tarde. 😕";
+                    chats[jid].estado = 'normal';
+                }
+            } else {
+                reply = "Por favor, envie apenas o NÚMERO do seu pedido. Exemplo: 1234";
+            }
+            await db.set('chats', chats).write();
+            
+            const s = await sendHumanizedMessage(jid, { text: reply });
+            await saveMessage(jid, { id: s.key.id, text: reply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+            return;
+        }
+
         // --- LÓGICA DE RESPOSTAS (ESTADO: DELIVERY) ---
         if (estado === 'delivery') {
             const isCheckStatus = text === '1' || normalizedText.includes('status') || normalizedText.includes('rastrear') || (normalizedText.includes('pedido') && !normalizedText.includes('fazer'));
@@ -924,6 +965,7 @@ async function connectToWhatsApp() {
             const isMenu3 = text === '3' || normalizedText.includes('promo') || normalizedText.includes('oferta');
             const isMenu4 = text === '4' || normalizedText.includes('endereco') || normalizedText.includes('local') || normalizedText.includes('onde') || normalizedText.includes('horario');
             const isMenu5 = text === '5' || normalizedText.includes('atendente') || normalizedText.includes('falar') || normalizedText.includes('ajuda') || normalizedText.includes('humano');
+            const isMenu6 = text === '6' || normalizedText.includes('acompanhar pedido') || normalizedText.includes('acompanhar delivery');
 
             if (isMenu1) {
                 reply = btexts.menu1;
@@ -947,7 +989,11 @@ async function connectToWhatsApp() {
                 chats[jid].atendimentoManual = true;
                 await db.set('chats', chats).write();
                 io.emit('status_atendimento', { jid, atendimentoManual: true });
-            } else if (!/^[1-5]/.test(text)) {
+            } else if (isMenu6) {
+                reply = "Entendido! 📦\n\nPor favor, digite apenas o *número do seu Pedido Delivery* para consultarmos o status:";
+                chats[jid].estado = 'aguardando_id_pedido';
+                await db.set('chats', chats).write();
+            } else if (!/^[1-6]/.test(text)) {
                 // Checar menus dinâmicos principais
                 let match = null;
                 if (btexts.customMenusMain && btexts.customMenusMain.length > 0) {
