@@ -495,7 +495,7 @@ async function getBotTexts() {
     } catch(e) {}
     return {
         welcome: "Olá {nome}! 👋 Seja muito bem-vindo ao *GuGA Bebidas*! 🍻\n\nComo podemos deixar o seu dia melhor hoje?\n\n1️⃣ - Ver nosso Cardápio 📋\n2️⃣ - Fazer um Pedido agora 🛵\n3️⃣ - Ver Promoções do Dia 🤑\n4️⃣ - Endereço e Horários 📍\n5️⃣ - Falar com um Atendente 👨‍💻\n6️⃣ - Acompanhar Pedido Delivery 🛵\n\n_Basta digitar o número da opção desejada._",
-        delivery: "Olá {nome}! 👋\n\nIdentificamos que você tem um pedido ativo conosco! 🛵🍔\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻",
+        delivery: "Olá {nome}! 👋\n\nIdentificamos que você tem um pedido ativo conosco! 🛵🍔\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻\n3️⃣ - Voltar ao Menu Principal ↩️",
         menu1: "📋 *NOSSO CARDÁPIO DIGITAL*\n\nExplore todas as nossas bebidas e delícias diretamente pelo link abaixo:\n🔗 https://garconnexpress.vercel.app/delivery\n\n_Dê uma olhadinha e escolha o seu preferido!_ 😋",
         menu2: "🛵 *FAZER UM PEDIDO AGORA*\n\nJá escolheu? Então não perca tempo! Peça agora pelo nosso sistema de Delivery:\n🔗 https://garconnexpress.vercel.app/delivery\n\n💡 *Dica:* Seus dados ficam salvos para o próximo pedido ser ainda mais rápido!",
         menu3: "No momento não temos promoções ativas, mas nossos preços continuam os melhores da região! 😉\n\nConfira tudo aqui: https://garconnexpress.vercel.app/delivery",
@@ -918,6 +918,7 @@ async function connectToWhatsApp() {
         if (estado === 'delivery') {
             const isCheckStatus = text === '1' || normalizedText.includes('status') || normalizedText.includes('rastrear') || (normalizedText.includes('pedido') && !normalizedText.includes('fazer'));
             const isCallHuman = text === '2' || normalizedText.includes('atendente') || normalizedText.includes('falar') || normalizedText.includes('ajuda') || normalizedText.includes('humano');
+            const isExit = text === '3' || normalizedText.includes('voltar') || normalizedText.includes('sair') || normalizedText.includes('encerrar');
 
             if (isCheckStatus) {
                 const pId = chatData.activePedidoId;
@@ -945,6 +946,12 @@ async function connectToWhatsApp() {
                 chats[jid].atendimentoManual = true;
                 await db.set('chats', chats).write();
                 io.emit('status_atendimento', { jid, atendimentoManual: true });
+            } else if (isExit) {
+                chats[jid].estado = 'normal';
+                chats[jid].activePedidoId = null;
+                await db.set('chats', chats).write();
+                const btexts = await getBotTexts();
+                reply = "Prontinho! Você saiu do acompanhamento do pedido. 🔄\n\n" + btexts.welcome.split('{nome}').join(pushName || '');
             } else {
                 // Checar menus dinâmicos de delivery
                 const btexts = await getBotTexts();
