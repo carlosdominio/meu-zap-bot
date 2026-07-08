@@ -484,6 +484,31 @@ async function sendHumanizedMessage(jid, content, options = {}) {
     } catch (e) { throw e; }
 }
 
+async function getPedidoResumo(pedidoId, statusText, pushName) {
+    try {
+        const resp = await fetch(`${DELIVERY_API_URL}/${pedidoId}`);
+        if (!resp.ok) return null;
+        const ped = await resp.json();
+        
+        let itemsText = "";
+        try {
+            const itemsResp = await fetch(`${DELIVERY_API_URL}/${pedidoId}/itens`);
+            if (itemsResp.ok) {
+                const items = await itemsResp.json();
+                if (items && items.length > 0) {
+                    itemsText = "\n\n📋 *Itens do Pedido:*\n" + items.map(i => `▫️ ${i.quantidade}x ${i.nome} (R$ ${parseFloat(i.preco).toFixed(2)})`).join('\n');
+                }
+            }
+        } catch(e) {}
+
+        const details = ped.observacao || '';
+        
+        return `🛍️ *DETALHES DO PEDIDO #${pedidoId}*\n\n📌 *Status Atual:* *${statusText}*\n\n${details}${itemsText}\n\n💵 *Total:* *R$ ${parseFloat(ped.total).toFixed(2)}*\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻\n3️⃣ - Voltar ao Menu Principal ↩️`;
+    } catch (e) {
+        return null;
+    }
+}
+
 async function getBotTexts() {
     try {
         const baseUrl = DELIVERY_API_URL.replace('/pedidos', '');
@@ -851,16 +876,17 @@ async function connectToWhatsApp() {
                         'aguardando_fechamento': 'Entregue 😋' 
                     };
                     const statusDesc = stMap[ped.status] || ped.status || 'Em processamento... ⏳';
-                    const statusReply = `📦 *STATUS DO PEDIDO #${detectedPedidoId}*\n\nOlá ${pushName}! 👋\n\n📊 *Status Atual:* *${statusDesc}*\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻\n3️⃣ - Voltar ao Menu Principal ↩️`;
+                    const statusReply = await getPedidoResumo(detectedPedidoId, statusDesc, pushName);
                     
-                    // Vincula o chat ao pedido para futuras consultas rápidas (Opção 1)
-                    chatData.activePedidoId = detectedPedidoId;
-                    chatData.estado = 'delivery';
-                    await db.set('chats', chats).write();
+                    if (statusReply) {
+                        chatData.activePedidoId = detectedPedidoId;
+                        chatData.estado = 'delivery';
+                        await db.set('chats', chats).write();
 
-                    await sendHumanizedMessage(jid, { text: statusReply });
-                    await saveMessage(jid, { id: 'search-' + Date.now(), text: statusReply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
-                    return; // Interrompe para não mostrar o menu logo abaixo
+                        await sendHumanizedMessage(jid, { text: statusReply });
+                        await saveMessage(jid, { id: 'search-' + Date.now(), text: statusReply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+                        return; // Interrompe para não mostrar o menu logo abaixo
+                    }
                 }
             } catch (e) {
                 console.error(`❌ Erro na busca inteligente por ID #${detectedPedidoId}:`, e.message);
@@ -891,10 +917,14 @@ async function connectToWhatsApp() {
                             'aguardando_fechamento': 'Entregue 😋' 
                         };
                         const statusDesc = stMap[ped.status] || ped.status || 'Em processamento... ⏳';
-                        reply = `📦 *STATUS DO PEDIDO #${possibleId}*\n\nOlá ${pushName}! 👋\n\n📊 *Status Atual:* *${statusDesc}*\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻\n3️⃣ - Voltar ao Menu Principal ↩️`;
+                        reply = await getPedidoResumo(possibleId, statusDesc, pushName);
                         
-                        chats[jid].activePedidoId = possibleId;
-                        chats[jid].estado = 'delivery';
+                        if (reply) {
+                            chats[jid].activePedidoId = possibleId;
+                            chats[jid].estado = 'delivery';
+                        } else {
+                            throw new Error('Falha no resumo');
+                        }
                     } else {
                         reply = `Ops! Não conseguimos localizar o pedido #${possibleId}. Por favor, verifique se o número está correto ou digite '5' para falar com um atendente.`;
                         chats[jid].estado = 'normal';
@@ -1017,7 +1047,16 @@ async function connectToWhatsApp() {
                                 'cancelado': 'Cancelado ❌'
                             };
                             const statusText = stMap[pedido.status] || pedido.status;
-                            reply = `Olá ${pushName || 'cliente'}! 👋\n\nIdentificamos o seu pedido ativo *#${pedido.id}*!\n\n📌 *Status Atual:* *${statusText}*\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻\n3️⃣ - Voltar ao Menu Principal ↩️`;
+                            const statusReply = await getPedidoResumo(pedido.id, statusText, pushName);
+                            
+                            if (statusReply) {
+                                chats[jid].estado = 'delivery';
+                                chats[jid].activePedidoId = String(pedido.id);
+                                await db.set('chats', chats).write();
+                                reply = statusReply;
+                            } else {
+                                throw new Error('Falha no resumo');
+                            }
                         } else {
                             throw new Error('Sem pedido');
                         }
