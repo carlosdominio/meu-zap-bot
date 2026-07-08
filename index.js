@@ -997,9 +997,38 @@ async function connectToWhatsApp() {
                 await db.set('chats', chats).write();
                 io.emit('status_atendimento', { jid, atendimentoManual: true });
             } else if (isMenu6) {
-                reply = "Entendido! 📦\n\nPor favor, digite apenas o *número do seu Pedido Delivery* para consultarmos o status:";
-                chats[jid].estado = 'aguardando_id_pedido';
-                await db.set('chats', chats).write();
+                const cleanPhone = jid.split('@')[0].replace(/\D/g, '');
+                try {
+                    const baseUrl = DELIVERY_API_URL.replace('/pedidos', '');
+                    const response = await fetch(`${baseUrl}/pedidos/ativo-telefone/${cleanPhone}`);
+                    if (response.ok) {
+                        const pedido = await response.json();
+                        if (pedido && pedido.id) {
+                            chats[jid].estado = 'delivery';
+                            chats[jid].activePedidoId = String(pedido.id);
+                            await db.set('chats', chats).write();
+
+                            const stMap = { 
+                                'recebido': 'Recebido 📝', 
+                                'preparando': 'Preparando 👨‍🍳🔥', 
+                                'pronto': 'Pronto 🥡✨', 
+                                'saiu_entrega': 'Saiu para Entrega 🛵💨',
+                                'entregue': 'Entregue 😋🥤',
+                                'cancelado': 'Cancelado ❌'
+                            };
+                            const statusText = stMap[pedido.status] || pedido.status;
+                            reply = `Olá ${pushName || 'cliente'}! 👋\n\nIdentificamos o seu pedido ativo *#${pedido.id}*!\n\n📌 *Status Atual:* *${statusText}*\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻\n3️⃣ - Voltar ao Menu Principal ↩️`;
+                        } else {
+                            throw new Error('Sem pedido');
+                        }
+                    } else {
+                        throw new Error('Resposta inválida');
+                    }
+                } catch (e) {
+                    reply = "Entendido! 📦\n\nNão encontrei nenhum pedido ativo associado ao seu número de WhatsApp.\n\nPor favor, digite apenas o *número do seu Pedido Delivery* (ex: 1234) para consultarmos o status:";
+                    chats[jid].estado = 'aguardando_id_pedido';
+                    await db.set('chats', chats).write();
+                }
             } else if (!/^[1-6]/.test(text)) {
                 // Checar menus dinâmicos principais
                 let match = null;
