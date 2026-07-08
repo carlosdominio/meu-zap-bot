@@ -291,21 +291,17 @@ app.post('/api/notify-delivery', async (req, res) => {
         
         const sentCat = lastNotifCategory[pedidoId];
 
-        // 1. Trava de duplicata desativada
-        /*
+        // 1. Se já enviamos ESTA mesma categoria, ignoramos duplicata
         if (currentCat && sentCat === currentCat) {
             console.log(`⚠️ [Delivery] Categoria ${currentCat} já enviada para Pedido #${pedidoId}. Ignorando duplicata.`);
             return res.json({ success: true, info: 'Categoria já enviada' });
         }
-        */
 
-        // 2. Trava de pedido finalizado desativada
-        /*
+        // 2. Se já finalizamos o pedido, ignoramos qualquer notificação de entrega que chegar depois
         if (currentCat === 'ENTREGUE' && sentCat === 'FINALIZADO') {
             console.log(`⚠️ [Delivery] Pedido #${pedidoId} já está FINALIZADO. Ignorando notificação de ENTREGA tardia.`);
             return res.json({ success: true, info: 'Pedido já finalizado' });
         }
-        */
     }
 
     const statusMessages = {
@@ -335,7 +331,7 @@ app.post('/api/notify-delivery', async (req, res) => {
     const isEntregueStatus = ['entregue', 'servido'].includes(status);
     
     // Lista de status que disparam o template de FINALIZAÇÃO
-    const isFinalizedStatus = ['concluido', 'finalizado', 'concluído', 'concluida', 'concluída', 'finalizada', 'pago', 'encerrado', 'fechado', 'aguardando_fechamento'].includes(status);
+    const isFinalizedStatus = ['entregue', 'servido', 'concluido', 'finalizado', 'concluído', 'concluida', 'concluída', 'finalizada', 'pago', 'encerrado', 'fechado', 'aguardando_fechamento'].includes(status);
 
     if (status === 'recebido') return res.json({ success: true, info: 'Recebimento silenciado' });
 
@@ -346,7 +342,7 @@ app.post('/api/notify-delivery', async (req, res) => {
 
     try {
         // --- SEQUENCE PROTECTOR: Se for FINALIZAR mas não enviamos o ENTREGUE, envia agora primeiro ---
-        if (db && isFinalizedStatus) {
+        if (db && isFinalizedStatus && !isEntregueStatus) {
             const lastNotifCategory = db.get('lastNotifications').value() || {};
             if (lastNotifCategory[pedidoId] !== 'ENTREGUE' && lastNotifCategory[pedidoId] !== 'FINALIZADO') {
                 console.log(`⚡ [Sequence] Forçando mensagem de ENTREGA antes da FINALIZAÇÃO para Pedido #${pedidoId}`);
