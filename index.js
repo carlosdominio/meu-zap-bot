@@ -851,7 +851,7 @@ async function connectToWhatsApp() {
                         'aguardando_fechamento': 'Entregue 😋' 
                     };
                     const statusDesc = stMap[ped.status] || ped.status || 'Em processamento... ⏳';
-                    const statusReply = `📦 *STATUS DO PEDIDO #${detectedPedidoId}*\n\nOlá ${pushName}, localizamos o seu pedido! ✨\n\n📊 *Status Atual:* *${statusDesc}*\n\n💡 *Dica:* Te avisaremos aqui assim que houver uma nova atualização! 🛵💨`;
+                    const statusReply = `📦 *STATUS DO PEDIDO #${detectedPedidoId}*\n\nOlá ${pushName}! 👋\n\n📊 *Status Atual:* *${statusDesc}*\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻\n3️⃣ - Voltar ao Menu Principal ↩️`;
                     
                     // Vincula o chat ao pedido para futuras consultas rápidas (Opção 1)
                     chatData.activePedidoId = detectedPedidoId;
@@ -891,7 +891,7 @@ async function connectToWhatsApp() {
                             'aguardando_fechamento': 'Entregue 😋' 
                         };
                         const statusDesc = stMap[ped.status] || ped.status || 'Em processamento... ⏳';
-                        reply = `📦 *STATUS DO PEDIDO #${possibleId}*\n\nOlá ${pushName}, localizamos o seu pedido! ✨\n\n📊 *Status Atual:* *${statusDesc}*\n\n💡 *Dica:* Te avisaremos aqui assim que houver uma nova atualização! 🛵💨`;
+                        reply = `📦 *STATUS DO PEDIDO #${possibleId}*\n\nOlá ${pushName}! 👋\n\n📊 *Status Atual:* *${statusDesc}*\n\nComo posso te ajudar agora?\n\n1️⃣ - Ver Status Atual 🕒\n2️⃣ - Falar com Atendente 👨‍💻\n3️⃣ - Voltar ao Menu Principal ↩️`;
                         
                         chats[jid].activePedidoId = possibleId;
                         chats[jid].estado = 'delivery';
