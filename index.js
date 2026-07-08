@@ -291,17 +291,21 @@ app.post('/api/notify-delivery', async (req, res) => {
         
         const sentCat = lastNotifCategory[pedidoId];
 
-        // 1. Se já enviamos ESTA mesma categoria, ignoramos duplicata
+        // 1. Trava de duplicata desativada
+        /*
         if (currentCat && sentCat === currentCat) {
             console.log(`⚠️ [Delivery] Categoria ${currentCat} já enviada para Pedido #${pedidoId}. Ignorando duplicata.`);
             return res.json({ success: true, info: 'Categoria já enviada' });
         }
+        */
 
-        // 2. Se já finalizamos o pedido, ignoramos qualquer notificação de entrega que chegar depois
+        // 2. Trava de pedido finalizado desativada
+        /*
         if (currentCat === 'ENTREGUE' && sentCat === 'FINALIZADO') {
             console.log(`⚠️ [Delivery] Pedido #${pedidoId} já está FINALIZADO. Ignorando notificação de ENTREGA tardia.`);
             return res.json({ success: true, info: 'Pedido já finalizado' });
         }
+        */
     }
 
     const statusMessages = {
