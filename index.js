@@ -467,6 +467,69 @@ app.post('/api/sync-caixa', async (req, res) => {
     res.status(500).json({ error: 'DB não pronto' });
 });
 
+// ─── ROTA: Notificações do Painel ADM → WhatsApp do Admin ────────────────────
+app.post('/api/notify-admin', async (req, res) => {
+    const { titulo, descricao, numero } = req.body;
+
+    if (!numero) return res.status(400).json({ error: 'numero é obrigatório' });
+    if (!titulo)  return res.status(400).json({ error: 'titulo é obrigatório' });
+
+    const cleanNumber = String(numero).replace(/\D/g, '');
+    const jid = cleanNumber + '@s.whatsapp.net';
+
+    if (!sock || statusConexao !== 'CONECTADO') {
+        console.warn('⚠️ [Notif-Admin] Bot offline. Notificação ignorada:', titulo);
+        return res.status(503).json({ error: 'Bot offline' });
+    }
+
+    const hora = getFormattedTime();
+    const mensagem = `🔔 *PAINEL ADM — ${titulo}*\n\n${descricao || ''}\n\n🕒 _${hora}_`;
+
+    try {
+        // Envia SEM delay humanizado (notificação de sistema deve ser imediata)
+        const s = await sock.sendMessage(jid, { text: mensagem });
+
+        const msgObj = {
+            id: s?.key?.id || ('adm-' + Date.now()),
+            text: mensagem,
+            fromMe: true,
+            time: hora,
+            sender: sock.user?.id,
+            pushName: 'Notificações Meu zap 🔔 🤖'
+        };
+
+        if (db) {
+            const chats = db.get('chats').value() || {};
+            if (!chats[jid]) {
+                chats[jid] = {
+                    name: 'Notificações Meu zap 🔔 🤖',
+                    messages: [],
+                    unreadCount: 0,
+                    lastUpdate: Date.now(),
+                    estado: 'normal',
+                    isSystemNotification: true
+                };
+            }
+            // Garante nome e flag de sistema sempre
+            chats[jid].name = 'Notificações Meu zap 🔔 🤖';
+            chats[jid].isSystemNotification = true;
+            chats[jid].lastUpdate = Date.now();
+            chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
+            if (!chats[jid].messages) chats[jid].messages = [];
+            chats[jid].messages.push(msgObj);
+            if (chats[jid].messages.length > 100) chats[jid].messages.shift();
+            await db.set('chats', chats).write();
+        }
+
+        io.emit('new_msg', msgObj);
+        console.log(`✅ [Notif-Admin] Enviado para ${jid}: ${titulo}`);
+        res.json({ success: true });
+    } catch (e) {
+        console.error('❌ [Notif-Admin] Erro ao enviar:', e.message);
+        res.status(500).json({ error: e.message });
+    }
+});
+
 let statusConexao = "DESCONECTADO";
 let sock = null;
 let lastQr = null;
