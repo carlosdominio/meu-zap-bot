@@ -220,7 +220,15 @@
         document.getElementById('qr-overlay').style.display = (data.status === 'CONECTADO') ? 'none' : 'flex';
     });
     socket.on('qr', (url) => { const img = document.getElementById('qr-img'); img.src = url; img.style.display = 'block'; document.getElementById('qr-overlay').style.display = 'flex'; });
-    socket.on('history', (history) => { chatData = history || {}; updateChatList(); setInterval(updateUnreadTitle, 5000); });       
+    socket.on('history', (history) => { 
+        chatData = history || {}; 
+        updateChatList(); 
+        setInterval(updateUnreadTitle, 5000); 
+        const savedJid = localStorage.getItem('zap_current_jid');
+        if (savedJid && chatData[savedJid] && !currentJid) {
+            openChat(savedJid);
+        }
+    });       
     socket.on('new_msg', (msg) => {
         const jid = msg.sender;
         const cleanJid = jid.split('@')[0].split(':')[0];
@@ -232,15 +240,6 @@
         }
         
         
-        // NOVO: Se o admin não estiver na aba do Zap e chegar uma mensagem, desceleciona o chat atual
-        if (!tabAtiva && currentJid) {
-            currentJid = null;
-            document.getElementById('messages').innerHTML = '';
-            document.getElementById('chat-footer').style.display = 'none';
-            document.getElementById('human-control-toggle').style.display = 'none';
-            document.getElementById('current-chat-name').innerText = 'Selecione uma conversa';
-        }
-
         if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now() };      
         if (!msg.fromMe && msg.pushName && msg.pushName !== 'Voce' && msg.pushName !== 'Robo') { chatData[jid].name = msg.pushName; }
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
@@ -259,6 +258,7 @@
         delete chatData[jid];
         if(currentJid === jid) {
             currentJid = null;
+            localStorage.removeItem('zap_current_jid');
             document.getElementById('messages').innerHTML = '';
             document.getElementById('chat-footer').style.display = 'none';
             document.getElementById('human-control-toggle').style.display = 'none';
@@ -411,6 +411,7 @@
     }
     function openChat(jid) {
         currentJid = jid;
+        localStorage.setItem('zap_current_jid', jid);
         // O contador some ao selecionar o chat no sidebar
         if (chatData[jid]) { 
             chatData[jid].unreadCount = 0; 
