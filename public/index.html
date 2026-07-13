@@ -250,13 +250,19 @@
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
             chatData[jid].messages.push(msg);
             chatData[jid].lastUpdate = Date.now();
-            // Contador incrementa sempre que não for mensagem enviada por nós (ou se for os chats de notificações/pedidos do bot)
-            const isSpecialChat = chatData[jid].name === 'Pedidos Zap 📦' || 
-                                  chatData[jid].name === 'Pedidos Zap 📦 🤖' || 
-                                  chatData[jid].name === 'Notificações Meu zap 🔔' || 
-                                  chatData[jid].name === 'Notificações Meu zap 🔔 🤖';
-            if (!msg.fromMe || isSpecialChat) { 
-                chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1; 
+            // Só incrementa o contador se o chat NÃO for o atualmente selecionado/aberto
+            if (jid !== currentJid) {
+                const isSpecialChat = chatData[jid].name === 'Pedidos Zap 📦' || 
+                                      chatData[jid].name === 'Pedidos Zap 📦 🤖' || 
+                                      chatData[jid].name === 'Notificações Meu zap 🔔' || 
+                                      chatData[jid].name === 'Notificações Meu zap 🔔 🤖';
+                if (!msg.fromMe || isSpecialChat) { 
+                    chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1; 
+                }
+            } else {
+                // Se for o chat atualmente aberto, garante que o contador permaneça zerado
+                chatData[jid].unreadCount = 0;
+                socket.emit('mark_seen', jid);
             }
             window.parent.postMessage({ type: 'whatsapp_new_activity', jid: jid, active: (jid === currentJid), fromMe: msg.fromMe }, '*');
             if (jid === currentJid) renderMessage(msg);
