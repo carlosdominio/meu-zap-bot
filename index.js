@@ -229,6 +229,28 @@ async function checkInactivity() {
     }
 }
 
+const BOT_SECRET = process.env.BOT_SECRET || process.env.JWT_SECRET || 'seusegredomuitolouco123';
+
+// Middleware de autenticação para servir o painel estático
+app.use((req, res, next) => {
+    if (req.path === '/' || req.path === '/index.html' || req.path === '/qr') {
+        const token = req.query.token || req.headers['x-bot-token'];
+        if (token !== BOT_SECRET) {
+            return res.status(401).send('<h1>Acesso Não Autorizado</h1><p>Token de acesso inválido ou ausente.</p>');
+        }
+    }
+    next();
+});
+
+// Middleware de segurança para as rotas de API do bot (/api/)
+app.use('/api/', (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1] || req.query.token || req.body.token;
+    if (token !== BOT_SECRET) {
+        return res.status(401).json({ error: 'Acesso não autorizado. Token inválido.' });
+    }
+    next();
+});
+
 app.use(express.static('public'));
 app.get('/health', (req, res) => res.send('OK'));
 app.get('/status', (req, res) => res.json({ status: statusConexao }));
@@ -640,6 +662,15 @@ function isStoreOpen() {
     
     return isOpen;
 }
+
+io.use((socket, next) => {
+    const token = socket.handshake.auth?.token || socket.handshake.query?.token;
+    if (token !== BOT_SECRET) {
+        console.warn(`⚠️ [Socket] Conexão rejeitada de IP ${socket.handshake.address}. Token inválido.`);
+        return next(new Error('Authentication error'));
+    }
+    next();
+});
 
 io.on('connection', (socket) => {
     socket.emit('status', { status: statusConexao });
