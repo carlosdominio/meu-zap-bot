@@ -250,8 +250,12 @@
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
             chatData[jid].messages.push(msg);
             chatData[jid].lastUpdate = Date.now();
-            // Contador incrementa sempre que não for mensagem enviada por nós (ou se for o bot de pedidos)
-            if (!msg.fromMe || chatData[jid].name === 'Pedidos Zap 📦') { 
+            // Contador incrementa sempre que não for mensagem enviada por nós (ou se for os chats de notificações/pedidos do bot)
+            const isSpecialChat = chatData[jid].name === 'Pedidos Zap 📦' || 
+                                  chatData[jid].name === 'Pedidos Zap 📦 🤖' || 
+                                  chatData[jid].name === 'Notificações Meu zap 🔔' || 
+                                  chatData[jid].name === 'Notificações Meu zap 🔔 🤖';
+            if (!msg.fromMe || isSpecialChat) { 
                 chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1; 
             }
             window.parent.postMessage({ type: 'whatsapp_new_activity', jid: jid, active: (jid === currentJid), fromMe: msg.fromMe }, '*');
@@ -385,7 +389,7 @@
         sortedJids.forEach(jid => {
             const chat = chatData[jid];
             const cleanJid = jid.split('@')[0].split(':')[0];
-            const isPedidosZap = chat.name === 'Pedidos Zap 📦' || chat.name === 'Pedidos Zap 📦 🤖' || chat.name === 'Notificações Meu zap 🔔';
+            const isPedidosZap = chat.name === 'Pedidos Zap 📦' || chat.name === 'Pedidos Zap 📦 🤖' || chat.name === 'Notificações Meu zap 🔔' || chat.name === 'Notificações Meu zap 🔔 🤖';
             
             // REGRA DE OURO: Se for o admin mas não for o chat de Pedidos Zap, esconde.
             if (cleanJid.includes('558293157048') && !isPedidosZap) return;
