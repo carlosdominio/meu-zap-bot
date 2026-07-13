@@ -666,7 +666,7 @@ function isStoreOpen() {
 io.use((socket, next) => {
     const token = socket.handshake.auth?.token || socket.handshake.query?.token;
     if (token !== BOT_SECRET) {
-        console.warn(`⚠️ [Socket] Conexão rejeitada de IP ${socket.handshake.address}. Token inválido.`);
+        console.warn(`⚠️ [Socket] Conexão rejeitada de IP ${socket.handshake.address}. Token recebido: "${token}"`);
         return next(new Error('Authentication error'));
     }
     next();
