@@ -242,9 +242,16 @@
         chatData = history || {}; 
         updateChatList(); 
         setInterval(updateUnreadTitle, 5000); 
-        const savedJid = localStorage.getItem('zap_current_jid');
-        if (savedJid && chatData[savedJid] && !currentJid) {
-            openChat(savedJid);
+        
+        // Se houver mais de 1 chat com mensagens não lidas, desativa a abertura automática
+        const activeChatsCount = Object.values(chatData).filter(chat => (chat.unreadCount || 0) > 0).length;
+        if (activeChatsCount <= 1) {
+            const savedJid = localStorage.getItem('zap_current_jid');
+            if (savedJid && chatData[savedJid] && !currentJid) {
+                openChat(savedJid);
+            }
+        } else {
+            console.log(`[Bot] ${activeChatsCount} chats ativos com mensagens não lidas. Seleção automática desativada.`);
         }
     });       
     socket.on('new_msg', (msg) => {
