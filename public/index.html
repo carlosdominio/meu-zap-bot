@@ -210,7 +210,7 @@
     let chatData = {};
     let mediaRecorder;
     let audioChunks = [];
-    let tabAtiva = true; // Controla se a aba do Zap está visível no Admin
+    let tabAtiva = false; // Controla se a aba do Zap está visível no Admin
 
     // Ouve mensagens do painel pai (Admin)
     window.addEventListener('message', (event) => {
@@ -438,11 +438,13 @@
     function openChat(jid) {
         currentJid = jid;
         localStorage.setItem('zap_current_jid', jid);
-        // O contador some ao selecionar o chat no sidebar
+        // O contador some ao selecionar o chat no sidebar, mas apenas se a aba estiver ativa
         if (chatData[jid]) { 
-            chatData[jid].unreadCount = 0; 
-            socket.emit('mark_seen', jid); 
-            updateUnreadTitle();
+            if (tabAtiva) {
+                chatData[jid].unreadCount = 0; 
+                socket.emit('mark_seen', jid); 
+                updateUnreadTitle();
+            }
         }
         document.getElementById('chat-footer').style.display = 'flex';
         document.getElementById('human-control-toggle').style.display = 'flex';
