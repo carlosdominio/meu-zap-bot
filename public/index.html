@@ -279,6 +279,7 @@
             if (jid === currentJid) renderMessage(msg);
         }
         updateChatList();
+        updateUnreadTitle(); // Atualiza o contador no painel pai imediatamente
     });
     socket.on('chat_deleted', (jid) => {
         delete chatData[jid];
