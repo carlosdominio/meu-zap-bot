@@ -217,6 +217,31 @@
         if (event.data && event.data.type === 'tab_change') {
             tabAtiva = event.data.active;
             console.log("Aba Zap ativa:", tabAtiva);
+            
+            // Se a aba ficou ativa no painel principal
+            if (tabAtiva) {
+                if (currentJid && chatData[currentJid]) {
+                    // Se houver um chat aberto, zera o contador e marca como visto imediatamente
+                    chatData[currentJid].unreadCount = 0;
+                    socket.emit('mark_seen', currentJid);
+                    updateChatList();
+                    updateUnreadTitle();
+                } else {
+                    // Se não tiver chat selecionado, mas houver apenas 1 chat visível na lista, abre e zera ele automaticamente
+                    const visibleChats = Object.keys(chatData).filter(jid => {
+                        const cleanJid = jid.split('@')[0].split(':')[0];
+                        const chat = chatData[jid];
+                        const isPedidosZap = chat.name === 'Notificações Meu zap 🔔' || chat.name === 'Notificações Meu zap 🔔 🤖';
+                        if (cleanJid.includes('558293157048') && !isPedidosZap) return false;
+                        if (blockedNumbers.some(num => cleanJid.includes(num)) && !isPedidosZap) return false;
+                        return true;
+                    });
+                    
+                    if (visibleChats.length === 1) {
+                        openChat(visibleChats[0]);
+                    }
+                }
+            }
         }
     });
 
