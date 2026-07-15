@@ -215,11 +215,13 @@
     // Ouve mensagens do painel pai (Admin)
     window.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'tab_change') {
-            tabAtiva = event.data.active;
+            const newActive = event.data.active;
+            const changed = (newActive !== tabAtiva);
+            tabAtiva = newActive;
             console.log("Aba Zap ativa:", tabAtiva);
             
-            // Se a aba ficou ativa no painel principal
-            if (tabAtiva) {
+            // Se a aba ficou ativa no painel principal E o estado mudou
+            if (tabAtiva && changed) {
                 if (currentJid && chatData[currentJid]) {
                     // Se houver um chat aberto, zera o contador e marca como visto imediatamente
                     chatData[currentJid].unreadCount = 0;
