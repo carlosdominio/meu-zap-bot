@@ -35,11 +35,14 @@
         .msg-recebida { align-self: flex-start; background: white; }
         .msg-enviada { align-self: flex-end; background: #d9fdd3; }
         .audio-msg { min-width: 200px; }
-        footer { background: #f0f2f5; padding: 10px 20px; display: flex; gap: 10px; border-top: 1px solid #ddd; align-items: center; }
-        input { flex: 1; padding: 12px; border: none; border-radius: 8px; outline: none; font-size: 1.1rem; }
-        .btn-action { background: #00a884; color: white; border: none; padding: 10px; border-radius: 50%; cursor: pointer; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        #btn-record { background: #7f8c8d; }
-        #btn-record.recording { background: #e74c3c; animation: pulse 1.5s infinite; }
+        footer { background: #f0f2f5; padding: 10px 20px; display: flex; gap: 15px; border-top: 1px solid #ddd; align-items: center; }
+        input { flex: 1; padding: 12px 16px; border: none; border-radius: 8px; outline: none; font-size: 1.1rem; background: white; }
+        .btn-action { background: none; color: #54656f; border: none; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: color 0.2s, transform 0.1s; outline: none; }
+        .btn-action:hover { color: #1f2c33; }
+        .btn-action:active { transform: scale(0.95); }
+        #btn-record.recording { color: #e74c3c; animation: pulse 1.5s infinite; }
+        #btn-send { color: #00a884; }
+        #btn-send:hover { color: #008069; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         #qr-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
@@ -82,6 +85,7 @@
         #image-viewer-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         #image-viewer-close:hover { color: #ccc; }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <div id="image-viewer-overlay" onclick="fecharImagem()">
@@ -154,11 +158,11 @@
     </div>
     <div id="messages"></div>
     <footer id="chat-footer" style="display: none;">
-        <button id="btn-image" class="btn-action" onclick="document.getElementById('image-upload').click()" style="background: #3498db; margin-right: 5px;">🖼️</button>
+        <button id="btn-image" class="btn-action" onclick="document.getElementById('image-upload').click()" title="Anexar imagem"><i class="fa-solid fa-paperclip"></i></button>
         <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="enviarImagem(this)">
-        <button id="btn-record" class="btn-action" onclick="toggleRecording()">🎙️</button>
-        <input type="text" id="msg-input" placeholder="Digite uma message..." onkeyup="handleKeyUp(event)">
-        <button class="btn-action" onclick="enviar()">></button>
+        <button id="btn-record" class="btn-action" onclick="toggleRecording()" title="Gravar áudio"><i class="fa-solid fa-microphone"></i></button>
+        <input type="text" id="msg-input" placeholder="Digite uma mensagem..." onkeyup="handleKeyUp(event)">
+        <button id="btn-send" class="btn-action" onclick="enviar()" title="Enviar mensagem"><i class="fa-solid fa-paper-plane"></i></button>
     </footer>
 </div>
 <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
@@ -602,11 +606,11 @@
             };
             mediaRecorder.start();
             btn.classList.add('recording');
-            btn.innerText = '🔴';
+            btn.innerHTML = '<i class="fa-solid fa-circle" style="color:#e74c3c; font-size:14px;"></i>';
         } else {
             mediaRecorder.stop();
             btn.classList.remove('recording');
-            btn.innerText = '🎙️';
+            btn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
         }
     }
     function enviarImagem(input) {
