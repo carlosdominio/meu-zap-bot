@@ -222,6 +222,34 @@ async function checkInactivity() {
                 console.error(`❌ Erro ao enviar mensagem de timeout para ${jid}:`, e);
             }
         }
+
+        // --- CHECAGEM DE INATIVIDADE DO MENU (5 MINUTOS) ---
+        const MENU_INACTIVITY_THRESHOLD = 5 * 60 * 1000; // 5 minutos
+        if (!chat.atendimentoManual && chat.estado && chat.estado !== 'normal' && (now - chat.lastUpdate) >= MENU_INACTIVITY_THRESHOLD) {
+            console.log(`⏰ [Timeout Menu] Resetando estado de menu para ${jid} por inatividade.`);
+            chat.estado = 'normal';
+            chat.activePedidoId = null;
+            changed = true;
+
+            const menuTimeoutMsg = "Olá! Como você ficou sem interagir por alguns minutos, reiniciamos nossa conversa de volta ao menu inicial. Se precisar de algo, basta mandar uma nova mensagem! 🤖";
+            try {
+                const s = await sendHumanizedMessage(jid, { text: menuTimeoutMsg });
+                const rObj = { 
+                    id: s?.key?.id || ('menu-timeout-' + Date.now()), 
+                    text: menuTimeoutMsg, 
+                    fromMe: true, 
+                    time: getFormattedTime(), 
+                    sender: sock.user.id, 
+                    pushName: 'Robô 🤖' 
+                };
+                if (!chat.messages) chat.messages = [];
+                chat.messages.push(rObj);
+                if (chat.messages.length > 100) chat.messages.shift();
+                io.emit('new_msg', rObj);
+            } catch (e) {
+                console.error(`❌ Erro ao enviar mensagem de timeout de menu para ${jid}:`, e.message);
+            }
+        }
     }
 
     if (changed) {
