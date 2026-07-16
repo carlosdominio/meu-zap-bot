@@ -825,6 +825,24 @@ io.on('connection', (socket) => {
         io.emit('new_msg', { jid, ...rObj });
     });
 
+    socket.on('send_audio', async (data) => {
+        let jid = data.number;
+        if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+        const buffer = Buffer.from(data.audio.split(';base64,').pop(), 'base64');
+        const s = await sendHumanizedMessage(jid, { audio: buffer, mimetype: 'audio/ogg; codecs=opus', ptt: true });
+        
+        // Salva localmente para poder tocar no painel
+        const mediaDir = path.join(__dirname, 'public', 'media');
+        if (!fs.existsSync(mediaDir)) fs.mkdirSync(mediaDir, { recursive: true });
+        const fileName = `audio-sent-${s.key.id || Date.now()}.ogg`;
+        fs.writeFileSync(path.join(mediaDir, fileName), buffer);
+        const audioUrl = `/media/${fileName}`;
+
+        const rObj = { id: s.key.id || `sent-${Date.now()}`, text: '🎵 Áudio', fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖", audioUrl };
+        await saveMessage(jid, rObj, "Robo");
+        io.emit('new_msg', { jid, ...rObj });
+    });
+
     socket.on('mark_seen', async (jid) => {
         if (db) {
             const chats = db.get('chats').value() || {};
@@ -987,7 +1005,50 @@ async function connectToWhatsApp() {
             console.log(`[Sistema] Mensagem de protocolo ou vazia ignorada de ${jid}`);
             return;
         }
-        const msgObj = { id: msg.key.id, from: jid, jid: jid, text, fromMe, time: getFormattedTime(msg.messageTimestamp ? msg.messageTimestamp * 1000 : undefined), sender: jid, pushName };
+
+        let imageUrl = undefined;
+        let audioUrl = undefined;
+
+        if (msg.message.imageMessage) {
+            try {
+                const { downloadMediaMessage } = await import('@whiskeysockets/baileys');
+                const buffer = await downloadMediaMessage(msg, 'buffer', {}, { logger: pino({ level: 'silent' }), rekey: true });
+                const mediaDir = path.join(__dirname, 'public', 'media');
+                if (!fs.existsSync(mediaDir)) fs.mkdirSync(mediaDir, { recursive: true });
+                const fileName = `img-${msg.key.id}.jpg`;
+                fs.writeFileSync(path.join(mediaDir, fileName), buffer);
+                imageUrl = `/media/${fileName}`;
+                console.log(`📸 [WhatsApp] Imagem baixada com sucesso: ${imageUrl}`);
+            } catch (err) {
+                console.error('❌ Erro ao baixar imagem do WhatsApp:', err.message);
+            }
+        } else if (msg.message.audioMessage) {
+            try {
+                const { downloadMediaMessage } = await import('@whiskeysockets/baileys');
+                const buffer = await downloadMediaMessage(msg, 'buffer', {}, { logger: pino({ level: 'silent' }), rekey: true });
+                const mediaDir = path.join(__dirname, 'public', 'media');
+                if (!fs.existsSync(mediaDir)) fs.mkdirSync(mediaDir, { recursive: true });
+                const fileName = `audio-${msg.key.id}.ogg`;
+                fs.writeFileSync(path.join(mediaDir, fileName), buffer);
+                audioUrl = `/media/${fileName}`;
+                console.log(`🎵 [WhatsApp] Áudio baixado com sucesso: ${audioUrl}`);
+            } catch (err) {
+                console.error('❌ Erro ao baixar áudio do WhatsApp:', err.message);
+            }
+        }
+
+        const msgObj = { 
+            id: msg.key.id, 
+            from: jid, 
+            jid: jid, 
+            text, 
+            fromMe, 
+            time: getFormattedTime(msg.messageTimestamp ? msg.messageTimestamp * 1000 : undefined), 
+            sender: jid, 
+            pushName,
+            imageUrl,
+            audioUrl
+        };
         await saveMessage(jid, msgObj, pushName);
         io.emit('new_msg', msgObj);
 
