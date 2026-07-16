@@ -390,6 +390,26 @@
                 window.parent.postMessage({ type: 'caixa_status_change', status: val }, '*');
             });
         }
+
+        const msgInput = document.getElementById('msg-input');
+        if (msgInput) {
+            msgInput.addEventListener('input', () => {
+                if (currentJid && chatData[currentJid] && !chatData[currentJid].atendimentoManual) {
+                    console.log('✍️ [Atendimento] Admin digitando. Ativando Modo Humano automaticamente para:', currentJid);
+                    chatData[currentJid].atendimentoManual = true;
+                    
+                    const input = document.getElementById('human-toggle-input');
+                    if (input) input.checked = true;
+                    const label = document.getElementById('status-label');
+                    if (label) label.innerText = 'Humano Ativo';
+                    const badge = document.getElementById('header-human-badge');
+                    if (badge) badge.style.display = 'block';
+                    updateChatList();
+                    
+                    socket.emit('toggle_atendimento', { jid: currentJid, status: true });
+                }
+            });
+        }
     });
 
     function toggleCaixa(val) {
