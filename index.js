@@ -884,6 +884,12 @@ async function connectToWhatsApp() {
         const chatData = chats[jid] || {};
         const hasActiveOrder = chatData.estado === 'delivery' && chatData.activePedidoId;
 
+        // --- TRAVA DE ATENDIMENTO HUMANO (SILÊNCIO TOTAL DO ROBÔ) ---
+        if (chatData?.atendimentoManual) {
+            console.log(`👤 [Humano] Atendimento manual ativo para ${jid}. Robô em silêncio.`);
+            return;
+        }
+
         console.log(`📩 [Mensagem] De: ${jid} | Loja Aberta: ${storeOpen} | Pedido Ativo: ${!!hasActiveOrder}`);
 
         if (!storeOpen && !hasActiveOrder) {
@@ -894,12 +900,6 @@ async function connectToWhatsApp() {
             if (s) {
                 await saveMessage(jid, { id: s.key.id, text: closedMsg, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
             }
-            return;
-        }
-
-        // --- TRAVA DE ATENDIMENTO HUMANO (SILÊNCIO TOTAL DO ROBÔ) ---
-        if (chatData?.atendimentoManual) {
-            console.log(`👤 [Humano] Atendimento manual ativo for ${jid}. Robô em silêncio.`);
             return;
         }
 
