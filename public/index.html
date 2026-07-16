@@ -314,13 +314,19 @@
     socket.on('status_atendimento', (data) => {
         if (chatData[data.jid]) {
             chatData[data.jid].atendimentoManual = data.atendimentoManual;
+            if (typeof data.unreadCount !== 'undefined') {
+                chatData[data.jid].unreadCount = data.unreadCount;
+            }
             if (data.jid === currentJid) {
                 const input = document.getElementById('human-toggle-input');
-                input.checked = data.atendimentoManual;
-                document.getElementById('status-label').innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';        
-                document.getElementById('header-human-badge').style.display = data.atendimentoManual ? 'block' : 'none';
+                if (input) input.checked = data.atendimentoManual;
+                const label = document.getElementById('status-label');
+                if (label) label.innerText = data.atendimentoManual ? 'Humano Ativo' : 'Robô Ativo';        
+                const badge = document.getElementById('header-human-badge');
+                if (badge) badge.style.display = data.atendimentoManual ? 'block' : 'none';
             }
             updateChatList();
+            updateUnreadTitle();
         }
     });
     socket.on('status_caixa', (status) => {

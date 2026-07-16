@@ -156,6 +156,100 @@ app.get('/qr', (req, res) => {
     }
 });
 
+// --- ENDPOINTS PARA O CHAT FLUTUANTE DO PAINEL ADMIN ---
+app.get('/api/chats', (req, res) => {
+    if (!db) return res.status(500).json({ error: 'DB não inicializado' });
+    const chats = db.get('chats').value() || {};
+    const list = Object.keys(chats).map(jid => ({
+        jid,
+        name: chats[jid].name || jid.split('@')[0],
+        atendimentoManual: !!chats[jid].atendimentoManual,
+        unreadCount: chats[jid].unreadCount || 0,
+        estado: chats[jid].estado || 'normal',
+        lastUpdate: chats[jid].lastUpdate || 0,
+        lastMessage: chats[jid].messages && chats[jid].messages.length > 0 
+            ? chats[jid].messages[chats[jid].messages.length - 1].text 
+            : ""
+    })).sort((a, b) => b.lastUpdate - a.lastUpdate);
+    res.json(list);
+});
+
+app.get('/api/chats/:jid/messages', (req, res) => {
+    if (!db) return res.status(500).json({ error: 'DB não inicializado' });
+    const { jid } = req.params;
+    const chats = db.get('chats').value() || {};
+    const chat = chats[jid];
+    if (!chat) return res.status(404).json({ error: 'Conversa não encontrada' });
+    
+    // Zera contador de não lidas ao abrir a conversa no admin
+    chat.unreadCount = 0;
+    db.set('chats', chats).write();
+    io.emit('status_atendimento', { jid, atendimentoManual: !!chat.atendimentoManual, unreadCount: 0 });
+
+    res.json(chat.messages || []);
+});
+
+app.post('/api/send-message', async (req, res) => {
+    const { jid, text } = req.body;
+    if (!jid || !text) return res.status(400).json({ error: 'JID e texto são obrigatórios' });
+    if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'WhatsApp desconectado' });
+
+    try {
+        const sent = await sendHumanizedMessage(jid, { text });
+        const chats = db.get('chats').value() || {};
+        
+        if (!chats[jid]) {
+            chats[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0 };
+        }
+
+        const chat = chats[jid];
+        chat.atendimentoManual = true; // Força Modo Humano ao responder manualmente
+        chat.lastUpdate = Date.now();
+
+        const msgObj = {
+            id: sent?.key?.id || ('admin-' + Date.now()),
+            jid,
+            from: jid,
+            text,
+            fromMe: true,
+            time: getFormattedTime(),
+            sender: sock.user.id,
+            pushName: 'Admin'
+        };
+
+        if (!chat.messages) chat.messages = [];
+        chat.messages.push(msgObj);
+        if (chat.messages.length > 100) chat.messages.shift();
+
+        await db.set('chats', chats).write();
+
+        io.emit('new_msg', { jid, ...msgObj });
+        io.emit('status_atendimento', { jid, atendimentoManual: true });
+
+        res.json({ success: true, message: msgObj });
+    } catch (e) {
+        console.error(`Erro ao enviar mensagem pelo admin para ${jid}:`, e.message);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.post('/api/chats/:jid/toggle-human', async (req, res) => {
+    const { jid } = req.params;
+    const { atendimentoManual } = req.body;
+    if (!db) return res.status(500).json({ error: 'DB não inicializado' });
+    
+    const chats = db.get('chats').value() || {};
+    if (!chats[jid]) return res.status(404).json({ error: 'Conversa não encontrada' });
+
+    chats[jid].atendimentoManual = !!atendimentoManual;
+    chats[jid].lastUpdate = Date.now();
+    await db.set('chats', chats).write();
+
+    io.emit('status_atendimento', { jid, atendimentoManual: !!atendimentoManual });
+    res.json({ success: true, atendimentoManual: !!atendimentoManual });
+});
+
+
 const INACTIVITY_THRESHOLD = 15 * 60 * 1000; // 15 minutos
 const CHAT_EXPIRY_THRESHOLD = 24 * 60 * 60 * 1000; // 24 horas
 
@@ -217,7 +311,7 @@ async function checkInactivity() {
                 if (!chat.messages) chat.messages = [];
                 chat.messages.push(rObj);
                 if (chat.messages.length > 100) chat.messages.shift();
-                io.emit('new_msg', rObj);
+                io.emit('new_msg', { jid, ...rObj });
             } catch (e) {
                 console.error(`❌ Erro ao enviar mensagem de timeout para ${jid}:`, e);
             }
@@ -245,7 +339,7 @@ async function checkInactivity() {
                 if (!chat.messages) chat.messages = [];
                 chat.messages.push(rObj);
                 if (chat.messages.length > 100) chat.messages.shift();
-                io.emit('new_msg', rObj);
+                io.emit('new_msg', { jid, ...rObj });
             } catch (e) {
                 console.error(`❌ Erro ao enviar mensagem de timeout de menu para ${jid}:`, e.message);
             }
@@ -401,7 +495,7 @@ app.post('/api/notify-delivery', async (req, res) => {
 
                 const dObj = { id: 'f-' + Date.now(), text: forceDeliveryMsg, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
                 await saveMessage(targetJid, dObj, 'Robo');
-                io.emit('new_msg', dObj);
+                io.emit('new_msg', { jid: targetJid, ...dObj });
 
                 lastNotifCategory[pedidoId] = 'ENTREGUE';
                 await db.set('lastNotifications', lastNotifCategory).write();
@@ -431,7 +525,7 @@ app.post('/api/notify-delivery', async (req, res) => {
 
         const rObj = { id: s.key.id, text: message, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
         await saveMessage(targetJid, rObj, 'Robo');
-        io.emit('new_msg', rObj);
+        io.emit('new_msg', { jid: targetJid, ...rObj });
         console.log(`✅ [Delivery] Mensagem enviada com sucesso para Pedido #${pedidoId}`);
 
         if (db) {
@@ -482,7 +576,7 @@ app.post('/api/notify-delivery', async (req, res) => {
                         }
                         const rObj2 = { id: s2.key.id, text: surveyMessage, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: 'Robô 🤖' };
                         await saveMessage(targetJid, rObj2, 'Robo');
-                        io.emit('new_msg', rObj2);
+                        io.emit('new_msg', { jid: targetJid, ...rObj2 });
                         console.log(`✅ [Survey] Pesquisa enviada para Pedido #${pedidoId}`);
                     }
                 } catch (e) { console.error('❌ [Survey] Erro:', e.message); }
@@ -571,7 +665,7 @@ app.post('/api/notify-admin', async (req, res) => {
             await db.set('chats', chats).write();
         }
 
-        io.emit('new_msg', msgObj);
+        io.emit('new_msg', { jid, ...msgObj });
         console.log(`✅ [Notif-Admin] Enviado para ${jid}: ${titulo}`);
         res.json({ success: true });
     } catch (e) {
@@ -728,13 +822,17 @@ io.on('connection', (socket) => {
         const s = await sendHumanizedMessage(jid, { image: buffer });
         const rObj = { id: s.key.id, text: '🖼️ Imagem', fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖", imageUrl: data.image };
         await saveMessage(jid, rObj, "Robo");
-        io.emit('new_msg', rObj);
+        io.emit('new_msg', { jid, ...rObj });
     });
 
     socket.on('mark_seen', async (jid) => {
         if (db) {
             const chats = db.get('chats').value() || {};
-            if (chats[jid]) { chats[jid].unreadCount = 0; await db.set('chats', chats).write(); }
+            if (chats[jid]) {
+                chats[jid].unreadCount = 0;
+                await db.set('chats', chats).write();
+                io.emit('status_atendimento', { jid, atendimentoManual: !!chats[jid].atendimentoManual, unreadCount: 0 });
+            }
         }
     });
 
@@ -889,8 +987,7 @@ async function connectToWhatsApp() {
             console.log(`[Sistema] Mensagem de protocolo ou vazia ignorada de ${jid}`);
             return;
         }
-        
-        const msgObj = { id: msg.key.id, from: jid, text, fromMe, time: getFormattedTime(msg.messageTimestamp ? msg.messageTimestamp * 1000 : undefined), sender: jid, pushName };
+        const msgObj = { id: msg.key.id, from: jid, jid: jid, text, fromMe, time: getFormattedTime(msg.messageTimestamp ? msg.messageTimestamp * 1000 : undefined), sender: jid, pushName };
         await saveMessage(jid, msgObj, pushName);
         io.emit('new_msg', msgObj);
 
