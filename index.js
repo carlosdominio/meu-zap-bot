@@ -843,6 +843,42 @@ io.on('connection', (socket) => {
         io.emit('new_msg', { jid, ...rObj });
     });
 
+    socket.on('delete_msg', async (data) => {
+        const { jid, id, fromMe } = data;
+        console.log(`🗑️ [Deletar Mensagem] Solicitado deletar mensagem ${id} do chat ${jid}`);
+        
+        if (db && jid && id) {
+            const chats = db.get('chats').value() || {};
+            const chat = chats[jid];
+            if (chat && chat.messages) {
+                const initialLen = chat.messages.length;
+                chat.messages = chat.messages.filter(m => m.id !== id);
+                
+                if (chat.messages.length !== initialLen) {
+                    await db.set('chats', chats).write();
+                    console.log(`✅ [Deletar Mensagem] Mensagem ${id} removida do banco.`);
+                    
+                    io.emit('msg_deleted', { jid, id });
+                    
+                    try {
+                        if (sock) {
+                            await sock.sendMessage(jid, {
+                                delete: {
+                                    remoteJid: jid,
+                                    fromMe: !!fromMe,
+                                    id: id
+                                }
+                            });
+                            console.log(`📤 [WhatsApp] Mensagem ${id} revogada com sucesso no WhatsApp.`);
+                        }
+                    } catch (e) {
+                        console.error('❌ Erro ao apagar mensagem no WhatsApp:', e.message);
+                    }
+                }
+            }
+        }
+    });
+
     socket.on('mark_seen', async (jid) => {
         if (db) {
             const chats = db.get('chats').value() || {};
