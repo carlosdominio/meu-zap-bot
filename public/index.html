@@ -162,6 +162,13 @@
         <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="enviarImagem(this)">
         <button id="btn-record" class="btn-action" onclick="toggleRecording()" title="Gravar áudio"><i class="fa-solid fa-microphone"></i></button>
         <input type="text" id="msg-input" placeholder="Digite uma mensagem..." onkeyup="handleKeyUp(event)">
+        <div id="recording-status" style="display: none; flex: 1; align-items: center; justify-content: space-between; padding-right: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px; color: #ea0038; font-weight: bold; font-size: 1rem;">
+                <i class="fa-solid fa-circle" style="animation: pulse 1s infinite; font-size: 10px;"></i>
+                <span>Gravando: <span id="recording-timer">00:00</span></span>
+            </div>
+            <button onclick="cancelRecording()" style="background: none; border: none; color: #7f8c8d; font-size: 0.9rem; cursor: pointer; font-weight: bold; outline: none; padding: 5px;">Cancelar</button>
+        </div>
         <button id="btn-send" class="btn-action" onclick="enviar()" title="Enviar mensagem"><i class="fa-solid fa-paper-plane"></i></button>
     </footer>
 </div>
@@ -303,6 +310,17 @@
             document.getElementById('current-chat-name').innerText = 'Selecione uma conversa';
         }
         updateChatList();
+    });
+
+    socket.on('msg_deleted', (data) => {
+        const { jid, id } = data;
+        if (chatData[jid] && chatData[jid].messages) {
+            chatData[jid].messages = chatData[jid].messages.filter(m => m.id !== id);
+        }
+        if (currentJid === jid) {
+            const msgEl = document.getElementById('msg-' + id);
+            if (msgEl) msgEl.remove();
+        }
     });
 
     socket.on('chat_renamed', (data) => {
@@ -591,8 +609,15 @@
         socket.emit('send_msg', { number: currentJid, text: input.value });
         input.value = '';
     }
+    let recordingInterval = null;
+    let recordingSeconds = 0;
+
     async function toggleRecording() {
         const btn = document.getElementById('btn-record');
+        const msgInput = document.getElementById('msg-input');
+        const recStatus = document.getElementById('recording-status');
+        const recTimer = document.getElementById('recording-timer');
+        
         if (!mediaRecorder || mediaRecorder.state === 'inactive') {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
@@ -607,10 +632,56 @@
             mediaRecorder.start();
             btn.classList.add('recording');
             btn.innerHTML = '<i class="fa-solid fa-circle" style="color:#e74c3c; font-size:14px;"></i>';
+            
+            // Exibe o cronômetro de gravação
+            if (msgInput) msgInput.style.display = 'none';
+            if (recStatus) recStatus.style.display = 'flex';
+            recordingSeconds = 0;
+            if (recTimer) recTimer.innerText = '00:00';
+            
+            if (recordingInterval) clearInterval(recordingInterval);
+            recordingInterval = setInterval(() => {
+                recordingSeconds++;
+                const mins = String(Math.floor(recordingSeconds / 60)).padStart(2, '0');
+                const secs = String(recordingSeconds % 60).padStart(2, '0');
+                if (recTimer) recTimer.innerText = `${mins}:${secs}`;
+            }, 1000);
+            
         } else {
             mediaRecorder.stop();
             btn.classList.remove('recording');
             btn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+            
+            // Oculta o cronômetro de gravação
+            if (recordingInterval) {
+                clearInterval(recordingInterval);
+                recordingInterval = null;
+            }
+            if (recStatus) recStatus.style.display = 'none';
+            if (msgInput) msgInput.style.display = 'block';
+        }
+    }
+
+    function cancelRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            // Remove o onstop listener para que não envie o áudio gravado
+            mediaRecorder.onstop = null;
+            mediaRecorder.stop();
+            
+            const btn = document.getElementById('btn-record');
+            const msgInput = document.getElementById('msg-input');
+            const recStatus = document.getElementById('recording-status');
+            
+            btn.classList.remove('recording');
+            btn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+            
+            if (recordingInterval) {
+                clearInterval(recordingInterval);
+                recordingInterval = null;
+            }
+            if (recStatus) recStatus.style.display = 'none';
+            if (msgInput) msgInput.style.display = 'block';
+            console.log('🎙️ Gravação de áudio cancelada.');
         }
     }
     function enviarImagem(input) {
