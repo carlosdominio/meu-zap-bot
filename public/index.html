@@ -396,7 +396,7 @@
                 if (innerSearch) innerSearch.style.display = 'none';
             } else if (event.data.type === 'search_chats') {
                 currentSearchQuery = (event.data.query || '').toLowerCase();
-                filterChats();
+                updateChatList();
             }
         }
     });
@@ -739,8 +739,8 @@
 
             // Botão arquivar/desarquivar dinâmico
             let archiveBtnHtml = chat.hidden 
-                ? '<button onclick="desocultarConversa(event, \'' + jid + '\')" title="Desarquivar conversa" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; opacity:0.8; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'scale(1)\'">⬆️</button>' 
-                : '<button onclick="ocultarConversa(event, \'' + jid + '\')" title="Ocultar/Arquivar conversa" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; opacity:0.8; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'scale(1)\'">🗂️</button>';
+                ? '<button onclick="desocultarConversa(event, \'' + jid + '\')" title="Desarquivar conversa" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; opacity:0.8; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'scale(1)\'">📤</button>' 
+                : '<button onclick="ocultarConversa(event, \'' + jid + '\')" title="Ocultar/Arquivar conversa" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; opacity:0.8; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'scale(1)\'">📥</button>';
 
             item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + archiveBadgeHtml + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + humanBadge + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><div style="display: flex; gap: 4px;"><button onclick="fixarConversa(event, \'' + jid + '\', ' + (chat.isPinned ? 'true' : 'false') + ')" title="' + pinTitle + '" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; transition: 0.2s; ' + pinStyle + '">' + pinIcon + '</button>' + archiveBtnHtml + '<button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa" style="padding:3px;">🗑️</button></div>';
             listDiv.appendChild(item);
