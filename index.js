@@ -1418,11 +1418,32 @@ async function connectToWhatsApp() {
         }
     });
 
+    sock.ev.on('contacts.upsert', async (contacts) => {
+        console.log(`🔎 [DEBUG] contacts.upsert disparado:`, JSON.stringify(contacts, null, 2));
+    });
+
+    sock.ev.on('contacts.update', async (contacts) => {
+        console.log(`🔎 [DEBUG] contacts.update disparado:`, JSON.stringify(contacts, null, 2));
+    });
+
     sock.ev.on('messages.upsert', async (m) => {
         const msg = m.messages[0];
         if (!msg.message) return;
-        const jid = msg.key.remoteJid;
+        const rawJid = msg.key.remoteJid;
         
+        if (rawJid.includes('@lid')) {
+            console.log(`🔎 [DEBUG] Recebido de um LID:`, JSON.stringify(msg, null, 2));
+            const altJid = msg.key.remoteJidAlt || msg.key.participantAlt;
+            if (altJid && altJid.includes('@s.whatsapp.net')) {
+                console.log(`🔎 [DEBUG] LID ${rawJid} mapeado para ${altJid} automaticamente!`);
+                await saveJidMapping(altJid, rawJid);
+            }
+        }
+
+        // Converte o JID pro mapeamento mais recente para unificar no DB
+        const chatsRef = db ? db.get('chats').value() || {} : {};
+        const jid = findExistingChatJid(rawJid, chatsRef);
+
         // IGNORA GRUPOS, LISTAS DE TRANSMISSÃO E STATUS
         if (jid === 'status@broadcast' || jid.includes('@g.us') || jid.includes('@broadcast') || jid.startsWith('-')) {
             return;
