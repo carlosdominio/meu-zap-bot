@@ -237,6 +237,12 @@
             </select>
         </div>
     </div>
+    <div id="sidebar-search" style="padding: 10px 15px; border-bottom: 1px solid #ddd; background: #f0f2f5;">
+        <div style="position: relative; display: flex; align-items: center;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; color: #667781; font-size: 13px;"></i>
+            <input type="text" id="chat-search-input" oninput="filterChats()" placeholder="Pesquisar conversa..." style="width: 100%; padding: 8px 12px 8px 32px; border-radius: 8px; border: 1px solid #ccc; font-size: 13px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#00a884'" onblur="this.style.borderColor='#ccc'">
+        </div>
+    </div>
     <div id="archived-banner" onclick="toggleArchivedView()" style="display: none; padding: 12px 15px; border-bottom: 1px solid #ddd; cursor: pointer; align-items: center; gap: 15px; color: #00a884; font-weight: bold; background: #fafafa; font-size: 14px;">
         <span style="font-size: 16px;">📥</span>
         <span style="flex: 1;">Arquivadas</span>
@@ -724,7 +730,29 @@
             item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + humanBadge + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><div style="display: flex; gap: 4px;"><button onclick="fixarConversa(event, \'' + jid + '\', ' + (chat.isPinned ? 'true' : 'false') + ')" title="' + pinTitle + '" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; transition: 0.2s; ' + pinStyle + '">' + pinIcon + '</button>' + archiveBtnHtml + '<button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa" style="padding:3px;">🗑️</button></div>';
             listDiv.appendChild(item);
         });
+
+        filterChats();
     }
+    
+    function filterChats() {
+        const query = (document.getElementById('chat-search-input')?.value || '').toLowerCase();
+        const chatItems = document.querySelectorAll('.chat-item');
+        chatItems.forEach(item => {
+            const jidMatch = item.getAttribute('onclick').match(/'([^']+)'/);
+            if (!jidMatch) return;
+            const jid = jidMatch[1];
+            const chat = chatData[jid] || {};
+            const name = (chat.name || '').toLowerCase();
+            const number = jid.split('@')[0].toLowerCase();
+            
+            if (name.includes(query) || number.includes(query)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
     function openChat(jid) {
         currentJid = jid;
         localStorage.setItem('zap_current_jid', jid);
