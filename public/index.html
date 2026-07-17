@@ -257,9 +257,16 @@
     // Resolve o JID local: se o JID recebido não existir em chatData mas o contraparte (8/9 dígito) existir, usa o contraparte
     function resolveLocalChatJid(jid) {
         if (!jid) return jid;
-        if (chatData[jid]) return jid;
-        if (!jid.startsWith('55') || !jid.includes('@s.whatsapp.net')) return jid;
-        const num = jid.split('@')[0];
+        let normalized = jid;
+        if (jid.includes('@s.whatsapp.net')) {
+            let num = jid.split('@')[0].replace(/\D/g, '');
+            if (!num.startsWith('55') && (num.length === 10 || num.length === 11)) {
+                normalized = '55' + num + '@s.whatsapp.net';
+            }
+        }
+        if (chatData[normalized]) return normalized;
+        if (!normalized.startsWith('55') || !normalized.includes('@s.whatsapp.net')) return normalized;
+        const num = normalized.split('@')[0];
         let counterpart = null;
         if (num.length === 13) {
             // 55 + DDD(2) + 9 + 8 dígitos → remove o 9 → 12 dígitos
@@ -269,7 +276,7 @@
             counterpart = '55' + num.substring(2, 4) + '9' + num.substring(4) + '@s.whatsapp.net';
         }
         if (counterpart && chatData[counterpart]) return counterpart;
-        return jid;
+        return normalized;
     }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -1030,8 +1037,8 @@
                     // Se já existir na lista (mesmo que com JID ligeiramente diferente), apenas abre
                     openChat(existingJid);
                 } else {
-                    // Cria um chat temporário localmente
-                    chatData[jid] = {
+                    // Cria um chat temporário localmente com o JID normalizado/resolvido
+                    chatData[existingJid] = {
                         name: name,
                         messages: [],
                         unreadCount: 0,
@@ -1040,16 +1047,16 @@
                     };
                     
                     // Avisa o servidor via socket para persistir o atendimento manual
-                    socket.emit('toggle_atendimento', { jid: jid, status: true });
+                    socket.emit('toggle_atendimento', { jid: existingJid, status: true });
                     
                     // Notifica renomeação do chat se foi fornecido um nome personalizado
                     if (nameInput.value.trim()) {
-                        socket.emit('rename_chat', { jid: jid, name: name });
+                        socket.emit('rename_chat', { jid: existingJid, name: name });
                     }
                     
                     // Re-renderiza a lista de conversas e abre o chat
                     updateChatList();
-                    openChat(jid);
+                    openChat(existingJid);
                 }
             })
             .catch(err => {
@@ -1062,22 +1069,23 @@
                 const name = nameInput.value.trim() || number;
                 closeNewChatModal();
                 
-                if (chatData[jid]) {
-                    openChat(jid);
+                const existingJid = resolveLocalChatJid(jid);
+                if (chatData[existingJid]) {
+                    openChat(existingJid);
                 } else {
-                    chatData[jid] = {
+                    chatData[existingJid] = {
                         name: name,
                         messages: [],
                         unreadCount: 0,
                         lastUpdate: Date.now(),
                         atendimentoManual: true
                     };
-                    socket.emit('toggle_atendimento', { jid: jid, status: true });
+                    socket.emit('toggle_atendimento', { jid: existingJid, status: true });
                     if (nameInput.value.trim()) {
-                        socket.emit('rename_chat', { jid: jid, name: name });
+                        socket.emit('rename_chat', { jid: existingJid, name: name });
                     }
                     updateChatList();
-                    openChat(jid);
+                    openChat(existingJid);
                 }
             });
     }

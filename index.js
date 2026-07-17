@@ -453,29 +453,27 @@ app.post('/api/notify-delivery', async (req, res) => {
     const chats = db ? db.get('chats').value() || {} : {};
     let jid = number;
     if (jid && !jid.includes('@')) {
-        const cleanNumber = jid.replace(/\D/g, '');
-        const existingJid = Object.keys(chats).find(k => k.startsWith(cleanNumber));
-        jid = existingJid || (cleanNumber + '@s.whatsapp.net');
+        jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
     }
-
-    let targetJid = jid;
+    
+    // Converte o JID recebido para o JID consolidado no banco (resolvendo 55 e contrapartes)
+    let targetJid = jid ? findExistingChatJid(jid, chats) : null;
 
     // 2. Busca robusta pelo JID
     if (db) {
         const mapping = db.get('pedidoIdToJid').value() || {};
         if (mapping[pedidoId] && mapping[pedidoId] !== 'undefined') {
-            targetJid = mapping[pedidoId];
+            targetJid = findExistingChatJid(mapping[pedidoId], chats);
         } else {
             const foundJid = Object.keys(chats).find(k => 
                 String(chats[k].activePedidoId) === pedidoId || 
                 String(chats[k].ultimoPedidoId) === pedidoId
             );
-            if (foundJid) targetJid = foundJid;
+            if (foundJid) targetJid = findExistingChatJid(foundJid, chats);
         }
         
-        if ((!targetJid || targetJid === 'undefined') && jid) targetJid = jid;
-
         if (targetJid && targetJid !== 'undefined') {
+            targetJid = findExistingChatJid(targetJid, chats);
             mapping[pedidoId] = targetJid;
             await db.set('pedidoIdToJid', mapping).write();
         }
@@ -800,9 +798,23 @@ async function getBotTexts() {
     };
 }
 
+function normalizeJid(jid) {
+    if (!jid || !jid.includes('@s.whatsapp.net')) return jid;
+    let num = jid.split('@')[0];
+    num = num.replace(/\D/g, '');
+    
+    // Se o número tiver 10 ou 11 dígitos (sem 55) assume Brasil
+    if (!num.startsWith('55') && (num.length === 10 || num.length === 11)) {
+        num = '55' + num;
+    }
+    return num + '@s.whatsapp.net';
+}
+
 function getCounterpartJid(jid) {
-    if (!jid || !jid.startsWith('55') || !jid.includes('@s.whatsapp.net')) return null;
-    const num = jid.split('@')[0];
+    if (!jid || !jid.includes('@s.whatsapp.net')) return null;
+    const normalized = normalizeJid(jid);
+    const num = normalized.split('@')[0];
+    if (!num.startsWith('55')) return null;
     if (num.length === 13) {
         const ddd = num.substring(2, 4);
         const rest = num.substring(5);
@@ -816,11 +828,12 @@ function getCounterpartJid(jid) {
 }
 
 function findExistingChatJid(jid, chats) {
-    if (!chats) return jid;
-    if (chats[jid]) return jid;
-    const counterpart = getCounterpartJid(jid);
+    if (!chats) return normalizeJid(jid);
+    const normalized = normalizeJid(jid);
+    if (chats[normalized]) return normalized;
+    const counterpart = getCounterpartJid(normalized);
     if (counterpart && chats[counterpart]) return counterpart;
-    return jid;
+    return normalized;
 }
 
 async function saveMessage(jid, msg, name = "") {
