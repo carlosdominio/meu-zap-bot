@@ -252,7 +252,26 @@
         console.error('❌ [Pusher] Erro ao carregar:', e.message);
     }
 
-    const blockedNumbers = ['5582993225452', '82993225452']; // Nmeros ocultos no chat UI
+    const blockedNumbers = ['5582993225452', '82993225452']; // Números ocultos no chat UI
+
+    // Resolve o JID local: se o JID recebido não existir em chatData mas o contraparte (8/9 dígito) existir, usa o contraparte
+    function resolveLocalChatJid(jid) {
+        if (!jid) return jid;
+        if (chatData[jid]) return jid;
+        if (!jid.startsWith('55') || !jid.includes('@s.whatsapp.net')) return jid;
+        const num = jid.split('@')[0];
+        let counterpart = null;
+        if (num.length === 13) {
+            // 55 + DDD(2) + 9 + 8 dígitos → remove o 9 → 12 dígitos
+            counterpart = '55' + num.substring(2, 4) + num.substring(5) + '@s.whatsapp.net';
+        } else if (num.length === 12) {
+            // 55 + DDD(2) + 8 dígitos → adiciona 9 → 13 dígitos
+            counterpart = '55' + num.substring(2, 4) + '9' + num.substring(4) + '@s.whatsapp.net';
+        }
+        if (counterpart && chatData[counterpart]) return counterpart;
+        return jid;
+    }
+
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const socket = io({
@@ -309,27 +328,30 @@
         }
     });       
     socket.on('new_msg', (msg) => {
-        const jid = msg.sender;
-        const cleanJid = jid.split('@')[0].split(':')[0];
-        
+        // Usa msg.jid (destinatário/remetente correto enviado pelo backend)
+        // com fallback para msg.from para compatibilidade
+        let jid = msg.jid || msg.from || msg.sender;
+        const cleanJid = (jid || '').split('@')[0].split(':')[0];
+
         if (blockedNumbers.some(num => cleanJid.includes(num))) {
-            console.log('?? [LOG] Mensagem oculta recebida:', msg.text || 'm�dia', 'de:', jid);
-            // Se for um desses n�meros, apenas logamos no console e n�o processamos na UI
+            console.log('🔕 [LOG] Mensagem oculta recebida:', msg.text || 'mídia', 'de:', jid);
             return;
         }
-        
-        
-        if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now() };      
+
+        // Resolução de contraparte: consolida JIDs com/sem 9º dígito brasileiro
+        jid = resolveLocalChatJid(jid);
+
+        if (!chatData[jid]) chatData[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now() };
         if (!msg.fromMe && msg.pushName && msg.pushName !== 'Voce' && msg.pushName !== 'Robo') { chatData[jid].name = msg.pushName; }
         if (!chatData[jid].messages.some(m => m.id === msg.id)) {
             chatData[jid].messages.push(msg);
             chatData[jid].lastUpdate = Date.now();
             // Só incrementa o contador se o chat NÃO for o atualmente selecionado/aberto ou se a aba do Zap não estiver ativa no painel principal
             if (jid !== currentJid || !tabAtiva) {
-                const isSpecialChat = chatData[jid].name === 'Notificações Meu zap 🔔' || 
+                const isSpecialChat = chatData[jid].name === 'Notificações Meu zap 🔔' ||
                                       chatData[jid].name === 'Notificações Meu zap 🔔 🤖';
-                if (!msg.fromMe || isSpecialChat) { 
-                    chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1; 
+                if (!msg.fromMe || isSpecialChat) {
+                    chatData[jid].unreadCount = (chatData[jid].unreadCount || 0) + 1;
                 }
             } else {
                 // Se for o chat atualmente aberto e a aba estiver ativa, garante que o contador permaneça zerado e marca como visto
@@ -340,7 +362,7 @@
             if (jid === currentJid) renderMessage(msg);
         }
         updateChatList();
-        updateUnreadTitle(); // Atualiza o contador no painel pai imediatamente
+        updateUnreadTitle();
     });
     socket.on('chat_deleted', (jid) => {
         delete chatData[jid];
@@ -1002,10 +1024,11 @@
                 // Fecha o modal
                 closeNewChatModal();
                 
-                // Inicia a conversa
-                if (chatData[jid]) {
-                    // Se já existir na lista, apenas abre
-                    openChat(jid);
+                // Checa se o contato já existe com o JID ou seu contraparte (8/9 dígito)
+                const existingJid = resolveLocalChatJid(jid);
+                if (chatData[existingJid]) {
+                    // Se já existir na lista (mesmo que com JID ligeiramente diferente), apenas abre
+                    openChat(existingJid);
                 } else {
                     // Cria um chat temporário localmente
                     chatData[jid] = {
