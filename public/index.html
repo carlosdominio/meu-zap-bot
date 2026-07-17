@@ -614,6 +614,11 @@
     }
     function apagarConversa(e, jid) { e.stopPropagation(); openConfirmModal(jid); }
     function enviar() {
+        // Se estiver gravando áudio, para a gravação (o que disparará o envio automático)
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            toggleRecording();
+            return;
+        }
         const input = document.getElementById('msg-input');
         if (!input.value.trim() || !currentJid) return;
         socket.emit('send_msg', { number: currentJid, text: input.value });
