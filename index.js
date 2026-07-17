@@ -932,12 +932,10 @@ function findExistingChatJid(jid, chats) {
         const mappedLid = phoneToLid[normalized] || phoneToLid[counterpart];
         if (mappedLid && chats[mappedLid]) return mappedLid;
         
-        // Se for um JID de LID, tenta converter para o telefone mapeado se este existir no chats
+        // Se for um JID de LID, converte OBRIGATORIAMENTE para o telefone se o mapeamento existir
         const mappedPhone = lidToPhone[normalized];
         if (mappedPhone) {
-            if (chats[mappedPhone]) return mappedPhone;
-            const phoneCounterpart = getCounterpartJid(mappedPhone);
-            if (phoneCounterpart && chats[phoneCounterpart]) return phoneCounterpart;
+            return mappedPhone; // Retorna o telefone sempre, independente de já ter mensagens
         }
     }
     return normalized;
