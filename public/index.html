@@ -1035,6 +1035,7 @@
                 const existingJid = resolveLocalChatJid(jid);
                 if (chatData[existingJid]) {
                     // Se já existir na lista (mesmo que com JID ligeiramente diferente), apenas abre
+                    alert('Este número já possui uma conversa em andamento. Redirecionando para o chat existente!');
                     openChat(existingJid);
                 } else {
                     // Cria um chat temporário localmente com o JID normalizado/resolvido
@@ -1071,6 +1072,7 @@
                 
                 const existingJid = resolveLocalChatJid(jid);
                 if (chatData[existingJid]) {
+                    alert('Este número já possui uma conversa em andamento. Redirecionando para o chat existente!');
                     openChat(existingJid);
                 } else {
                     chatData[existingJid] = {
