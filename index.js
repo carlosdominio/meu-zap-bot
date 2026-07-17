@@ -102,14 +102,66 @@ async function clearPostgresSession() {
 
 // Banco de dados local
 const low = require('lowdb');
-const FileAsync = require('lowdb/adapters/FileAsync');
-const adapter = new FileAsync('db.json');
+
+class PostgresAdapter {
+    constructor(key) {
+        this.key = key;
+    }
+    
+    async read() {
+        if (!pgPool) {
+            try {
+                if (fs.existsSync('db.json')) {
+                    return JSON.parse(fs.readFileSync('db.json', 'utf8'));
+                }
+            } catch (e) {}
+            return {};
+        }
+        
+        try {
+            await pgPool.query(`
+                CREATE TABLE IF NOT EXISTS zap_db (
+                    id TEXT PRIMARY KEY,
+                    value TEXT NOT NULL,
+                    updated_at TIMESTAMP DEFAULT NOW()
+                )
+            `);
+            
+            const res = await pgPool.query('SELECT value FROM zap_db WHERE id = $1', [this.key]);
+            if (res.rows.length > 0) {
+                return JSON.parse(res.rows[0].value);
+            }
+        } catch (e) {
+            console.error("❌ [PostgreSQL DB] Erro ao ler banco de dados:", e.message);
+        }
+        return {};
+    }
+    
+    async write(data) {
+        if (!pgPool) {
+            fs.writeFileSync('db.json', JSON.stringify(data, null, 2), 'utf8');
+            return;
+        }
+        
+        try {
+            const value = JSON.stringify(data);
+            await pgPool.query(
+                'INSERT INTO zap_db (id, value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET value = $2, updated_at = NOW()',
+                [this.key, value]
+            );
+        } catch (e) {
+            console.error("❌ [PostgreSQL DB] Erro ao gravar banco de dados:", e.message);
+        }
+    }
+}
+
+const adapter = new PostgresAdapter('meu_zap_db');
 let db;
 
 async function initDB() {
     db = await low(adapter);
     await db.defaults({ chats: {}, pedidoIdToJid: {}, settings: { caixaFechado: 'aberto' }, lastNotifications: {}, surveysSent: {}, phoneToLid: {}, lidToPhone: {} }).write();
-    console.log('✅ Banco de dados pronto');
+    console.log('✅ Banco de dados pronto (PostgreSQL)');
 }
 
 const app = express();
