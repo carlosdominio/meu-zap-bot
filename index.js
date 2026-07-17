@@ -796,7 +796,6 @@ async function getBotTexts() {
     };
 }
 
-async function saveMessage(jid, msg, name) {
 function getCounterpartJid(jid) {
     if (!jid || !jid.startsWith('55') || !jid.includes('@s.whatsapp.net')) return null;
     const num = jid.split('@')[0];
