@@ -181,11 +181,12 @@ app.get('/api/chats', (req, res) => {
 
 app.post('/api/chats/:jid/hide', async (req, res) => {
     if (!db) return res.status(500).json({ error: 'DB não inicializado' });
-    const jid = req.params.jid;
+    const rawJid = req.params.jid;
     const unhide = req.query.unhide === 'true';
     const hidden = unhide ? false : (req.body && typeof req.body.hidden !== 'undefined' ? req.body.hidden : true);
 
     const chats = db.get('chats').value() || {};
+    const jid = findExistingChatJid(rawJid, chats);
     if (chats[jid]) {
         chats[jid].hidden = hidden;
         await db.set('chats', chats).write();
@@ -202,8 +203,9 @@ app.post('/api/chats/:jid/hide', async (req, res) => {
 
 app.get('/api/chats/:jid/messages', (req, res) => {
     if (!db) return res.status(500).json({ error: 'DB não inicializado' });
-    const { jid } = req.params;
+    const rawJid = req.params.jid;
     const chats = db.get('chats').value() || {};
+    const jid = findExistingChatJid(rawJid, chats);
     const chat = chats[jid];
     if (!chat) return res.status(404).json({ error: 'Conversa não encontrada' });
     
@@ -247,13 +249,14 @@ app.get('/api/resolve-number/:number', async (req, res) => {
 });
 
 app.post('/api/send-message', async (req, res) => {
-    const { jid, text } = req.body;
-    if (!jid || !text) return res.status(400).json({ error: 'JID e texto são obrigatórios' });
+    const { jid: rawJid, text } = req.body;
+    if (!rawJid || !text) return res.status(400).json({ error: 'JID e texto são obrigatórios' });
     if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'WhatsApp desconectado' });
 
     try {
-        const sent = await sendHumanizedMessage(jid, { text });
         const chats = db.get('chats').value() || {};
+        const jid = findExistingChatJid(rawJid, chats);
+        const sent = await sendHumanizedMessage(jid, { text });
         
         if (!chats[jid]) {
             chats[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0 };
@@ -291,11 +294,12 @@ app.post('/api/send-message', async (req, res) => {
 });
 
 app.post('/api/chats/:jid/toggle-human', async (req, res) => {
-    const { jid } = req.params;
+    const rawJid = req.params.jid;
     const { atendimentoManual } = req.body;
     if (!db) return res.status(500).json({ error: 'DB não inicializado' });
     
     const chats = db.get('chats').value() || {};
+    const jid = findExistingChatJid(rawJid, chats);
     if (!chats[jid]) return res.status(404).json({ error: 'Conversa não encontrada' });
 
     chats[jid].atendimentoManual = !!atendimentoManual;
@@ -996,9 +1000,10 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('mark_seen', async (jid) => {
+    socket.on('mark_seen', async (rawJid) => {
         if (db) {
             const chats = db.get('chats').value() || {};
+            const jid = findExistingChatJid(rawJid, chats);
             if (chats[jid]) {
                 chats[jid].unreadCount = 0;
                 await db.set('chats', chats).write();
@@ -1008,9 +1013,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('toggle_atendimento', async (data) => {
-        const { jid, status } = data;
+        const { jid: rawJid, status } = data;
         if (db) {
             const chats = db.get('chats').value() || {};
+            const jid = findExistingChatJid(rawJid, chats);
             if (!chats[jid]) chats[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0 };
             chats[jid].atendimentoManual = status;
             await db.set('chats', chats).write();
@@ -1040,9 +1046,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('rename_chat', async (data) => {
-        const { jid, name } = data;
-        if (db && jid && name) {
+        const { jid: rawJid, name } = data;
+        if (db && rawJid && name) {
             const chats = db.get('chats').value() || {};
+            const jid = findExistingChatJid(rawJid, chats);
             if (!chats[jid]) {
                 chats[jid] = { name: name, messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'normal' };
             } else {
@@ -1057,17 +1064,18 @@ io.on('connection', (socket) => {
     socket.on('pin_chat', async (data) => {
         try {
             if (sock && data.jid) {
+                const chats = db.get('chats').value() || {};
+                const jid = findExistingChatJid(data.jid, chats);
                 const pinState = data.unpin ? false : true;
-                await sock.chatModify({ pin: pinState }, data.jid);
-                console.log(pinState ? `📌 Conversa fixada: ${data.jid}` : `📍 Conversa desfixada: ${data.jid}`);
+                await sock.chatModify({ pin: pinState }, jid);
+                console.log(pinState ? `📌 Conversa fixada: ${jid}` : `📍 Conversa desfixada: ${jid}`);
                 
                 // Salvar o estado no banco e notificar a UI
                 if (db) {
-                    const chats = db.get('chats').value() || {};
-                    if (chats[data.jid]) {
-                        chats[data.jid].isPinned = pinState;
+                    if (chats[jid]) {
+                        chats[jid].isPinned = pinState;
                         await db.set('chats', chats).write();
-                        io.emit('chat_renamed', { jid: data.jid, name: chats[data.jid].name, isPinned: pinState });
+                        io.emit('chat_renamed', { jid: jid, name: chats[jid].name, isPinned: pinState });
                     }
                 }
             }
@@ -1076,9 +1084,10 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('delete_chat', async (jid) => {
+    socket.on('delete_chat', async (rawJid) => {
         if (db) {
             const chats = db.get('chats').value() || {};
+            const jid = findExistingChatJid(rawJid, chats);
             delete chats[jid];
             await db.set('chats', { ...chats }).write();
             io.emit('chat_deleted', jid);
@@ -1087,10 +1096,11 @@ io.on('connection', (socket) => {
 
     socket.on('hide_chat', async (data) => {
         if (db) {
-            const jid = typeof data === 'string' ? data : data.jid;
+            const rawJid = typeof data === 'string' ? data : data.jid;
             const hidden = typeof data === 'object' && typeof data.hidden !== 'undefined' ? data.hidden : true;
             
             const chats = db.get('chats').value() || {};
+            const jid = findExistingChatJid(rawJid, chats);
             if (chats[jid]) {
                 chats[jid].hidden = hidden;
                 await db.set('chats', chats).write();
