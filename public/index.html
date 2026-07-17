@@ -691,11 +691,22 @@
         sortedJids.forEach(jid => {
             const chat = chatData[jid];
             
-            // Se estiver exibindo os arquivados, mostramos apenas os ocultos. Se não, ignoramos os ocultos.
-            if (exibindoArquivados) {
-                if (!chat.hidden) return;
+            const nameLower = (chat.name || '').toLowerCase();
+            const numberLower = jid.split('@')[0].toLowerCase();
+            const isSearching = currentSearchQuery.trim().length > 0;
+            
+            if (isSearching) {
+                if (!nameLower.includes(currentSearchQuery) && !numberLower.includes(currentSearchQuery)) {
+                    return; // Ignora se não bater com a busca global
+                }
+                // Se está buscando e achou, renderiza independente de estar arquivado ou não!
             } else {
-                if (chat.hidden) return;
+                // Comportamento normal sem busca ativa
+                if (exibindoArquivados) {
+                    if (!chat.hidden) return;
+                } else {
+                    if (chat.hidden) return;
+                }
             }
 
             const cleanJid = jid.split('@')[0].split(':')[0];
@@ -718,41 +729,26 @@
             }
 
             item.onclick = () => openChat(jid);
-            const statusIcon = chat.atendimentoManual ? '👤' : '🤖';
+            const statusIcon = chat.atendimentoManual ? '🤖' : '👨‍💻';
             const humanBadge = chat.atendimentoManual ? '<span class="badge-msg badge-human">HUMANO</span>' : '';
+            const archiveBadgeHtml = (isSearching && chat.hidden) ? '<span style="font-size: 10px; background: #667781; color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">Arquivada</span>' : '';
             
             const pinIcon = '📌'; 
             const pinTitle = chat.isPinned ? 'Desfixar do Zap' : 'Fixar no topo do Zap';
             const pinStyle = chat.isPinned ? 'background:#ffeb3b; border-radius:50%; box-shadow:0 0 8px #ffeb3b; opacity:1;' : 'opacity:0.7;';
 
             // Botão arquivar/desarquivar dinâmico
-            const archiveBtnHtml = exibindoArquivados
-                ? '<button onclick="desarquivarConversa(event, \'' + jid + '\')" title="Desarquivar conversa" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; opacity:0.8; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'scale(1)\'">📤</button>'
-                : '<button onclick="ocultarConversa(event, \'' + jid + '\')" title="Ocultar/Arquivar conversa" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; opacity:0.8; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'scale(1)\'">📥</button>';
+            let archiveBtnHtml = chat.hidden 
+                ? '<button onclick="desocultarConversa(event, \'' + jid + '\')" title="Desarquivar conversa" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; opacity:0.8; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'scale(1)\'">⬆️</button>' 
+                : '<button onclick="ocultarConversa(event, \'' + jid + '\')" title="Ocultar/Arquivar conversa" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; opacity:0.8; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'scale(1)\'">🗂️</button>';
 
-            item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + humanBadge + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><div style="display: flex; gap: 4px;"><button onclick="fixarConversa(event, \'' + jid + '\', ' + (chat.isPinned ? 'true' : 'false') + ')" title="' + pinTitle + '" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; transition: 0.2s; ' + pinStyle + '">' + pinIcon + '</button>' + archiveBtnHtml + '<button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa" style="padding:3px;">🗑️</button></div>';
+            item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + archiveBadgeHtml + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + humanBadge + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><div style="display: flex; gap: 4px;"><button onclick="fixarConversa(event, \'' + jid + '\', ' + (chat.isPinned ? 'true' : 'false') + ')" title="' + pinTitle + '" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; transition: 0.2s; ' + pinStyle + '">' + pinIcon + '</button>' + archiveBtnHtml + '<button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa" style="padding:3px;">🗑️</button></div>';
             listDiv.appendChild(item);
         });
-
-        filterChats();
     }
     
     function filterChats() {
-        const query = currentSearchQuery;
-        const chatItems = document.querySelectorAll('.chat-item');
-        chatItems.forEach(item => {
-            const jid = item.getAttribute('data-jid');
-            if (!jid) return;
-            const chat = chatData[jid] || {};
-            const name = (chat.name || '').toLowerCase();
-            const number = jid.split('@')[0].toLowerCase();
-            
-            if (name.includes(query) || number.includes(query)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
-        });
+        // Obsoleto: a filtragem agora é feita diretamente no updateChatList() para unificar a busca.
     }
 
     function openChat(jid) {
