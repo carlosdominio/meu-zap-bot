@@ -708,6 +708,7 @@
             const item = document.createElement('div');
             const isUnread = chat.unreadCount > 0;
             item.className = 'chat-item' + (jid === currentJid ? ' active' : '') + (isUnread ? ' unread' : '');
+            item.setAttribute('data-jid', jid);
             
             // Highlight background se estiver fixado
             if (chat.isPinned && jid !== currentJid && !isUnread) {
@@ -738,9 +739,8 @@
         const query = (document.getElementById('chat-search-input')?.value || '').toLowerCase();
         const chatItems = document.querySelectorAll('.chat-item');
         chatItems.forEach(item => {
-            const jidMatch = item.getAttribute('onclick').match(/'([^']+)'/);
-            if (!jidMatch) return;
-            const jid = jidMatch[1];
+            const jid = item.getAttribute('data-jid');
+            if (!jid) return;
             const chat = chatData[jid] || {};
             const name = (chat.name || '').toLowerCase();
             const number = jid.split('@')[0].toLowerCase();
