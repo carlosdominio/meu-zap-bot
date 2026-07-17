@@ -108,7 +108,7 @@ let db;
 
 async function initDB() {
     db = await low(adapter);
-    await db.defaults({ chats: {}, pedidoIdToJid: {}, settings: { caixaFechado: 'aberto' }, lastNotifications: {}, surveysSent: {} }).write();
+    await db.defaults({ chats: {}, pedidoIdToJid: {}, settings: { caixaFechado: 'aberto' }, lastNotifications: {}, surveysSent: {}, phoneToLid: {}, lidToPhone: {} }).write();
     console.log('✅ Banco de dados pronto');
 }
 
@@ -238,7 +238,10 @@ app.get('/api/resolve-number/:number', async (req, res) => {
     try {
         const result = await sock.onWhatsApp(number);
         if (result && result[0] && result[0].exists) {
-            return res.json({ jid: result[0].jid, exists: true });
+            const resolvedJid = result[0].jid;
+            const phoneJid = number + '@s.whatsapp.net';
+            await saveJidMapping(phoneJid, resolvedJid);
+            return res.json({ jid: resolvedJid, exists: true });
         } else {
             return res.json({ jid: number + '@s.whatsapp.net', exists: false, message: 'Número não registrado no WhatsApp.' });
         }
@@ -833,7 +836,47 @@ function findExistingChatJid(jid, chats) {
     if (chats[normalized]) return normalized;
     const counterpart = getCounterpartJid(normalized);
     if (counterpart && chats[counterpart]) return counterpart;
+    
+    // Procura por mapeamentos de LID/Telefone persistidos no banco
+    if (db) {
+        const phoneToLid = db.get('phoneToLid').value() || {};
+        const lidToPhone = db.get('lidToPhone').value() || {};
+        
+        // Se for um JID de telefone, tenta converter para o LID mapeado se este existir no chats
+        const mappedLid = phoneToLid[normalized] || phoneToLid[counterpart];
+        if (mappedLid && chats[mappedLid]) return mappedLid;
+        
+        // Se for um JID de LID, tenta converter para o telefone mapeado se este existir no chats
+        const mappedPhone = lidToPhone[normalized];
+        if (mappedPhone) {
+            if (chats[mappedPhone]) return mappedPhone;
+            const phoneCounterpart = getCounterpartJid(mappedPhone);
+            if (phoneCounterpart && chats[phoneCounterpart]) return phoneCounterpart;
+        }
+    }
     return normalized;
+}
+
+async function saveJidMapping(phoneJid, lidJid) {
+    if (!db || !phoneJid || !lidJid || phoneJid === lidJid) return;
+    const phoneToLid = db.get('phoneToLid').value() || {};
+    const lidToPhone = db.get('lidToPhone').value() || {};
+    
+    let changed = false;
+    if (phoneToLid[phoneJid] !== lidJid) {
+        phoneToLid[phoneJid] = lidJid;
+        changed = true;
+    }
+    if (lidToPhone[lidJid] !== phoneJid) {
+        lidToPhone[lidJid] = phoneJid;
+        changed = true;
+    }
+    
+    if (changed) {
+        await db.set('phoneToLid', phoneToLid).write();
+        await db.set('lidToPhone', lidToPhone).write();
+        console.log(`🔗 [JID Mapping] Vinculado: ${phoneJid} ↔ ${lidJid}`);
+    }
 }
 
 async function mergeDuplicateChats() {
@@ -908,6 +951,37 @@ async function mergeDuplicateChats() {
             chats[keepKey].lastUpdate = Math.max(chats[keepKey].lastUpdate || 0, chats[mergeKey].lastUpdate || 0);
             
             delete chats[mergeKey];
+            changed = true;
+        }
+    }
+
+    // 3. Mescla chats baseados no mapeamento phoneToLid (Consolida Chats de telefone com LID)
+    const phoneToLid = db.get('phoneToLid').value() || {};
+    const keysForLidMerge = Object.keys(chats);
+    for (const key of keysForLidMerge) {
+        if (!chats[key]) continue;
+        const targetLid = phoneToLid[key];
+        if (targetLid && chats[targetLid] && key !== targetLid) {
+            console.log(`🧹 [Merge] Mesclando chat de telefone ${key} no chat de LID ${targetLid}`);
+            const oldMessages = chats[key].messages || [];
+            const newMessages = chats[targetLid].messages || [];
+            const combined = [...newMessages, ...oldMessages];
+            const uniqueMsgs = [];
+            const seenIds = new Set();
+            combined.forEach(m => {
+                if (m && m.id && !seenIds.has(m.id)) {
+                    seenIds.add(m.id);
+                    uniqueMsgs.push(m);
+                }
+            });
+            uniqueMsgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+            
+            chats[targetLid].messages = uniqueMsgs;
+            chats[targetLid].unreadCount = (chats[targetLid].unreadCount || 0) + (chats[key].unreadCount || 0);
+            if (chats[key].atendimentoManual) chats[targetLid].atendimentoManual = true;
+            chats[targetLid].lastUpdate = Math.max(chats[targetLid].lastUpdate || 0, chats[key].lastUpdate || 0);
+            
+            delete chats[key];
             changed = true;
         }
     }
