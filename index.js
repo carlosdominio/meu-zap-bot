@@ -314,8 +314,23 @@ app.post('/api/send-message', async (req, res) => {
     if (!sock || statusConexao !== 'CONECTADO') return res.status(503).json({ error: 'WhatsApp desconectado' });
 
     try {
+        let finalJid = rawJid;
+        // Resolve dinamicamente o JID oficial via WhatsApp para capturar mapeamentos LID vs Telefone
+        if (rawJid && !rawJid.includes('@g.us')) {
+            try {
+                const cleanNum = rawJid.split('@')[0];
+                const result = await sock.onWhatsApp(cleanNum);
+                if (result && result[0] && result[0].exists) {
+                    await saveJidMapping(rawJid, result[0].jid);
+                    finalJid = result[0].jid;
+                }
+            } catch (e) {
+                console.error("Erro ao resolver JID no send-message:", e.message);
+            }
+        }
+
         const chats = db.get('chats').value() || {};
-        const jid = findExistingChatJid(rawJid, chats);
+        const jid = findExistingChatJid(finalJid, chats);
         const sent = await sendHumanizedMessage(jid, { text });
         
         if (!chats[jid]) {
@@ -514,6 +529,20 @@ app.post('/api/notify-delivery', async (req, res) => {
     let jid = number;
     if (jid && !jid.includes('@')) {
         jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+    }
+    
+    // Resolve dinamicamente o JID oficial via WhatsApp para capturar mapeamentos LID vs Telefone
+    if (jid && sock && statusConexao === 'CONECTADO') {
+        try {
+            const cleanNum = jid.split('@')[0];
+            const result = await sock.onWhatsApp(cleanNum);
+            if (result && result[0] && result[0].exists) {
+                await saveJidMapping(jid, result[0].jid);
+                jid = result[0].jid; // Usa o JID oficial (LID ou Telefone retornado)
+            }
+        } catch (e) {
+            console.error("Erro ao resolver JID no webhook:", e.message);
+        }
     }
     
     // Converte o JID recebido para o JID consolidado no banco (resolvendo 55 e contrapartes)
