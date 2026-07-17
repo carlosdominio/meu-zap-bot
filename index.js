@@ -797,6 +797,30 @@ async function getBotTexts() {
 }
 
 async function saveMessage(jid, msg, name) {
+function getCounterpartJid(jid) {
+    if (!jid || !jid.startsWith('55') || !jid.includes('@s.whatsapp.net')) return null;
+    const num = jid.split('@')[0];
+    if (num.length === 13) {
+        const ddd = num.substring(2, 4);
+        const rest = num.substring(5);
+        return `55${ddd}${rest}@s.whatsapp.net`;
+    } else if (num.length === 12) {
+        const ddd = num.substring(2, 4);
+        const rest = num.substring(4);
+        return `55${ddd}9${rest}@s.whatsapp.net`;
+    }
+    return null;
+}
+
+function findExistingChatJid(jid, chats) {
+    if (!chats) return jid;
+    if (chats[jid]) return jid;
+    const counterpart = getCounterpartJid(jid);
+    if (counterpart && chats[counterpart]) return counterpart;
+    return jid;
+}
+
+async function saveMessage(jid, msg, name = "") {
     if (!jid || jid.includes('@newsletter')) return;
     const chats = db.get('chats').value() || {};
 
@@ -809,25 +833,27 @@ async function saveMessage(jid, msg, name) {
     const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0];
     const isSelf = myJid && jid.includes(myJid);
 
-    if (!chats[jid]) {
-        chats[jid] = { name: jid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'normal' };
+    const targetJid = isSelf ? jid : findExistingChatJid(jid, chats);
+
+    if (!chats[targetJid]) {
+        chats[targetJid] = { name: targetJid.split('@')[0], messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'normal' };
     }
 
     if (isSelf) {
-        chats[jid].name = "Notificações Meu zap 🔔";
-    } else if (chats[jid].isSystemNotification) {
+        chats[targetJid].name = "Notificações Meu zap 🔔";
+    } else if (chats[targetJid].isSystemNotification) {
         // Trava o nome se for o número de notificações
     } else if (name && name !== "Voce" && name !== "Robo") {
-        chats[jid].name = name;
+        chats[targetJid].name = name;
     }
 
-    chats[jid].hidden = false; // Garante que a conversa reapareça se chegar ou for enviada uma nova mensagem
-    chats[jid].lastUpdate = Date.now();
-    if (!msg.fromMe || isSelf) chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
+    chats[targetJid].hidden = false; // Garante que a conversa reapareça se chegar ou for enviada uma nova mensagem
+    chats[targetJid].lastUpdate = Date.now();
+    if (!msg.fromMe || isSelf) chats[targetJid].unreadCount = (chats[targetJid].unreadCount || 0) + 1;
 
-    if (chats[jid].messages.some(m => m.id === msg.id)) return;
-    chats[jid].messages.push(msg);
-    if (chats[jid].messages.length > 100) chats[jid].messages.shift();
+    if (chats[targetJid].messages.some(m => m.id === msg.id)) return;
+    chats[targetJid].messages.push(msg);
+    if (chats[targetJid].messages.length > 100) chats[targetJid].messages.shift();
     await db.set('chats', chats).write();
 }
 
@@ -878,6 +904,8 @@ io.on('connection', (socket) => {
             let jid = data.number;
             if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
             
+            const targetJid = findExistingChatJid(jid, db.get('chats').value() || {});
+            
             console.log(`📤 [WhatsApp] Enviando mensagem de texto para JID: ${jid}...`);
             const s = await sendHumanizedMessage(jid, { text: data.text });
             if (s) {
@@ -891,8 +919,8 @@ io.on('connection', (socket) => {
                     pushName: "Voce",
                     timestamp: Date.now()
                 };
-                await saveMessage(jid, rObj, "Voce");
-                io.emit('new_msg', { jid, ...rObj });
+                await saveMessage(targetJid, rObj, "Voce");
+                io.emit('new_msg', { jid: targetJid, ...rObj });
             } else {
                 console.warn(`⚠️ [WhatsApp] Falha ao enviar ou bot desconectado para ${jid}`);
             }
@@ -904,16 +932,20 @@ io.on('connection', (socket) => {
     socket.on('send_image', async (data) => {
         let jid = data.number;
         if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+        const targetJid = findExistingChatJid(jid, db.get('chats').value() || {});
+
         const buffer = Buffer.from(data.image.split(';base64,').pop(), 'base64');
         const s = await sendHumanizedMessage(jid, { image: buffer });
         const rObj = { id: s.key.id, text: '🖼️ Imagem', fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖", imageUrl: data.image };
-        await saveMessage(jid, rObj, "Robo");
-        io.emit('new_msg', { jid, ...rObj });
+        await saveMessage(targetJid, rObj, "Robo");
+        io.emit('new_msg', { jid: targetJid, ...rObj });
     });
 
     socket.on('send_audio', async (data) => {
         let jid = data.number;
         if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+        const targetJid = findExistingChatJid(jid, db.get('chats').value() || {});
+
         const buffer = Buffer.from(data.audio.split(';base64,').pop(), 'base64');
         const s = await sendHumanizedMessage(jid, { audio: buffer, mimetype: 'audio/ogg; codecs=opus', ptt: true });
         
@@ -925,8 +957,8 @@ io.on('connection', (socket) => {
         const audioUrl = `/media/${fileName}`;
 
         const rObj = { id: s.key.id || `sent-${Date.now()}`, text: '🎵 Áudio', fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖", audioUrl };
-        await saveMessage(jid, rObj, "Robo");
-        io.emit('new_msg', { jid, ...rObj });
+        await saveMessage(targetJid, rObj, "Robo");
+        io.emit('new_msg', { jid: targetJid, ...rObj });
     });
 
     socket.on('delete_msg', async (data) => {
@@ -1189,8 +1221,9 @@ async function connectToWhatsApp() {
             imageUrl,
             audioUrl
         };
-        await saveMessage(jid, msgObj, pushName);
-        io.emit('new_msg', msgObj);
+        const targetJid = findExistingChatJid(jid, db.get('chats').value() || {});
+        await saveMessage(targetJid, msgObj, pushName);
+        io.emit('new_msg', { ...msgObj, jid: targetJid });
 
         if (fromMe) return;
 
@@ -1207,16 +1240,17 @@ async function connectToWhatsApp() {
         // --- VERIFICAÇÃO DE STATUS DA LOJA (LOG EM TEMPO REAL) ---
         const storeOpen = isStoreOpen();
         const chats = db.get('chats').value() || {};
-        const chatData = chats[jid] || {};
+        const targetJidState = findExistingChatJid(jid, chats);
+        const chatData = chats[targetJidState] || {};
         const hasActiveOrder = chatData.estado === 'delivery' && chatData.activePedidoId;
 
         // --- TRAVA DE ATENDIMENTO HUMANO (SILÊNCIO TOTAL DO ROBÔ) ---
         if (chatData?.atendimentoManual) {
-            console.log(`👤 [Humano] Atendimento manual ativo para ${jid}. Robô em silêncio.`);
+            console.log(`👤 [Humano] Atendimento manual ativo para ${targetJidState}. Robô em silêncio.`);
             return;
         }
 
-        console.log(`📩 [Mensagem] De: ${jid} | Loja Aberta: ${storeOpen} | Pedido Ativo: ${!!hasActiveOrder}`);
+        console.log(`📩 [Mensagem] De: ${jid} (Consolidado: ${targetJidState}) | Loja Aberta: ${storeOpen} | Pedido Ativo: ${!!hasActiveOrder}`);
 
         if (!storeOpen && !hasActiveOrder) {
             console.log(`🚫 [Bloqueio] Caixa FECHADO. Enviando mensagem de fechamento para ${jid}`);
@@ -1263,10 +1297,11 @@ async function connectToWhatsApp() {
         if (isOrder) {
             const pId = (text.match(/#(\d+)/) || [])[1];
             if (pId) {
-                await db.get('pedidoIdToJid').set(String(pId), jid).write();
-                chats[jid] = chats[jid] || { messages: [], unreadCount: 0 };
-                chats[jid].activePedidoId = pId; 
-                chats[jid].estado = 'delivery';
+                const targetJidOrder = findExistingChatJid(jid, chats);
+                await db.get('pedidoIdToJid').set(String(pId), targetJidOrder).write();
+                chats[targetJidOrder] = chats[targetJidOrder] || { messages: [], unreadCount: 0 };
+                chats[targetJidOrder].activePedidoId = pId; 
+                chats[targetJidOrder].estado = 'delivery';
                 await db.set('chats', chats).write();
                 
                 const richWelcome = `Olá ${pushName}! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#${pId}* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻`;

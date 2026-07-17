@@ -125,6 +125,17 @@
     </div>
 </div>
 
+<div id="modal-confirm-archive" class="modal-overlay" style="z-index: 3000; display:none;">
+    <div class="modal-content">
+        <div class="modal-title" id="archive-modal-title">Arquivar Conversa?</div>
+        <div class="modal-text" id="archive-modal-text">Deseja realmente ocultar/arquivar esta conversa? Ela reaparecerá automaticamente se houver nova atividade.</div>
+        <div class="modal-buttons">
+            <button class="btn-modal btn-cancel" onclick="closeArchiveModal()">Cancelar</button>
+            <button class="btn-modal" id="btn-modal-confirm-archive" style="background:#00a884; color:white;">Confirmar</button>
+        </div>
+    </div>
+</div>
+
 <div id="modal-new-chat" class="modal-overlay" style="z-index: 3000; display: none;">
     <div class="modal-content" style="border-radius: 16px; padding: 30px; max-width: 380px;">
         <div class="modal-title" style="font-size: 1.3rem; font-weight: 700; color: #111b21; margin-bottom: 8px; text-align: left;">Nova Conversa</div>
@@ -512,14 +523,10 @@
     }
     let exibindoArquivados = false;
 
+
     function toggleArchivedView() {
         exibindoArquivados = !exibindoArquivados;
         updateChatList();
-    }
-
-    function desarquivarConversa(e, jid) {
-        e.stopPropagation();
-        socket.emit('hide_chat', { jid: jid, hidden: false });
     }
 
     function updateChatList() {
@@ -772,11 +779,35 @@
         jidToPin = null;
     }
     function apagarConversa(e, jid) { e.stopPropagation(); openConfirmModal(jid); }
+
+    let jidToArchive = null;
     function ocultarConversa(e, jid) {
         e.stopPropagation();
-        if (confirm('Deseja realmente ocultar/arquivar esta conversa? Ela reaparecerá automaticamente se houver nova atividade.')) {
-            socket.emit('hide_chat', jid);
-        }
+        jidToArchive = jid;
+        document.getElementById('archive-modal-title').innerText = 'Arquivar Conversa?';
+        document.getElementById('archive-modal-text').innerText = 'Deseja realmente ocultar/arquivar esta conversa? Ela reaparecerá automaticamente se houver nova atividade.';
+        document.getElementById('modal-confirm-archive').style.display = 'flex';
+        document.getElementById('btn-modal-confirm-archive').onclick = () => {
+            if (jidToArchive) socket.emit('hide_chat', { jid: jidToArchive, hidden: true });
+            closeArchiveModal();
+        };
+    }
+
+    function desarquivarConversa(e, jid) {
+        e.stopPropagation();
+        jidToArchive = jid;
+        document.getElementById('archive-modal-title').innerText = 'Desarquivar Conversa?';
+        document.getElementById('archive-modal-text').innerText = 'Deseja realmente desarquivar esta conversa?';
+        document.getElementById('modal-confirm-archive').style.display = 'flex';
+        document.getElementById('btn-modal-confirm-archive').onclick = () => {
+            if (jidToArchive) socket.emit('hide_chat', { jid: jidToArchive, hidden: false });
+            closeArchiveModal();
+        };
+    }
+
+    function closeArchiveModal() {
+        document.getElementById('modal-confirm-archive').style.display = 'none';
+        jidToArchive = null;
     }
     function enviar() {
         // Se estiver gravando áudio, para a gravação (o que disparará o envio automático)
