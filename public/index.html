@@ -84,10 +84,58 @@
         #image-viewer-img { max-width: 98vw; max-height: 98vh; width: auto; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); cursor: default; }
         #image-viewer-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         #image-viewer-close:hover { color: #ccc; }
+
+        /* Estilos do Toast (Notificação flutuante) */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background: #fff;
+            color: #111b21;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.3s ease forwards;
+            transform: translateX(120%);
+            border-left: 5px solid #00a884;
+            font-family: inherit;
+        }
+        .toast.info {
+            border-left-color: #3498db;
+        }
+        .toast.success {
+            border-left-color: #00a884;
+        }
+        .toast.error {
+            border-left-color: #e74c3c;
+        }
+        .toast.warning {
+            border-left-color: #f39c12;
+        }
+        .toast.fade-out {
+            animation: slideOutRight 0.3s ease forwards;
+        }
+        @keyframes slideInRight {
+            to { transform: translateX(0); }
+        }
+        @keyframes slideOutRight {
+            to { transform: translateX(120%); }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+<div id="toast-container"></div>
 <div id="image-viewer-overlay" onclick="fecharImagem()">
     <span id="image-viewer-close" onclick="fecharImagem()">&times;</span>
     <button id="image-viewer-delete" onclick="deletarImagemAtual(event)" style="position: fixed; bottom: 40px; right: 40px; background: #ff4d4d; color: white; border: 2px solid white; padding: 15px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 18px; box-shadow: 0 5px 20px rgba(0,0,0,0.8); z-index: 2100; display: none;">🗑️ Apagar Foto</button>
@@ -217,6 +265,26 @@
 <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        let icon = 'fa-info-circle';
+        if (type === 'success') icon = 'fa-check-circle';
+        if (type === 'error') icon = 'fa-exclamation-circle';
+        if (type === 'warning') icon = 'fa-exclamation-triangle';
+        
+        toast.innerHTML = `<i class="fa-solid ${icon}" style="font-size: 18px;"></i> <span>${message}</span>`;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('fade-out');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
     // --- SINCRONIZAÇÃO PUSHER (OPCIONAL) ---
     try {
         const pusher = new Pusher('5b2b284e309dea9d90fb', { cluster: 'sa1' });
@@ -992,7 +1060,7 @@
         
         let number = numInput.value.replace(/\D/g, '');
         if (!number) {
-            alert('Por favor, digite um número de WhatsApp válido.');
+            showToast('Por favor, digite um número de WhatsApp válido.', 'warning');
             return;
         }
         
@@ -1035,7 +1103,7 @@
                 const existingJid = resolveLocalChatJid(jid);
                 if (chatData[existingJid]) {
                     // Se já existir na lista (mesmo que com JID ligeiramente diferente), apenas abre
-                    alert('Este número já possui uma conversa em andamento. Redirecionando para o chat existente!');
+                    showToast('Este número já possui uma conversa em andamento. Redirecionando para o chat existente!', 'info');
                     openChat(existingJid);
                 } else {
                     // Cria um chat temporário localmente com o JID normalizado/resolvido
@@ -1072,7 +1140,7 @@
                 
                 const existingJid = resolveLocalChatJid(jid);
                 if (chatData[existingJid]) {
-                    alert('Este número já possui uma conversa em andamento. Redirecionando para o chat existente!');
+                    showToast('Este número já possui uma conversa em andamento. Redirecionando para o chat existente!', 'info');
                     openChat(existingJid);
                 } else {
                     chatData[existingJid] = {
