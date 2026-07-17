@@ -836,6 +836,91 @@ function findExistingChatJid(jid, chats) {
     return normalized;
 }
 
+async function mergeDuplicateChats() {
+    if (!db) return;
+    console.log("🧹 [Merge] Iniciando varredura para mesclar chats duplicados...");
+    const chats = db.get('chats').value() || {};
+    const keys = Object.keys(chats);
+    let changed = false;
+
+    // 1. Normaliza as chaves removendo a falta de 55
+    for (const key of keys) {
+        if (!chats[key]) continue;
+        const normalizedKey = normalizeJid(key);
+        if (normalizedKey !== key) {
+            console.log(`🧹 [Merge] Normalizando chave de chat de ${key} para ${normalizedKey}`);
+            if (chats[normalizedKey]) {
+                const oldMessages = chats[key].messages || [];
+                const newMessages = chats[normalizedKey].messages || [];
+                const combined = [...newMessages, ...oldMessages];
+                const uniqueMsgs = [];
+                const seenIds = new Set();
+                combined.forEach(m => {
+                    if (m && m.id && !seenIds.has(m.id)) {
+                        seenIds.add(m.id);
+                        uniqueMsgs.push(m);
+                    }
+                });
+                uniqueMsgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+                
+                chats[normalizedKey].messages = uniqueMsgs;
+                chats[normalizedKey].unreadCount = (chats[normalizedKey].unreadCount || 0) + (chats[key].unreadCount || 0);
+                if (chats[key].atendimentoManual) chats[normalizedKey].atendimentoManual = true;
+                chats[normalizedKey].lastUpdate = Math.max(chats[normalizedKey].lastUpdate || 0, chats[key].lastUpdate || 0);
+            } else {
+                chats[normalizedKey] = chats[key];
+            }
+            delete chats[key];
+            changed = true;
+        }
+    }
+
+    // 2. Mescla contrapartes de 8/9 dígitos
+    const currentKeys = Object.keys(chats);
+    for (const key of currentKeys) {
+        if (!chats[key]) continue;
+        const counterpart = getCounterpartJid(key);
+        if (counterpart && chats[counterpart] && key !== counterpart) {
+            const countKey = (chats[key].messages || []).length;
+            const countCounterpart = (chats[counterpart].messages || []).length;
+            
+            const keepKey = countKey >= countCounterpart ? key : counterpart;
+            const mergeKey = keepKey === key ? counterpart : key;
+            
+            console.log(`🧹 [Merge] Mesclando chat duplicado ${mergeKey} em ${keepKey}`);
+            
+            const oldMessages = chats[mergeKey].messages || [];
+            const newMessages = chats[keepKey].messages || [];
+            const combined = [...newMessages, ...oldMessages];
+            const uniqueMsgs = [];
+            const seenIds = new Set();
+            combined.forEach(m => {
+                if (m && m.id && !seenIds.has(m.id)) {
+                    seenIds.add(m.id);
+                    uniqueMsgs.push(m);
+                }
+            });
+            uniqueMsgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+            
+            chats[keepKey].messages = uniqueMsgs;
+            chats[keepKey].unreadCount = (chats[keepKey].unreadCount || 0) + (chats[mergeKey].unreadCount || 0);
+            if (chats[mergeKey].atendimentoManual) chats[keepKey].atendimentoManual = true;
+            chats[keepKey].lastUpdate = Math.max(chats[keepKey].lastUpdate || 0, chats[mergeKey].lastUpdate || 0);
+            
+            delete chats[mergeKey];
+            changed = true;
+        }
+    }
+
+    if (changed) {
+        await db.set('chats', chats).write();
+        console.log("✅ [Merge] Mesclagem de chats duplicados concluída!");
+    } else {
+        console.log("✅ [Merge] Nenhum chat duplicado pendente de mesclagem.");
+    }
+}
+
+
 async function saveMessage(jid, msg, name = "") {
     if (!jid || jid.includes('@newsletter')) return;
     const chats = db.get('chats').value() || {};
@@ -1596,7 +1681,8 @@ async function connectToWhatsApp() {
     });
 }
 
-initDB().then(() => {
+initDB().then(async () => {
+    await mergeDuplicateChats();
     server.listen(port, () => connectToWhatsApp());
     setInterval(checkInactivity, 60000); // Checa inatividade a cada 1 minuto
     setInterval(cleanupOldChats, 3600000); // Limpa chats antigos a cada 1 hora
