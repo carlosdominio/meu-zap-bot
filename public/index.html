@@ -380,20 +380,29 @@
 
     // Ouve mensagens do painel pai (Admin)
     window.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'tab_change') {
-            const newActive = event.data.active;
-            const changed = (newActive !== tabAtiva);
-            tabAtiva = newActive;
-            console.log("Aba Zap ativa:", tabAtiva);
-            
-            // Se a aba ficou ativa no painel principal E o estado mudou
-            if (tabAtiva && changed) {
-                if (currentJid && chatData[currentJid]) {
-                    // Se houver um chat aberto, zera o contador e marca como visto imediatamente
-                    chatData[currentJid].unreadCount = 0;
-                    socket.emit('mark_seen', currentJid);
-                    updateChatList();
-                    updateUnreadTitle();
+        if (event.data) {
+            if (event.data.type === 'tab_change') {
+                const newActive = event.data.active;
+                const changed = (newActive !== tabAtiva);
+                tabAtiva = newActive;
+                console.log("Aba Zap ativa:", tabAtiva);
+                
+                if (tabAtiva && changed) {
+                    if (currentJid && chatData[currentJid]) {
+                        chatData[currentJid].unreadCount = 0;
+                        socket.emit('mark_seen', currentJid);
+                        updateChatList();
+                        updateUnreadTitle();
+                    }
+                }
+            } else if (event.data.type === 'hide_internal_search') {
+                const innerSearch = document.getElementById('sidebar-search');
+                if (innerSearch) innerSearch.style.display = 'none';
+            } else if (event.data.type === 'search_chats') {
+                const searchInput = document.getElementById('chat-search-input');
+                if (searchInput) {
+                    searchInput.value = event.data.query || '';
+                    filterChats();
                 }
             }
         }
