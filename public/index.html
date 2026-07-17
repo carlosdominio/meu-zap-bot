@@ -339,6 +339,21 @@
         updateChatList();
     });
 
+    socket.on('chat_hidden', (jid) => {
+        if (chatData[jid]) {
+            chatData[jid].hidden = true;
+        }
+        if(currentJid === jid) {
+            currentJid = null;
+            localStorage.removeItem('zap_current_jid');
+            document.getElementById('messages').innerHTML = '';
+            document.getElementById('chat-footer').style.display = 'none';
+            document.getElementById('human-control-toggle').style.display = 'none';
+            document.getElementById('current-chat-name').innerText = 'Selecione uma conversa';
+        }
+        updateChatList();
+    });
+
     socket.on('msg_deleted', (data) => {
         const { jid, id } = data;
         if (chatData[jid] && chatData[jid].messages) {
@@ -494,6 +509,10 @@
         });     
         sortedJids.forEach(jid => {
             const chat = chatData[jid];
+            
+            // Se o chat estiver marcado como oculto/arquivado, não exibe
+            if (chat.hidden) return;
+
             const cleanJid = jid.split('@')[0].split(':')[0];
             const isPedidosZap = chat.name === 'Notificações Meu zap 🔔' || chat.name === 'Notificações Meu zap 🔔 🤖';
             
@@ -520,7 +539,7 @@
             const pinTitle = chat.isPinned ? 'Desfixar do Zap' : 'Fixar no topo do Zap';
             const pinStyle = chat.isPinned ? 'background:#ffeb3b; border-radius:50%; box-shadow:0 0 8px #ffeb3b; opacity:1;' : 'opacity:0.7;';
 
-            item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + humanBadge + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><div style="display: flex;"><button onclick="fixarConversa(event, \'' + jid + '\', ' + (chat.isPinned ? 'true' : 'false') + ')" title="' + pinTitle + '" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; transition: 0.2s; ' + pinStyle + '">' + pinIcon + '</button><button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa" style="padding:3px;">🗑️</button></div>';
+            item.innerHTML = '<div class="chat-info"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><strong>' + (chat.name || jid.split('@')[0]) + ' ' + statusIcon + '</strong>' + (isUnread ? '<span class="badge-msg badge-unread">' + chat.unreadCount + '</span>' : '') + humanBadge + '</div><div style="display: flex; justify-content: space-between; align-items: center;"><small style="color: #666;">' + (chat.messages ? chat.messages.length : 0) + ' msgs</small><small style="font-size: 10px; color: #999;">' + new Date(chat.lastUpdate).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + '</small></div></div><div style="display: flex; gap: 4px;"><button onclick="fixarConversa(event, \'' + jid + '\', ' + (chat.isPinned ? 'true' : 'false') + ')" title="' + pinTitle + '" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; transition: 0.2s; ' + pinStyle + '">' + pinIcon + '</button><button onclick="ocultarConversa(event, \'' + jid + '\')" title="Ocultar/Arquivar conversa" style="background:none; border:none; cursor:pointer; font-size:16px; padding:3px; opacity:0.8; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.2)\'" onmouseout="this.style.transform=\'scale(1)\'">📥</button><button class="btn-del-chat" onclick="apagarConversa(event, \'' + jid + '\')" title="Apagar conversa" style="padding:3px;">🗑️</button></div>';
             listDiv.appendChild(item);
         });
     }
@@ -687,6 +706,12 @@
         jidToPin = null;
     }
     function apagarConversa(e, jid) { e.stopPropagation(); openConfirmModal(jid); }
+    function ocultarConversa(e, jid) {
+        e.stopPropagation();
+        if (confirm('Deseja realmente ocultar/arquivar esta conversa? Ela reaparecerá automaticamente se houver nova atividade.')) {
+            socket.emit('hide_chat', jid);
+        }
+    }
     function enviar() {
         // Se estiver gravando áudio, para a gravação (o que disparará o envio automático)
         if (mediaRecorder && mediaRecorder.state === 'recording') {

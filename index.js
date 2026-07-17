@@ -160,18 +160,35 @@ app.get('/qr', (req, res) => {
 app.get('/api/chats', (req, res) => {
     if (!db) return res.status(500).json({ error: 'DB não inicializado' });
     const chats = db.get('chats').value() || {};
-    const list = Object.keys(chats).map(jid => ({
-        jid,
-        name: chats[jid].name || jid.split('@')[0],
-        atendimentoManual: !!chats[jid].atendimentoManual,
-        unreadCount: chats[jid].unreadCount || 0,
-        estado: chats[jid].estado || 'normal',
-        lastUpdate: chats[jid].lastUpdate || 0,
-        lastMessage: chats[jid].messages && chats[jid].messages.length > 0 
-            ? chats[jid].messages[chats[jid].messages.length - 1].text 
-            : ""
-    })).sort((a, b) => b.lastUpdate - a.lastUpdate);
+    const list = Object.keys(chats)
+        .filter(jid => !chats[jid].hidden)
+        .map(jid => ({
+            jid,
+            name: chats[jid].name || jid.split('@')[0],
+            atendimentoManual: !!chats[jid].atendimentoManual,
+            unreadCount: chats[jid].unreadCount || 0,
+            estado: chats[jid].estado || 'normal',
+            lastUpdate: chats[jid].lastUpdate || 0,
+            lastMessage: chats[jid].messages && chats[jid].messages.length > 0 
+                ? chats[jid].messages[chats[jid].messages.length - 1].text 
+                : ""
+        }))
+        .sort((a, b) => b.lastUpdate - a.lastUpdate);
     res.json(list);
+});
+
+app.post('/api/chats/:jid/hide', async (req, res) => {
+    if (!db) return res.status(500).json({ error: 'DB não inicializado' });
+    const jid = req.params.jid;
+    const chats = db.get('chats').value() || {};
+    if (chats[jid]) {
+        chats[jid].hidden = true;
+        await db.set('chats', chats).write();
+        io.emit('chat_hidden', jid);
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ error: 'Chat não encontrado' });
+    }
 });
 
 app.get('/api/chats/:jid/messages', (req, res) => {
@@ -795,6 +812,7 @@ async function saveMessage(jid, msg, name) {
         chats[jid].name = name;
     }
 
+    chats[jid].hidden = false; // Garante que a conversa reapareça se chegar ou for enviada uma nova mensagem
     chats[jid].lastUpdate = Date.now();
     if (!msg.fromMe || isSelf) chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
 
@@ -1024,6 +1042,17 @@ io.on('connection', (socket) => {
             delete chats[jid];
             await db.set('chats', { ...chats }).write();
             io.emit('chat_deleted', jid);
+        }
+    });
+
+    socket.on('hide_chat', async (jid) => {
+        if (db) {
+            const chats = db.get('chats').value() || {};
+            if (chats[jid]) {
+                chats[jid].hidden = true;
+                await db.set('chats', chats).write();
+                io.emit('chat_hidden', jid);
+            }
         }
     });
 });
