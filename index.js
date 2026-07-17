@@ -189,6 +189,37 @@ app.get('/api/chats/:jid/messages', (req, res) => {
     res.json(chat.messages || []);
 });
 
+app.get('/api/resolve-number/:number', async (req, res) => {
+    let number = req.params.number.replace(/\D/g, '');
+    if (!number) {
+        return res.status(400).json({ error: 'Número inválido.' });
+    }
+    
+    if (number.startsWith('0')) {
+        number = number.substring(1);
+    }
+    
+    if (number.length <= 11) {
+        number = '55' + number;
+    }
+    
+    if (!sock || statusConexao !== "CONECTADO") {
+        return res.json({ jid: number + '@s.whatsapp.net', exists: true, estimated: true });
+    }
+    
+    try {
+        const result = await sock.onWhatsApp(number);
+        if (result && result[0] && result[0].exists) {
+            return res.json({ jid: result[0].jid, exists: true });
+        } else {
+            return res.json({ jid: number + '@s.whatsapp.net', exists: false, message: 'Número não registrado no WhatsApp.' });
+        }
+    } catch (e) {
+        console.error(`❌ [Resolve Number] Erro ao validar ${number}:`, e.message);
+        return res.json({ jid: number + '@s.whatsapp.net', exists: true, estimated: true });
+    }
+});
+
 app.post('/api/send-message', async (req, res) => {
     const { jid, text } = req.body;
     if (!jid || !text) return res.status(400).json({ error: 'JID e texto são obrigatórios' });
@@ -743,6 +774,11 @@ async function saveMessage(jid, msg, name) {
     if (!jid || jid.includes('@newsletter')) return;
     const chats = db.get('chats').value() || {};
 
+    // Garante que o timestamp de envio/recebimento existe no objeto da mensagem
+    if (!msg.timestamp) {
+        msg.timestamp = Date.now();
+    }
+
     // REGRA DE OURO: Identifica se é o próprio robô falando consigo mesmo
     const myJid = sock?.user?.id?.split(':')[0]?.split('@')[0];
     const isSelf = myJid && jid.includes(myJid);
@@ -810,9 +846,32 @@ io.on('connection', (socket) => {
     }
 
     socket.on('send_msg', async (data) => {
-        let jid = data.number;
-        if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
-        await sendHumanizedMessage(jid, { text: data.text });
+        try {
+            console.log(`✉️ [Socket] Recebida solicitação de envio de mensagem para: ${data.number}`);
+            let jid = data.number;
+            if (!jid.includes('@')) jid = jid.replace(/\D/g, '') + '@s.whatsapp.net';
+            
+            console.log(`📤 [WhatsApp] Enviando mensagem de texto para JID: ${jid}...`);
+            const s = await sendHumanizedMessage(jid, { text: data.text });
+            if (s) {
+                console.log(`✅ [WhatsApp] Mensagem de texto enviada com sucesso para ${jid}`);
+                const rObj = { 
+                    id: s.key.id, 
+                    text: data.text, 
+                    fromMe: true, 
+                    time: getFormattedTime(), 
+                    sender: sock?.user?.id ? (sock.user.id.split(':')[0] + '@s.whatsapp.net') : jid, 
+                    pushName: "Voce",
+                    timestamp: Date.now()
+                };
+                await saveMessage(jid, rObj, "Voce");
+                io.emit('new_msg', { jid, ...rObj });
+            } else {
+                console.warn(`⚠️ [WhatsApp] Falha ao enviar ou bot desconectado para ${jid}`);
+            }
+        } catch (e) {
+            console.error(`❌ [WhatsApp] Erro ao enviar mensagem para ${data.number}:`, e.message);
+        }
     });
 
     socket.on('send_image', async (data) => {

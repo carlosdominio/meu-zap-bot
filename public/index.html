@@ -125,13 +125,39 @@
     </div>
 </div>
 
+<div id="modal-new-chat" class="modal-overlay" style="z-index: 3000; display: none;">
+    <div class="modal-content" style="border-radius: 16px; padding: 30px; max-width: 380px;">
+        <div class="modal-title" style="font-size: 1.3rem; font-weight: 700; color: #111b21; margin-bottom: 8px; text-align: left;">Nova Conversa</div>
+        <div class="modal-text" style="font-size: 0.9rem; color: #667781; margin-bottom: 20px; line-height: 1.4; text-align: left;">
+            Digite o número com DDD para iniciar uma conversa direta pelo WhatsApp.
+        </div>
+        <div style="margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px; text-align: left;">
+            <div>
+                <label for="new-chat-number" style="font-size: 0.8rem; font-weight: 600; color: #00a884; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Número do Celular</label>
+                <input type="text" id="new-chat-number" placeholder="Ex: 82 99999-8888" style="width: 100%; padding: 12px 14px; border: 1.5px solid #e1e9eb; border-radius: 10px; font-size: 15px; outline: none; box-sizing: border-box; transition: border-color 0.2s; color: #111b21; font-weight: 500;" onfocus="this.style.borderColor='#00a884'" onblur="this.style.borderColor='#e1e9eb'">
+            </div>
+            <div>
+                <label for="new-chat-name" style="font-size: 0.8rem; font-weight: 600; color: #667781; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Nome do Contato (Opcional)</label>
+                <input type="text" id="new-chat-name" placeholder="Ex: João da Silva" style="width: 100%; padding: 12px 14px; border: 1.5px solid #e1e9eb; border-radius: 10px; font-size: 15px; outline: none; box-sizing: border-box; transition: border-color 0.2s; color: #111b21; font-weight: 500;" onfocus="this.style.borderColor='#00a884'" onblur="this.style.borderColor='#e1e9eb'">
+            </div>
+        </div>
+        <div class="modal-buttons" style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn-modal btn-cancel" onclick="closeNewChatModal()" style="background: #f0f2f5; color: #54656f; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s;">Cancelar</button>
+            <button class="btn-modal" onclick="confirmNewChat()" style="background: #00a884; color: white; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#008f72'" onmouseout="this.style.background='#00a884'">Iniciar Conversa</button>
+        </div>
+    </div>
+</div>
+
 <div id="qr-overlay" style="display: flex;">
     <h2 id="status-text">Iniciando...</h2>
     <img id="qr-img" src="" alt="QR Code" style="width: 250px; margin: 20px; display: none;">
 </div>
 <div id="sidebar">
     <div id="sidebar-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
-        <span style="font-size: 16px;">Conversas</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px; font-weight: 600; color: #111b21;">Conversas</span>
+            <button id="btn-new-chat" onclick="openNewChatModal()" title="Nova Conversa" style="background: none; border: none; color: #00a884; cursor: pointer; font-size: 1.25rem; padding: 2px 4px; outline: none; transition: transform 0.2s; display: flex; align-items: center;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><i class="fa-solid fa-circle-plus"></i></button>
+        </div>
         <div style="display: flex; align-items: center; gap: 8px;">
             <div id="status-badge" style="width: 10px; height: 10px; border-radius: 50%; background: #ccc; display: none; box-shadow: 0 0 5px rgba(0,0,0,0.2);"></div>
             <select id="caixa-select" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 12px; background: #f0f2f5; font-weight: bold; cursor: pointer; outline: none; transition: all 0.2s;">
@@ -222,6 +248,7 @@
     let mediaRecorder;
     let audioChunks = [];
     let tabAtiva = false; // Controla se a aba do Zap está visível no Admin
+    let lastRenderedDateLabel = null; // Rastreia o rótulo da última data renderizada no chat atual
 
     // Ouve mensagens do painel pai (Admin)
     window.addEventListener('message', (event) => {
@@ -500,6 +527,7 @@
     function openChat(jid) {
         currentJid = jid;
         localStorage.setItem('zap_current_jid', jid);
+        lastRenderedDateLabel = null; // Reseta o rastreador de data para esta nova conversa
         // O contador some ao selecionar o chat no sidebar, mas apenas se a aba estiver ativa
         if (chatData[jid]) { 
             if (tabAtiva) {
@@ -530,8 +558,52 @@
         updateChatList();
         scrollToBottom();
     }
+    function formatDateLabel(date) {
+        const today = new Date();
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+        
+        const isSameDay = (d1, d2) => 
+            d1.getDate() === d2.getDate() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getFullYear() === d2.getFullYear();
+            
+        if (isSameDay(date, today)) {
+            return 'HOJE';
+        } else if (isSameDay(date, yesterday)) {
+            return 'ONTEM';
+        } else {
+            return date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+    }
+
+    function renderDateHeader(dateStr) {
+        const messagesDiv = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.className = 'date-header-bubble';
+        div.style.display = 'flex';
+        div.style.justifyContent = 'center';
+        div.style.margin = '15px 0';
+        div.style.position = 'sticky';
+        div.style.top = '10px';
+        div.style.zIndex = '5';
+        
+        div.innerHTML = '<span style="background: rgba(255, 255, 255, 0.9); color: #54656f; font-size: 0.72rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; box-shadow: 0 1px 1.5px rgba(11,20,26,.08); text-transform: uppercase; letter-spacing: 0.5px; border: 1.5px solid #e1e9eb;">' + dateStr + '</span>';
+        
+        messagesDiv.appendChild(div);
+    }
+
     function renderMessage(msg) {
         if (document.getElementById('msg-' + msg.id)) return;
+        
+        // Verifica e renderiza o separador de data correspondente à mensagem
+        const msgDate = msg.timestamp ? new Date(msg.timestamp) : new Date();
+        const dateStr = formatDateLabel(msgDate);
+        if (dateStr !== lastRenderedDateLabel) {
+            renderDateHeader(dateStr);
+            lastRenderedDateLabel = dateStr;
+        }
+
         const div = document.createElement('div');
         div.id = 'msg-' + msg.id;
         div.className = 'msg ' + (msg.fromMe ? 'msg-enviada' : 'msg-recebida');
@@ -739,6 +811,128 @@
                 fecharImagem();
             };
         }
+    }
+
+    function openNewChatModal() {
+        const modal = document.getElementById('modal-new-chat');
+        const numInput = document.getElementById('new-chat-number');
+        const nameInput = document.getElementById('new-chat-name');
+        if (modal) {
+            modal.style.display = 'flex';
+            if (numInput) {
+                numInput.value = '';
+                numInput.focus();
+            }
+            if (nameInput) nameInput.value = '';
+        }
+    }
+
+    function closeNewChatModal() {
+        const modal = document.getElementById('modal-new-chat');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function confirmNewChat() {
+        const numInput = document.getElementById('new-chat-number');
+        const nameInput = document.getElementById('new-chat-name');
+        if (!numInput) return;
+        
+        let number = numInput.value.replace(/\D/g, '');
+        if (!number) {
+            alert('Por favor, digite um número de WhatsApp válido.');
+            return;
+        }
+        
+        // Remove zero à esquerda (ex: 082999998888 -> 82999998888)
+        if (number.startsWith('0')) {
+            number = number.substring(1);
+        }
+        
+        // Se tiver 10 ou 11 dígitos, assume 55 (Brasil)
+        if (number.length <= 11) {
+            number = '55' + number;
+        }
+        
+        // Adiciona um estado visual de carregando no botão
+        const btn = document.querySelector('#modal-new-chat .btn-modal:not(.btn-cancel)');
+        const originalText = btn.innerText;
+        btn.innerText = 'Validando...';
+        btn.disabled = true;
+        
+        // Consulta o backend para obter o JID exato/registrado no WhatsApp
+        fetch('/api/resolve-number/' + number)
+            .then(res => res.json())
+            .then(data => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                
+                if (!data.exists && !data.estimated) {
+                    if (!confirm('Aviso: Este número não parece estar registrado no WhatsApp. Deseja tentar iniciar a conversa mesmo assim?')) {
+                        return;
+                    }
+                }
+                
+                const jid = data.jid || (number + '@s.whatsapp.net');
+                const name = nameInput.value.trim() || number;
+                
+                // Fecha o modal
+                closeNewChatModal();
+                
+                // Inicia a conversa
+                if (chatData[jid]) {
+                    // Se já existir na lista, apenas abre
+                    openChat(jid);
+                } else {
+                    // Cria um chat temporário localmente
+                    chatData[jid] = {
+                        name: name,
+                        messages: [],
+                        unreadCount: 0,
+                        lastUpdate: Date.now(),
+                        atendimentoManual: true
+                    };
+                    
+                    // Avisa o servidor via socket para persistir o atendimento manual
+                    socket.emit('toggle_atendimento', { jid: jid, status: true });
+                    
+                    // Notifica renomeação do chat se foi fornecido um nome personalizado
+                    if (nameInput.value.trim()) {
+                        socket.emit('rename_chat', { jid: jid, name: name });
+                    }
+                    
+                    // Re-renderiza a lista de conversas e abre o chat
+                    updateChatList();
+                    openChat(jid);
+                }
+            })
+            .catch(err => {
+                console.error('Erro ao resolver JID:', err);
+                btn.innerText = originalText;
+                btn.disabled = false;
+                
+                // Fallback em caso de falha da API
+                const jid = number + '@s.whatsapp.net';
+                const name = nameInput.value.trim() || number;
+                closeNewChatModal();
+                
+                if (chatData[jid]) {
+                    openChat(jid);
+                } else {
+                    chatData[jid] = {
+                        name: name,
+                        messages: [],
+                        unreadCount: 0,
+                        lastUpdate: Date.now(),
+                        atendimentoManual: true
+                    };
+                    socket.emit('toggle_atendimento', { jid: jid, status: true });
+                    if (nameInput.value.trim()) {
+                        socket.emit('rename_chat', { jid: jid, name: name });
+                    }
+                    updateChatList();
+                    openChat(jid);
+                }
+            });
     }
 </script>
 </body>
