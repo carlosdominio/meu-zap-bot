@@ -179,6 +179,11 @@ app.get('/api/chats', (req, res) => {
     res.json(list);
 });
 
+app.get('/api/debug-db', (req, res) => {
+    if (!db) return res.status(500).json({ error: 'DB não inicializado' });
+    res.json(db.value());
+});
+
 app.post('/api/chats/:jid/hide', async (req, res) => {
     if (!db) return res.status(500).json({ error: 'DB não inicializado' });
     const rawJid = req.params.jid;
