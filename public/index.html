@@ -184,6 +184,18 @@
     </div>
 </div>
 
+<div id="modal-alert-chat" class="modal-overlay" style="z-index: 4000; display:none;">
+    <div class="modal-content" style="border-radius: 16px; padding: 30px; max-width: 380px;">
+        <div class="modal-title" style="font-size: 1.3rem; font-weight: 700; color: #111b21; margin-bottom: 8px; text-align: center;">Atenção</div>
+        <div class="modal-text" style="font-size: 0.95rem; color: #667781; margin-bottom: 24px; line-height: 1.5; text-align: center;">
+            Este número já possui uma conversa em andamento. Clique abaixo para ser redirecionado para a janela existente.
+        </div>
+        <div class="modal-buttons" style="justify-content: center; width: 100%;">
+            <button class="btn-modal" id="btn-alert-chat-ok" style="background:#00a884; color:white; width: 100%; padding: 12px; font-weight: 600; border-radius: 10px;">Ir para a conversa</button>
+        </div>
+    </div>
+</div>
+
 <div id="modal-new-chat" class="modal-overlay" style="z-index: 3000; display: none;">
     <div class="modal-content" style="border-radius: 16px; padding: 30px; max-width: 380px;">
         <div class="modal-title" style="font-size: 1.3rem; font-weight: 700; color: #111b21; margin-bottom: 8px; text-align: left;">Nova Conversa</div>
@@ -1053,6 +1065,18 @@
         if (modal) modal.style.display = 'none';
     }
 
+    function showAlertChatModal(jid) {
+        const modal = document.getElementById('modal-alert-chat');
+        const btn = document.getElementById('btn-alert-chat-ok');
+        if (modal && btn) {
+            btn.onclick = () => {
+                modal.style.display = 'none';
+                openChat(jid);
+            };
+            modal.style.display = 'flex';
+        }
+    }
+
     function confirmNewChat() {
         const numInput = document.getElementById('new-chat-number');
         const nameInput = document.getElementById('new-chat-name');
@@ -1102,9 +1126,8 @@
                 // Checa se o contato já existe com o JID ou seu contraparte (8/9 dígito)
                 const existingJid = resolveLocalChatJid(jid);
                 if (chatData[existingJid]) {
-                    // Se já existir na lista (mesmo que com JID ligeiramente diferente), apenas abre
-                    showToast('Este número já possui uma conversa em andamento. Redirecionando para o chat existente!', 'info');
-                    openChat(existingJid);
+                    // Se já existir na lista (mesmo que com JID ligeiramente diferente)
+                    showAlertChatModal(existingJid);
                 } else {
                     // Cria um chat temporário localmente com o JID normalizado/resolvido
                     chatData[existingJid] = {
@@ -1140,8 +1163,7 @@
                 
                 const existingJid = resolveLocalChatJid(jid);
                 if (chatData[existingJid]) {
-                    showToast('Este número já possui uma conversa em andamento. Redirecionando para o chat existente!', 'info');
-                    openChat(existingJid);
+                    showAlertChatModal(existingJid);
                 } else {
                     chatData[existingJid] = {
                         name: name,
