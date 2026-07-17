@@ -160,8 +160,9 @@ app.get('/qr', (req, res) => {
 app.get('/api/chats', (req, res) => {
     if (!db) return res.status(500).json({ error: 'DB não inicializado' });
     const chats = db.get('chats').value() || {};
+    const includeHidden = req.query.include_hidden === 'true' || req.query.all === 'true';
     const list = Object.keys(chats)
-        .filter(jid => !chats[jid].hidden)
+        .filter(jid => includeHidden || !chats[jid].hidden)
         .map(jid => ({
             jid,
             name: chats[jid].name || jid.split('@')[0],
@@ -169,6 +170,7 @@ app.get('/api/chats', (req, res) => {
             unreadCount: chats[jid].unreadCount || 0,
             estado: chats[jid].estado || 'normal',
             lastUpdate: chats[jid].lastUpdate || 0,
+            hidden: !!chats[jid].hidden,
             lastMessage: chats[jid].messages && chats[jid].messages.length > 0 
                 ? chats[jid].messages[chats[jid].messages.length - 1].text 
                 : ""
@@ -180,11 +182,18 @@ app.get('/api/chats', (req, res) => {
 app.post('/api/chats/:jid/hide', async (req, res) => {
     if (!db) return res.status(500).json({ error: 'DB não inicializado' });
     const jid = req.params.jid;
+    const unhide = req.query.unhide === 'true';
+    const hidden = unhide ? false : (req.body && typeof req.body.hidden !== 'undefined' ? req.body.hidden : true);
+
     const chats = db.get('chats').value() || {};
     if (chats[jid]) {
-        chats[jid].hidden = true;
+        chats[jid].hidden = hidden;
         await db.set('chats', chats).write();
-        io.emit('chat_hidden', jid);
+        if (hidden) {
+            io.emit('chat_hidden', jid);
+        } else {
+            io.emit('chat_unhidden', jid);
+        }
         res.json({ success: true });
     } else {
         res.status(404).json({ error: 'Chat não encontrado' });
@@ -1045,13 +1054,20 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('hide_chat', async (jid) => {
+    socket.on('hide_chat', async (data) => {
         if (db) {
+            const jid = typeof data === 'string' ? data : data.jid;
+            const hidden = typeof data === 'object' && typeof data.hidden !== 'undefined' ? data.hidden : true;
+            
             const chats = db.get('chats').value() || {};
             if (chats[jid]) {
-                chats[jid].hidden = true;
+                chats[jid].hidden = hidden;
                 await db.set('chats', chats).write();
-                io.emit('chat_hidden', jid);
+                if (hidden) {
+                    io.emit('chat_hidden', jid);
+                } else {
+                    io.emit('chat_unhidden', jid);
+                }
             }
         }
     });
