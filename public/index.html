@@ -9,7 +9,7 @@
         body { background: #d1d7db; height: 100vh; display: flex; overflow: hidden; }
         body.no-scroll { overflow: hidden !important; }
         #sidebar { width: 350px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; height: 100vh; }
-        #sidebar-header { background: #008069; color: white; padding: 15px; font-weight: bold; border-bottom: 1px solid #005a4a; }
+        #sidebar-header { background: #f0f2f5; color: #111b21; padding: 15px; font-weight: bold; border-bottom: 1px solid #ddd; }
         #chat-list { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #00a884 transparent; }
         #chat-list::-webkit-scrollbar { width: 6px; }
         #chat-list::-webkit-scrollbar-thumb { background: #00a884; border-radius: 10px; }
@@ -27,7 +27,7 @@
         .btn-del-chat { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; padding: 5px; opacity: 0.7; transition: transform 0.2s; }
         .btn-del-chat:hover { transform: scale(1.2); opacity: 1; }
         #main-chat { flex: 1; min-height: 0; display: flex; flex-direction: column; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: #efeae2; position: relative; }      
-        #chat-header { background: #008069; color: white; padding: 10px 20px; border-bottom: 1px solid #005a4a; height: 60px; display: flex; align-items: center; font-weight: bold; }
+        #chat-header { background: #f0f2f5; color: #111b21; padding: 10px 20px; border-bottom: 1px solid #ddd; height: 60px; display: flex; align-items: center; font-weight: bold; }
         #messages { flex: 1; min-height: 0; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scrollbar-width: thin; scrollbar-color: #00a884 transparent; }
         #messages::-webkit-scrollbar { width: 6px; }
         #messages::-webkit-scrollbar-thumb { background: #00a884; border-radius: 10px; }
@@ -149,7 +149,7 @@
             <span id="header-human-badge" style="display: none; font-size: 10px; background: #f39c12; color: white; padding: 2px 6px; border-radius: 4px; width: fit-content; margin-top: 2px; animation: pulse-human 2s infinite;">SOLICITAÇÃO DE ATENDIMENTO HUMANO</span>
         </div>
         <div id="human-control-toggle" style="display: none; align-items: center; gap: 8px;">
-            <span id="status-label" style="font-size: 12px; color: rgba(255,255,255,0.9);">Robô Ativo</span>
+            <span id="status-label" style="font-size: 12px; color: #54656f;">Robô Ativo</span>
             <label class="switch">
                 <input type="checkbox" id="human-toggle-input" onchange="toggleHumanControl(this.checked)">
                 <span class="slider round"></span>
@@ -320,6 +320,12 @@
         if (currentJid === jid) {
             const msgEl = document.getElementById('msg-' + id);
             if (msgEl) msgEl.remove();
+            
+            // Se todas as mensagens foram apagadas, mostra o aviso
+            const messagesDiv = document.getElementById('messages');
+            if (messagesDiv && messagesDiv.querySelectorAll('.msg').length === 0) {
+                messagesDiv.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #667781; font-size: 0.9rem; text-align: center; padding: 20px; font-style: italic;">Sem mensagens no histórico. Digite abaixo para iniciar!</div>';
+            }
         }
     });
 
@@ -511,10 +517,14 @@
         document.getElementById('header-human-badge').style.display = isManual ? 'block' : 'none';
         const messagesDiv = document.getElementById('messages');
         messagesDiv.innerHTML = '';
+        const uniqueMsgs = [];
         if (chatData[jid].messages) {
-            const uniqueMsgs = [];
             const ids = new Set();
             chatData[jid].messages.forEach(m => { if (!ids.has(m.id)) { ids.add(m.id); uniqueMsgs.push(m); } });
+        }
+        if (uniqueMsgs.length === 0) {
+            messagesDiv.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #667781; font-size: 0.9rem; text-align: center; padding: 20px; font-style: italic;">Sem mensagens no histórico. Digite abaixo para iniciar!</div>';
+        } else {
             uniqueMsgs.forEach(renderMessage);
         }
         updateChatList();
