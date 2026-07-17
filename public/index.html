@@ -581,14 +581,16 @@
         const messagesDiv = document.getElementById('messages');
         const div = document.createElement('div');
         div.className = 'date-header-bubble';
+        div.style.position = 'sticky';
+        div.style.top = '0';
+        div.style.zIndex = '10';
         div.style.display = 'flex';
         div.style.justifyContent = 'center';
-        div.style.margin = '15px 0';
-        div.style.position = 'sticky';
-        div.style.top = '10px';
-        div.style.zIndex = '5';
+        div.style.width = '100%';
+        div.style.margin = '10px 0';
+        div.style.pointerEvents = 'none';
         
-        div.innerHTML = '<span style="background: rgba(255, 255, 255, 0.9); color: #54656f; font-size: 0.72rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; box-shadow: 0 1px 1.5px rgba(11,20,26,.08); text-transform: uppercase; letter-spacing: 0.5px; border: 1.5px solid #e1e9eb;">' + dateStr + '</span>';
+        div.innerHTML = '<span style="pointer-events: auto; background: rgba(255, 255, 255, 0.95); color: #54656f; font-size: 0.72rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; box-shadow: 0 1px 1.5px rgba(11,20,26,.08); text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid #e1e9eb;">' + dateStr + '</span>';
         
         messagesDiv.appendChild(div);
     }
