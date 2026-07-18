@@ -593,6 +593,12 @@ app.post('/api/notify-delivery', async (req, res) => {
             if (resp.ok) {
                 const ped = await resp.json();
                 let possibleName = ped.cliente || ped.nome || ped.clienteNome || ped.cliente_nome || ped.name;
+                if (!possibleName && ped.observacao) {
+                    const obsMatch = ped.observacao.match(/(?:👤\s*Cliente|Cliente):\s*([^\n\r]+)/i);
+                    if (obsMatch && obsMatch[1]) {
+                        possibleName = obsMatch[1].trim();
+                    }
+                }
                 if (possibleName && typeof possibleName === 'object') {
                     possibleName = possibleName.nome || possibleName.name || '';
                 }
