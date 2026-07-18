@@ -779,7 +779,8 @@ app.post('/api/notify-admin', async (req, res) => {
 
     try {
         // Envia SEM delay humanizado (notificação de sistema deve ser imediata)
-        const s = await sock.sendMessage(jid, { text: mensagem });
+        const sendingJid = getSendingJid(jid);
+        const s = await sock.sendMessage(sendingJid, { text: mensagem });
 
         const msgObj = {
             id: s?.key?.id || ('adm-' + Date.now()),
@@ -829,12 +830,13 @@ let lastQr = null;
 async function sendHumanizedMessage(jid, content, options = {}) {
     if (!sock || statusConexao !== "CONECTADO") return;
     try {
-        await sock.sendPresenceUpdate('composing', jid);
+        const sendingJid = getSendingJid(jid);
+        await sock.sendPresenceUpdate('composing', sendingJid);
         let delay = 1500 + (Math.random() * 2000);
         if (content.text) delay += Math.min(content.text.length * 30, 5000);
         await new Promise(resolve => setTimeout(resolve, delay));
-        const result = await sock.sendMessage(jid, content, options);
-        await sock.sendPresenceUpdate('paused', jid);
+        const result = await sock.sendMessage(sendingJid, content, options);
+        await sock.sendPresenceUpdate('paused', sendingJid);
         return result;
     } catch (e) { throw e; }
 }
@@ -943,24 +945,47 @@ function findExistingChatJid(jid, chats) {
 
 async function saveJidMapping(phoneJid, lidJid) {
     if (!db || !phoneJid || !lidJid || phoneJid === lidJid) return;
+    const normPhone = normalizeJid(phoneJid);
+    const normLid = lidJid.trim();
+    
     const phoneToLid = db.get('phoneToLid').value() || {};
     const lidToPhone = db.get('lidToPhone').value() || {};
     
     let changed = false;
-    if (phoneToLid[phoneJid] !== lidJid) {
-        phoneToLid[phoneJid] = lidJid;
+    if (phoneToLid[normPhone] !== normLid) {
+        phoneToLid[normPhone] = normLid;
         changed = true;
     }
-    if (lidToPhone[lidJid] !== phoneJid) {
-        lidToPhone[lidJid] = phoneJid;
+    if (lidToPhone[normLid] !== normPhone) {
+        lidToPhone[normLid] = normPhone;
         changed = true;
     }
     
     if (changed) {
         await db.set('phoneToLid', phoneToLid).write();
         await db.set('lidToPhone', lidToPhone).write();
-        console.log(`🔗 [JID Mapping] Vinculado: ${phoneJid} ↔ ${lidJid}`);
+        console.log(`🔗 [JID Mapping] Vinculado: ${normPhone} ↔ ${normLid}`);
     }
+}
+
+function getSendingJid(jid) {
+    if (!jid) return jid;
+    const normalized = normalizeJid(jid);
+    
+    // Se for LID, ou grupo, ou transmissão, usa o próprio
+    if (normalized.endsWith('@lid') || normalized.includes('@g.us') || normalized.includes('@broadcast')) {
+        return normalized;
+    }
+    
+    if (db) {
+        const phoneToLid = db.get('phoneToLid').value() || {};
+        const counterpart = getCounterpartJid(normalized);
+        const mappedLid = phoneToLid[normalized] || (counterpart ? phoneToLid[counterpart] : null);
+        if (mappedLid && mappedLid !== 'undefined') {
+            return mappedLid;
+        }
+    }
+    return normalized;
 }
 
 async function mergeDuplicateChats() {
@@ -1239,9 +1264,10 @@ io.on('connection', (socket) => {
                     
                     try {
                         if (sock) {
-                            await sock.sendMessage(jid, {
+                            const sendingJid = getSendingJid(jid);
+                            await sock.sendMessage(sendingJid, {
                                 delete: {
-                                    remoteJid: jid,
+                                    remoteJid: sendingJid,
                                     fromMe: !!fromMe,
                                     id: id
                                 }
