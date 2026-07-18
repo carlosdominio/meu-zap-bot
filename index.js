@@ -1105,7 +1105,7 @@ async function mergeDuplicateChats() {
 
 
 async function saveMessage(jid, msg, name = "") {
-    if (!jid || jid.includes('@newsletter')) return;
+    if (!jid || jid.includes('@newsletter')) return false;
     const chats = db.get('chats').value() || {};
 
     // Garante que o timestamp de envio/recebimento existe no objeto da mensagem
@@ -1133,12 +1133,13 @@ async function saveMessage(jid, msg, name = "") {
 
     chats[targetJid].hidden = false; // Garante que a conversa reapareça se chegar ou for enviada uma nova mensagem
     chats[targetJid].lastUpdate = Date.now();
-    if (chats[targetJid].messages.some(m => m.id === msg.id)) return;
+    if (chats[targetJid].messages.some(m => m.id === msg.id)) return false;
 
     if (!msg.fromMe || isSelf) chats[targetJid].unreadCount = (chats[targetJid].unreadCount || 0) + 1;
     chats[targetJid].messages.push(msg);
     if (chats[targetJid].messages.length > 100) chats[targetJid].messages.shift();
     await db.set('chats', chats).write();
+    return true;
 }
 
 function isStoreOpen() {
@@ -1534,8 +1535,8 @@ async function connectToWhatsApp() {
             audioUrl
         };
         const targetJid = findExistingChatJid(jid, db.get('chats').value() || {});
-        await saveMessage(targetJid, msgObj, pushName);
-        io.emit('new_msg', { ...msgObj, jid: targetJid });
+        const wasNew = await saveMessage(targetJid, msgObj, pushName);
+        if (wasNew) io.emit('new_msg', { ...msgObj, jid: targetJid });
 
         if (fromMe) return;
 
@@ -1600,8 +1601,10 @@ async function connectToWhatsApp() {
             chatData.surveyPending = false;
             await db.set('chats', chats).write();
 
-            await sendHumanizedMessage(jid, { text: thanks });
-            await saveMessage(jid, { id: 'survey-thanks-' + Date.now(), text: thanks, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+            const s = await sendHumanizedMessage(jid, { text: thanks });
+            if (s) {
+                await saveMessage(jid, { id: s.key.id, text: thanks, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+            }
             return;
         }
 
@@ -1650,8 +1653,10 @@ async function connectToWhatsApp() {
                         chatData.estado = 'delivery';
                         await db.set('chats', chats).write();
 
-                        await sendHumanizedMessage(jid, { text: statusReply });
-                        await saveMessage(jid, { id: 'search-' + Date.now(), text: statusReply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+                        const s = await sendHumanizedMessage(jid, { text: statusReply });
+                        if (s) {
+                            await saveMessage(jid, { id: s.key.id, text: statusReply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+                        }
                         return; // Interrompe para não mostrar o menu logo abaixo
                     }
                 }
