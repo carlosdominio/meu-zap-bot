@@ -570,6 +570,62 @@ app.post('/api/notify-delivery', async (req, res) => {
 
     if (!targetJid || targetJid === 'undefined') return res.status(404).json({ error: 'JID não encontrado' });
 
+    // Captura o nome cadastrado no formulário (no corpo da requisição ou consultando a API do pedido)
+    let capturedName = req.body.nome || req.body.name || req.body.cliente || req.body.clienteNome;
+    
+    if (capturedName && typeof capturedName === 'object') {
+        capturedName = capturedName.nome || capturedName.name || capturedName.cliente || null;
+    }
+    
+    if (capturedName && typeof capturedName === 'string') {
+        capturedName = capturedName.trim();
+        const cleanName = capturedName.replace(/\D/g, '');
+        if (cleanName && cleanName.length >= 8 && (targetJid.includes(cleanName) || cleanName.includes(targetJid.split('@')[0]))) {
+            capturedName = null;
+        }
+    } else {
+        capturedName = null;
+    }
+
+    if (!capturedName && pedidoId) {
+        try {
+            const resp = await fetch(`${DELIVERY_API_URL}/${pedidoId}`);
+            if (resp.ok) {
+                const ped = await resp.json();
+                let possibleName = ped.cliente || ped.nome || ped.clienteNome || ped.cliente_nome || ped.name;
+                if (possibleName && typeof possibleName === 'object') {
+                    possibleName = possibleName.nome || possibleName.name || '';
+                }
+                if (possibleName && typeof possibleName === 'string' && possibleName.trim()) {
+                    possibleName = possibleName.trim();
+                    const cleanName = possibleName.replace(/\D/g, '');
+                    if (!(cleanName && cleanName.length >= 8 && (targetJid.includes(cleanName) || cleanName.includes(targetJid.split('@')[0])))) {
+                        capturedName = possibleName;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error(`⚠️ [Delivery] Erro ao buscar nome do cliente para Pedido #${pedidoId}:`, e.message);
+        }
+    }
+
+    if (capturedName && typeof capturedName === 'string') {
+        const lowerName = capturedName.toLowerCase();
+        if (lowerName === 'cliente' || lowerName === 'visitante' || lowerName === 'usuario') {
+            capturedName = null;
+        }
+    }
+
+    if (db && capturedName) {
+        if (!chats[targetJid]) {
+            chats[targetJid] = { name: capturedName, messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
+        } else {
+            chats[targetJid].name = capturedName;
+        }
+        await db.set('chats', chats).write();
+        console.log(`👤 [Delivery] Nome do cliente atualizado para: "${capturedName}" (Pedido #${pedidoId})`);
+    }
+
     // 3. Categorias e Deduplicação (Apenas Verificação Inicial)
     let currentCat = null;
     if (db) {
@@ -1571,7 +1627,9 @@ async function connectToWhatsApp() {
             const closedMsg = (btexts.store_closed || "Olá! Estamos fechados.").split('{nome}').join(pushName || '');
             const s = await sendHumanizedMessage(jid, { text: closedMsg });
             if (s) {
-                await saveMessage(jid, { id: s.key.id, text: closedMsg, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+                const rObj = { id: s.key.id, text: closedMsg, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" };
+                await saveMessage(jid, rObj, "Robo");
+                io.emit('new_msg', { jid, ...rObj });
             }
             return;
         }
@@ -1603,7 +1661,9 @@ async function connectToWhatsApp() {
 
             const s = await sendHumanizedMessage(jid, { text: thanks });
             if (s) {
-                await saveMessage(jid, { id: s.key.id, text: thanks, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+                const rObj = { id: s.key.id, text: thanks, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" };
+                await saveMessage(jid, rObj, "Robo");
+                io.emit('new_msg', { jid, ...rObj });
             }
             return;
         }
@@ -1620,7 +1680,12 @@ async function connectToWhatsApp() {
                 await db.set('chats', chats).write();
                 
                 const richWelcome = `Olá ${pushName}! 👋\n\n🛍️ *PEDIDO RECEBIDO COM SUCESSO!*\n\nObrigado por escolher o *GuGA Bebidas*. Seu pedido *#${pId}* já caiu em nosso sistema e está na fila de preparo! 🚀\n\n💡 *O que acontece agora?*\nAssim que seu pedido for para a entrega, você será notificado aqui no Zap!\n\n👇 *Opções:* \n1️⃣ - Ver Status Atual 🛵\n2️⃣ - Falar com Atendente 👨‍💻`;
-                await sendHumanizedMessage(jid, { text: richWelcome });
+                const s = await sendHumanizedMessage(jid, { text: richWelcome });
+                if (s) {
+                    const rObj = { id: s.key.id, text: richWelcome, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" };
+                    await saveMessage(jid, rObj, "Robo");
+                    io.emit('new_msg', { jid, ...rObj });
+                }
                 return;
             }
         }
@@ -1655,7 +1720,9 @@ async function connectToWhatsApp() {
 
                         const s = await sendHumanizedMessage(jid, { text: statusReply });
                         if (s) {
-                            await saveMessage(jid, { id: s.key.id, text: statusReply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+                            const rObj = { id: s.key.id, text: statusReply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" };
+                            await saveMessage(jid, rObj, "Robo");
+                            io.emit('new_msg', { jid, ...rObj });
                         }
                         return; // Interrompe para não mostrar o menu logo abaixo
                     }
@@ -1712,7 +1779,11 @@ async function connectToWhatsApp() {
             await db.set('chats', chats).write();
             
             const s = await sendHumanizedMessage(jid, { text: reply });
-            await saveMessage(jid, { id: s.key.id, text: reply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+            if (s) {
+                const rObj = { id: s.key.id, text: reply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" };
+                await saveMessage(jid, rObj, "Robo");
+                io.emit('new_msg', { jid, ...rObj });
+            }
             return;
         }
 
@@ -1886,7 +1957,11 @@ async function connectToWhatsApp() {
 
         if (reply) {
             const s = await sendHumanizedMessage(jid, { text: reply });
-            await saveMessage(jid, { id: s.key.id, text: reply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" }, "Robo");
+            if (s) {
+                const rObj = { id: s.key.id, text: reply, fromMe: true, time: getFormattedTime(), sender: sock.user.id, pushName: "Robô 🤖" };
+                await saveMessage(jid, rObj, "Robo");
+                io.emit('new_msg', { jid, ...rObj });
+            }
         }
     });
 }
