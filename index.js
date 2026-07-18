@@ -1108,9 +1108,9 @@ async function saveMessage(jid, msg, name = "") {
 
     chats[targetJid].hidden = false; // Garante que a conversa reapareça se chegar ou for enviada uma nova mensagem
     chats[targetJid].lastUpdate = Date.now();
-    if (!msg.fromMe || isSelf) chats[targetJid].unreadCount = (chats[targetJid].unreadCount || 0) + 1;
-
     if (chats[targetJid].messages.some(m => m.id === msg.id)) return;
+
+    if (!msg.fromMe || isSelf) chats[targetJid].unreadCount = (chats[targetJid].unreadCount || 0) + 1;
     chats[targetJid].messages.push(msg);
     if (chats[targetJid].messages.length > 100) chats[targetJid].messages.shift();
     await db.set('chats', chats).write();
