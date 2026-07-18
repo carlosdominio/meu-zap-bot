@@ -806,7 +806,7 @@ app.post('/api/notify-admin', async (req, res) => {
             chats[jid].name = 'Notificações Meu zap 🔔 🤖';
             chats[jid].isSystemNotification = true;
             chats[jid].lastUpdate = Date.now();
-            chats[jid].unreadCount = 0; // Notificações do sistema não incrementam não-lidas
+            chats[jid].unreadCount = (chats[jid].unreadCount || 0) + 1;
             if (!chats[jid].messages) chats[jid].messages = [];
             chats[jid].messages.push(msgObj);
             if (chats[jid].messages.length > 100) chats[jid].messages.shift();
@@ -1108,7 +1108,7 @@ async function saveMessage(jid, msg, name = "") {
 
     chats[targetJid].hidden = false; // Garante que a conversa reapareça se chegar ou for enviada uma nova mensagem
     chats[targetJid].lastUpdate = Date.now();
-    if (!msg.fromMe && !isSelf && !chats[targetJid].isSystemNotification) chats[targetJid].unreadCount = (chats[targetJid].unreadCount || 0) + 1;
+    if (!msg.fromMe || isSelf) chats[targetJid].unreadCount = (chats[targetJid].unreadCount || 0) + 1;
 
     if (chats[targetJid].messages.some(m => m.id === msg.id)) return;
     chats[targetJid].messages.push(msg);
