@@ -625,11 +625,11 @@ app.post('/api/notify-delivery', async (req, res) => {
     if (db && capturedName) {
         if (!chats[targetJid]) {
             chats[targetJid] = { name: capturedName, messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'delivery', activePedidoId: pedidoId };
-        } else {
+        } else if (!chats[targetJid].isOfficialName) {
             chats[targetJid].name = capturedName;
         }
         await db.set('chats', chats).write();
-        console.log(`👤 [Delivery] Nome do cliente atualizado para: "${capturedName}" (Pedido #${pedidoId})`);
+        console.log(`👤 [Delivery] Nome do cliente atualizado para: "${chats[targetJid].name}" (Pedido #${pedidoId})`);
     }
 
     // 3. Categorias e Deduplicação (Apenas Verificação Inicial)
@@ -1190,7 +1190,16 @@ async function saveMessage(jid, msg, name = "") {
     } else if (chats[targetJid].isSystemNotification) {
         // Trava o nome se for o número de notificações
     } else if (name && name !== "Voce" && name !== "Robo") {
-        chats[targetJid].name = name;
+        const cleanName = name.replace(/\D/g, '');
+        const isPhone = cleanName && cleanName.length >= 8;
+        if (!isPhone) {
+            chats[targetJid].name = name;
+            chats[targetJid].isOfficialName = true;
+        } else {
+            if (!chats[targetJid].name || chats[targetJid].name === targetJid.split('@')[0]) {
+                chats[targetJid].name = name;
+            }
+        }
     }
 
     chats[targetJid].hidden = false; // Garante que a conversa reapareça se chegar ou for enviada uma nova mensagem
@@ -1396,9 +1405,10 @@ io.on('connection', (socket) => {
             const chats = db.get('chats').value() || {};
             const jid = findExistingChatJid(rawJid, chats);
             if (!chats[jid]) {
-                chats[jid] = { name: name, messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'normal' };
+                chats[jid] = { name: name, messages: [], unreadCount: 0, lastUpdate: Date.now(), estado: 'normal', isOfficialName: true };
             } else {
                 chats[jid].name = name;
+                chats[jid].isOfficialName = true;
             }
             chats[jid].isSystemNotification = true;
             await db.set('chats', chats).write();
